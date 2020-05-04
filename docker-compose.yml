@@ -1,7 +1,7 @@
-version: "3.3"
-
+version: "3"
 services:
   mongo:
+    restart: always
     image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -9,6 +9,7 @@ services:
     ports:
       - 27017:27017
   mongo-express:
+    restart: always
     image: mongo-express
     ports:
       - 8081:8081
@@ -17,3 +18,6 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
     depends_on:
       - mongo
+  redis:
+    restart: always
+    image: redis
