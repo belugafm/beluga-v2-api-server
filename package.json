@@ -6,8 +6,12 @@
     "dependencies": {
         "@types/mongodb": "^3.5.14",
         "@types/node": "^13.13.4",
+        "cookie": "^0.4.1",
+        "find-my-way": "^3.0.0",
         "mongodb": "^3.5.7",
+        "qs": "^6.9.4",
         "ts-node": "^8.10.1",
+        "turbo-http": "^0.3.2",
         "typescript": "^3.8.3"
     },
     "devDependencies": {
