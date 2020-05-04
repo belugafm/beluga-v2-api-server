@@ -1,10 +1,13 @@
 {
     "extends": ["eslint:recommended"],
     "plugins": [],
-    "parserOptions": {},
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2017
+    },
     "env": {
         "browser": true,
-        "es6": true
+        "node": true
     },
     "globals": {},
     "rules": {}
