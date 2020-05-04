@@ -119,8 +119,7 @@ class Responce {
 }
 
 const make_stack_array = (stack_str) => {
-    components = stack_str.split("\n")
-    return components
+    return stack_str.split("\n")
 }
 
 class TurboServer {

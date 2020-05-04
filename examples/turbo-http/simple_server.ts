@@ -26,6 +26,7 @@ MongoClient.connect(uri)
             client
         )
         server.listen(8080)
+        // localhost:8080にアクセスすると上のdefaultRouteが表示される
     })
     .catch((reason) => {
         console.log(reason)
