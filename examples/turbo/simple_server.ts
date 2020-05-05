@@ -1,4 +1,4 @@
-import { TurboServer } from "../../app/turbo"
+import { TurboServer, Request, Response } from "../../app/turbo"
 import { MongoClient } from "mongodb"
 
 // 先にdocker-compose upしておく
@@ -9,7 +9,7 @@ MongoClient.connect(uri)
         const server = new TurboServer(
             {
                 maxParamLength: 128,
-                defaultRoute: (req: any, res: any) => {
+                defaultRoute: (req: Request, res: Response) => {
                     res.setHeader("Content-Type", "application/json")
                     res.statusCode = 404
                     res.write(
@@ -25,8 +25,19 @@ MongoClient.connect(uri)
             },
             client
         )
+        server.get("/", async (req, res, params) => {
+            return {
+                ok: true,
+                message: "index page",
+            }
+        })
+        server.get("/hoge", async (req, res, params) => {
+            return {
+                ok: true,
+                message: "hoge page",
+            }
+        })
         server.listen(8080)
-        // localhost:8080にアクセスすると上のdefaultRouteが表示される
     })
     .catch((reason) => {
         console.log(reason)
