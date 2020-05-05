@@ -27,8 +27,8 @@ MongoClient.connect(uri)
             const { body } = req
             return {
                 ok: true,
-                user_name: body["user_name"],
-                password: body["password"],
+                user_name: body.user_name,
+                password: body.password,
                 files: body.files.length,
             }
         })
