@@ -24,9 +24,10 @@ MongoClient.connect(uri)
         )
         server.post("/upload", async (req, res, params) => {
             const { body } = req
-            console.log(body)
             return {
                 ok: true,
+                user_name: body["user_name"],
+                password: body["password"],
             }
         })
         console.log(server.router.routes)
