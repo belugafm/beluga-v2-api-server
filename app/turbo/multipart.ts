@@ -6,9 +6,9 @@ interface FormData {
 }
 
 function parse(body_buffer: Buffer, boundary: string): FormData[] {
-    let lastline = ""
-    let header = ""
-    let info = ""
+    let last_line = ""
+    let content_disposition = ""
+    let conent_type = undefined
     let state = 0
     let buffer = []
     const ret: FormData[] = []
@@ -17,81 +17,88 @@ function parse(body_buffer: Buffer, boundary: string): FormData[] {
         const prev_byte = k > 0 ? body_buffer[k - 1] : null
         const newline_detected =
             byte === 0x0a && prev_byte === 0x0d ? true : false
-        const newline_char = byte === 0x0a || byte === 0x0d ? true : false
-        if (newline_char === false) {
-            lastline += String.fromCharCode(byte)
+        const is_newline_char = byte === 0x0a || byte === 0x0d ? true : false
+        if (is_newline_char === false) {
+            last_line += String.fromCharCode(byte)
         }
-        if (0 === state && newline_detected) {
-            if ("--" + boundary === lastline) {
+        if (state === 0 && newline_detected) {
+            if ("--" + boundary === last_line) {
                 state = 1
             }
-            lastline = ""
-        } else if (1 === state && newline_detected) {
-            header = lastline
+            last_line = ""
+        } else if (state === 1 && newline_detected) {
+            content_disposition = last_line
+            // input typeがtextやpasswordのときは↓
+            // Content-Disposition: form-data; name="hoge
+            // input typeがfileのときは↓
+            // Content-Disposition: orm-data; name="hoge"; filename="beluga.jpg"
+            // のようになっている
             state = 2
-            if (header.indexOf("filename") === -1) {
+            if (content_disposition.indexOf("filename") === -1) {
                 state = 3
             }
-            lastline = ""
-        } else if (2 === state && newline_detected) {
-            info = lastline
+            last_line = ""
+        } else if (state === 2 && newline_detected) {
+            conent_type = last_line
             state = 3
-            lastline = ""
-        } else if (3 === state && newline_detected) {
+            last_line = ""
+        } else if (state === 3 && newline_detected) {
             state = 4
             buffer = []
-            lastline = ""
-        } else if (4 === state) {
-            if (lastline.length > boundary.length + 4) lastline = "" // mem save
-            if ("--" + boundary === lastline) {
-                const j = buffer.length - lastline.length
-                const part = buffer.slice(0, j - 1)
-                const p = { header, info, part }
-                ret.push(process(p))
+            last_line = ""
+        } else if (state === 4) {
+            if (last_line.length > boundary.length + 4) {
+                last_line = ""
+            }
+            if (last_line === "--" + boundary) {
+                // boundaryを除くデータを取得
+                const body_length = buffer.length - last_line.length
+                const bytes = buffer.slice(0, body_length - 1)
+                const part = { content_disposition, conent_type, bytes }
+                ret.push(process(part))
                 buffer = []
-                lastline = ""
+                last_line = ""
                 state = 5
-                header = ""
-                info = ""
+                content_disposition = ""
+                conent_type = undefined
             } else {
                 buffer.push(byte)
             }
-            if (newline_detected) lastline = ""
-        } else if (5 === state) {
-            if (newline_detected) state = 1
+            if (newline_detected) {
+                last_line = ""
+            }
+        } else if (state === 5) {
+            if (newline_detected) {
+                state = 1
+            }
         }
     }
     return ret
 }
 
 function process(part: {
-    header: string
-    info: string
-    part: number[]
+    content_disposition: string
+    conent_type: string | undefined
+    bytes: number[]
 }): FormData {
-    const obj = function (str: string) {
-        const k = str.split("=")
-        const a = k[0].trim()
-        const b = JSON.parse(k[1].trim())
-        const o = {}
-        Object.defineProperty(o, a, {
-            value: b,
-            writable: true,
-            enumerable: true,
-            configurable: true,
-        })
-        return o
-    }
-    const header = part.header.split(";")
-    const name = header[1].split("=")[1].replace(/"/g, "")
-    const filename_data = header[2]
-    const data = new Buffer(part.part)
-    const type = part.info.split(":")[1].trim()
-    if (filename_data) {
-        const k = filename_data.split("=")
-        const a = k[0].trim()
-        console.log(a)
-        const filename = JSON.parse(k[1].trim())
+    const content_disposition = part.content_disposition.split(";")
+    // content_dispositionは以下のようになっている
+    // [
+    //   'Content-Disposition: form-data',
+    //   ' name="hoge"',
+    //   ' filename="beluga.jpg"'
+    // ]
+    console.log(content_disposition)
+    console.log(part.conent_type)
+    const name = content_disposition[1].split("=")[1].replace(/"/g, "") // 送信時のformのinputタグのname属性
+    const data = new Buffer(part.bytes)
+    const type = part.conent_type
+        ? part.conent_type.split(":")[1].trim()
+        : undefined
+    const filename_field = content_disposition[2]
+    if (filename_field) {
+        const raw_filename = filename_field.split("=")[1]
+        const filename = JSON.parse(raw_filename.trim())
         return {
             name,
             filename,

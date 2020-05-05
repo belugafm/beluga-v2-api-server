@@ -12,7 +12,6 @@ export class Request {
     constructor(req: turbo.Request) {
         this._req = req
         Object.assign(this, req)
-        console.log(this)
         this.headers = convert_raw_headers_to_dict(req._options.headers)
         this.cookies = this.headers["cookie"]
             ? cookie.parse(this.headers["cookie"])
@@ -28,9 +27,9 @@ export class Request {
 
 export class Response {
     _res: turbo.Response
+    statusCode: number = -1
     constructor(res: turbo.Response) {
         Object.assign(this, res)
-        console.log(this)
         this._res = res
     }
     end() {
@@ -55,6 +54,7 @@ export class Response {
 export function read_body(req: Request) {
     return new Promise((resolve, reject) => {
         const headers = req.headers ? req.headers : {}
+        console.log(headers)
         const chunks: Buffer[] = []
         req.onData((buffer, start, length) => {
             const body_chunk = buffer.slice(start, start + length)
@@ -66,6 +66,7 @@ export function read_body(req: Request) {
             try {
                 const data = Buffer.concat(chunks)
                 const content_type = headers["content-type"]
+                console.log(content_type)
                 if (content_type === "application/json") {
                     return resolve(JSON.parse(data.toString()))
                 }
@@ -76,16 +77,29 @@ export function read_body(req: Request) {
                 if (content_type.indexOf("multipart/form-data;") === 0) {
                     const boundary = content_type.split("boundary=")[1]
                     const items = multipart.parse(data, boundary)
-                    const ret: { [key: string]: Buffer | string } = {}
+                    const ret: { [key: string]: Buffer[] | string } = {}
+                    console.log(items)
                     items.forEach((item) => {
                         if (item.filename) {
+                            const list = ret[item.name]
                             // ファイルアップロードの場合バイナリデータを直接格納
-                            ret[item.name] = item.data
+                            if (Array.isArray(list)) {
+                                list.push(item.data)
+                            } else {
+                                ret[item.name] = [item.data]
+                            }
                         } else {
                             ret[item.name] = item.data.toString()
                         }
                     })
                     return resolve(ret)
+                }
+                if (content_type === "application/x-www-form-urlencoded") {
+                    reject(
+                        new Error(
+                            "Contenty-Typeが'application/x-www-form-urlencoded'になっています。フォームのデータを送信する場合はenctypeを'multipart/form-data'にしてください。"
+                        )
+                    )
                 }
                 reject(new Error("Content-Typeが不正です"))
             } catch (error) {
