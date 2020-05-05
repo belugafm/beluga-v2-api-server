@@ -54,7 +54,6 @@ export class Response {
 export function read_body(req: Request) {
     return new Promise((resolve, reject) => {
         const headers = req.headers ? req.headers : {}
-        console.log(headers)
         const chunks: Buffer[] = []
         req.onData((buffer, start, length) => {
             const body_chunk = buffer.slice(start, start + length)
@@ -66,7 +65,6 @@ export function read_body(req: Request) {
             try {
                 const buffer = Buffer.concat(chunks)
                 const content_type = headers["content-type"]
-                console.log(content_type)
                 if (content_type === "application/json") {
                     return resolve(JSON.parse(buffer.toString()))
                 }
@@ -78,7 +76,6 @@ export function read_body(req: Request) {
                     const boundary = content_type.split("boundary=")[1]
                     const items = multipart.parse(buffer, boundary)
                     const data: { [key: string]: Buffer[] | string } = {}
-                    console.log(items)
                     items.forEach((item) => {
                         if (item.filename) {
                             const list = data[item.name]
@@ -98,7 +95,6 @@ export function read_body(req: Request) {
                     const parts = buffer.toString().split("&")
                     const data: { [key: string]: string } = {}
                     parts.forEach((part) => {
-                        console.log(part)
                         const kv = part.split("=")
                         const key = kv[0]
                         const value = kv[1]

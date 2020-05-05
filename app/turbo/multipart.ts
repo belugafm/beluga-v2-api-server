@@ -88,8 +88,6 @@ function process(part: {
     //   ' name="hoge"',
     //   ' filename="beluga.jpg"'
     // ]
-    console.log(content_disposition)
-    console.log(part.conent_type)
     const name = content_disposition[1].split("=")[1].replace(/"/g, "") // 送信時のformのinputタグのname属性
     const data = new Buffer(part.bytes)
     const type = part.conent_type
