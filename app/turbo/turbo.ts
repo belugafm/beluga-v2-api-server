@@ -64,11 +64,11 @@ export function read_body(req: Request) {
         })
         req.onEnd(() => {
             try {
-                const data = Buffer.concat(chunks)
+                const buffer = Buffer.concat(chunks)
                 const content_type = headers["content-type"]
                 console.log(content_type)
                 if (content_type === "application/json") {
-                    return resolve(JSON.parse(data.toString()))
+                    return resolve(JSON.parse(buffer.toString()))
                 }
                 // multipart/form-dataの場合ヘッダは
                 // Content-Type: multipart/form-data; boundary=----XXXXXXXXXXXXX
@@ -76,30 +76,35 @@ export function read_body(req: Request) {
                 // XXXXXXXXXXXXXの部分がboundary
                 if (content_type.indexOf("multipart/form-data;") === 0) {
                     const boundary = content_type.split("boundary=")[1]
-                    const items = multipart.parse(data, boundary)
-                    const ret: { [key: string]: Buffer[] | string } = {}
+                    const items = multipart.parse(buffer, boundary)
+                    const data: { [key: string]: Buffer[] | string } = {}
                     console.log(items)
                     items.forEach((item) => {
                         if (item.filename) {
-                            const list = ret[item.name]
+                            const list = data[item.name]
                             // ファイルアップロードの場合バイナリデータを直接格納
                             if (Array.isArray(list)) {
                                 list.push(item.data)
                             } else {
-                                ret[item.name] = [item.data]
+                                data[item.name] = [item.data]
                             }
                         } else {
-                            ret[item.name] = item.data.toString()
+                            data[item.name] = item.data.toString()
                         }
                     })
-                    return resolve(ret)
+                    return resolve(data)
                 }
                 if (content_type === "application/x-www-form-urlencoded") {
-                    reject(
-                        new Error(
-                            "Contenty-Typeが'application/x-www-form-urlencoded'になっています。フォームのデータを送信する場合はenctypeを'multipart/form-data'にしてください。"
-                        )
-                    )
+                    const parts = buffer.toString().split("&")
+                    const data: { [key: string]: string } = {}
+                    parts.forEach((part) => {
+                        console.log(part)
+                        const kv = part.split("=")
+                        const key = kv[0]
+                        const value = kv[1]
+                        data[key] = value
+                    })
+                    return resolve(data)
                 }
                 reject(new Error("Content-Typeが不正です"))
             } catch (error) {
