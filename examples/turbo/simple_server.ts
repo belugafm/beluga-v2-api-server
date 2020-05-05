@@ -1,4 +1,4 @@
-import { TurboServer, Request, Response } from "../../app/turbo"
+import { TurboServer, Request, Response } from "../../app/web/turbo"
 import { MongoClient } from "mongodb"
 
 // 先にdocker-compose upしておく
