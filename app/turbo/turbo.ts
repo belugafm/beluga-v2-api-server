@@ -57,7 +57,7 @@ export function read_body(req: Request) {
         const chunks: Buffer[] = []
         req.onData((buffer, start, length) => {
             const body_chunk = buffer.slice(start, start + length)
-            const data = new Buffer(length)
+            const data = Buffer.alloc(length)
             body_chunk.copy(data, 0, 0, length)
             chunks.push(data)
         })
