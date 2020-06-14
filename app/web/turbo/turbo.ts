@@ -112,7 +112,7 @@ export function read_body(req: Request) {
 }
 
 function convert_raw_headers_to_dict(header_strings: string[]) {
-    // raw_headersの中身はこういう形になっている
+    // header_stringsの中身はこういう形になっている
     // [
     //     "Host",
     //     "localhost:8080",

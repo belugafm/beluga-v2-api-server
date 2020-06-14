@@ -127,10 +127,7 @@ export class TurboServer {
             async (req, res, params, store) => {
                 const { content_type } = store
                 check_content_type(content_type)
-                res.setHeader(
-                    "Content-Type",
-                    content_type ? content_type : ContentType.JSON
-                )
+                res.setHeader("Content-Type", content_type)
                 try {
                     const query = qs.parse(req.url.replace(/^.+\?/, ""), {
                         decoder: decodeURIComponent,
@@ -158,7 +155,7 @@ export class TurboServer {
                 }
                 res.end()
             },
-            { content_type }
+            { content_type: content_type ? content_type : ContentType.JSON }
         )
     }
     post(url: string, handler: Router.Handler) {

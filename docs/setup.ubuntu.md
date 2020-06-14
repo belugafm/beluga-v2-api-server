@@ -8,3 +8,9 @@ sudo apt purge -y nodejs npm
 ```
 sudo npm install -g typescript eslint
 ```
+
+## Examples
+
+```
+npx ts-node examples/turbo/simple_server.ts
+```
