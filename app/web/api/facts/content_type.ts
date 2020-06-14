@@ -3,3 +3,5 @@ export const ContentTypes = {
     ApplicationFormUrlencoded: "application/x-www-form-urlencoded",
     ApplicationJson: "application/json",
 } as const
+
+export type ContentTypesUnion = typeof ContentTypes[keyof typeof ContentTypes]
