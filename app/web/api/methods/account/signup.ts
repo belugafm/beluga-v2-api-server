@@ -1,6 +1,6 @@
 import { MethodMetadata } from "../../metadata"
 import { ContentTypes } from "../../facts/content_type"
-import { AuthenticationTypes } from "../../facts/authentication_type"
+import { AuthenticationMethods } from "../../facts/authentication_method"
 import { RateLimits } from "../../facts/rate_limit"
 import { HttpMethods } from "../../facts/http_method"
 import { TokenTypes } from "../../facts/token_type"
@@ -17,10 +17,7 @@ export const metadata: MethodMetadata = {
         ContentTypes.ApplicationFormUrlencoded,
         ContentTypes.ApplicationJson,
     ],
-    accepted_authentication_types: [
-        AuthenticationTypes.Cookie,
-        AuthenticationTypes.AccessToken,
-    ],
+    accepted_authentication_methods: [AuthenticationMethods.AccessToken],
     accepted_scopes: [
         {
             token_type: TokenTypes.InternalSystem,

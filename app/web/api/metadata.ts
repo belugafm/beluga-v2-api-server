@@ -13,7 +13,7 @@ export interface MethodMetadata {
     http_method: HttpMethodUnion
     rate_limiting: { [token_type in TokenTypesUnion]?: RateLimitUnion }
     accepted_content_types: string[]
-    accepted_authentication_types: string[]
+    accepted_authentication_methods: string[]
     accepted_scopes: AcceptedScopeItem[]
     description: string[]
 }
