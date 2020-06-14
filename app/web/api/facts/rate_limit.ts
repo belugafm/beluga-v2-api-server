@@ -11,26 +11,26 @@ export const RateLimitConfiguration = {
         limit_per_minite: 1,
         label: "Web API Tier 1",
         description: [
-            "この規制レベルは動画のアップロードなどのサーバーに高い負荷がかかる処理を制限するために使用される",
+            "動画のアップロードなどのサーバーに高い負荷がかかる処理を制限するために使用されます",
         ],
     },
     [RateLimits.Tier2]: {
         limit_per_minite: 20,
         label: "Web API Tier 2",
         description: [
-            "連続した画像のアップロードやプロフィール画像の更新などを規制するために使用される",
+            "連続した画像のアップロードやプロフィール画像の更新などを規制するために使用されます",
         ],
     },
     [RateLimits.Tier3]: {
         limit_per_minite: 60,
         label: "Web API Tier 3",
-        description: ["すべてのWeb APIで使用されるデフォルトの規制レベル"],
+        description: ["すべてのWeb APIで使用されるデフォルトの規制レベルです"],
     },
     [RateLimits.Tier4]: {
         limit_per_minite: 200,
         label: "Web API Tier 4",
         description: [
-            "ユーザーとのインタラクションが多いボットのための高頻度なリクエストが可能な規制レベル",
+            "ユーザーとのインタラクションが多いボットのための高頻度なリクエストが可能な規制レベルです",
         ],
     },
     [RateLimits.InternalSystem]: {
