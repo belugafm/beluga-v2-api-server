@@ -1,7 +1,7 @@
 export const TokenTypes = {
     User: "User",
     Bot: "Bot",
-    System: "System",
+    InternalSystem: "InternalSystem",
 } as const
 
 export const TokenTypeConfiguration = {
@@ -11,7 +11,7 @@ export const TokenTypeConfiguration = {
     [TokenTypes.Bot]: {
         description: [],
     },
-    [TokenTypes.System]: {
+    [TokenTypes.InternalSystem]: {
         description: [],
     },
 }

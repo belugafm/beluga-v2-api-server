@@ -11,7 +11,7 @@ export const metadata: MethodMetadata = {
     url: MethodIdentifiers.CreateAccount,
     http_method: HttpMethods.POST,
     rate_limiting: {
-        [TokenTypes.System]: RateLimits.InternalSystem,
+        [TokenTypes.InternalSystem]: RateLimits.InternalSystem,
     },
     accepted_content_types: [
         ContentTypes.ApplicationFormUrlencoded,
@@ -23,7 +23,7 @@ export const metadata: MethodMetadata = {
     ],
     accepted_scopes: [
         {
-            token_type: TokenTypes.System,
+            token_type: TokenTypes.InternalSystem,
             scope: Scopes.WriteApp,
         },
     ],
