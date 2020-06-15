@@ -1,7 +1,7 @@
 export const TokenTypes = {
     User: "User",
     Bot: "Bot",
-    InternalSystem: "InternalSystem",
+    Admin: "Admin",
 } as const
 
 export const TokenTypeConfiguration = {
@@ -11,9 +11,9 @@ export const TokenTypeConfiguration = {
     [TokenTypes.Bot]: {
         description: [],
     },
-    [TokenTypes.InternalSystem]: {
+    [TokenTypes.Admin]: {
         description: [],
     },
 }
 
-export type TokenTypesUnion = keyof typeof TokenTypes
+export type TokenTypesLiteralUnion = keyof typeof TokenTypes

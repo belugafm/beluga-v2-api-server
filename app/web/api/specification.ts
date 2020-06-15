@@ -1,13 +1,21 @@
-import { HttpMethodUnion } from "./facts/http_method"
-import { TokenTypesUnion } from "./facts/token_type"
-import { RateLimitUnion } from "./facts/rate_limit"
+import { HttpMethodLiteralUnion } from "./facts/http_method"
+import { TokenTypesLiteralUnion } from "./facts/token_type"
+import { RateLimitLiteralUnion } from "./facts/rate_limit"
 import { ScopesUnion } from "./facts/scope"
-import { AuthenticationMethodsUnion } from "./facts/authentication_method"
-import { ContentTypesUnion } from "./facts/content_type"
+import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
+import { ContentTypesLiteralUnion } from "./facts/content_type"
 
-interface AcceptedScopeItem {
-    token_type: TokenTypesUnion
+type AcceptedScopeItem = {
+    token_type: TokenTypesLiteralUnion
     scope: ScopesUnion
+}
+
+type Argument = {
+    [arg: string]: {
+        description: string[]
+        examples: string[]
+        required: boolean
+    }
 }
 
 export interface MethodSpecification {
@@ -18,17 +26,26 @@ export interface MethodSpecification {
 
     // GETかPOSTか
     // それ以外のHTTP Methodは基本使わない
-    http_method: HttpMethodUnion
+    http_method: HttpMethodLiteralUnion
 
     // 規制レベルをトークンの種類ごとに設定する
     // UserトークンとBotトークンで規制レベルを異なる設定にすることがある
-    rate_limiting: { [TokenType in TokenTypesUnion]?: RateLimitUnion }
+    rate_limiting: {
+        [TokenType in TokenTypesLiteralUnion]?: RateLimitLiteralUnion
+    }
 
     // Web APIをリクエストするときのContent-Type
-    accepted_content_types: ContentTypesUnion[]
+    accepted_content_types: ContentTypesLiteralUnion[]
+
+    // Web APIのリクエストの際に認証が必要かどうか
+    // falseの場合以下のプロパティは無視される
+    // - rate_limiting
+    // - accepted_authentication_methods
+    // - accepted_scopes
+    authentication_required: boolean
 
     // Web APIをリクエストする時の認証方法
-    accepted_authentication_methods: AuthenticationMethodsUnion[]
+    accepted_authentication_methods: AuthenticationMethodsLiteralUnion[]
 
     // Web APIを利用可能なスコープを指定
     // 複数指定可

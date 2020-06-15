@@ -4,4 +4,4 @@ export const AuthenticationMethods = {
     OAuth: "OAuth",
 } as const
 
-export type AuthenticationMethodsUnion = keyof typeof AuthenticationMethods
+export type AuthenticationMethodsLiteralUnion = keyof typeof AuthenticationMethods

@@ -3,4 +3,4 @@ export const HttpMethods = {
     GET: "GET",
 } as const
 
-export type HttpMethodUnion = keyof typeof HttpMethods
+export type HttpMethodLiteralUnion = keyof typeof HttpMethods
