@@ -5,20 +5,23 @@ import { ScopesUnion } from "./facts/scope"
 import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
 import { ContentTypesLiteralUnion } from "./facts/content_type"
 
-type AcceptedScopeItem = {
+interface AcceptedScopeItem {
     token_type: TokenTypesLiteralUnion
     scope: ScopesUnion
 }
 
-type Argument = {
-    [arg: string]: {
-        description: string[]
-        examples: string[]
-        required: boolean
-    }
+export interface ErrorInterface {
+    description: string
+    hint: string | null
 }
 
-export interface MethodSpecification {
+export interface ArgumentInterface {
+    description: string[]
+    examples: string[] | null
+    required: boolean
+}
+
+export interface MethodSpecsInterface {
     // Web APIのURLの末尾
     // https://beluga.cx/api/xxxx/yyyy
     // ↑xsxx/yyyyの部分
@@ -54,4 +57,10 @@ export interface MethodSpecification {
     // 簡易的な説明
     // 詳細な説明はドキュメントの方で書く
     description: string[]
+
+    // 発生しうるエラー
+    expected_errors: { [arg: string]: ErrorInterface }
+
+    // Web APIの呼び出し時の引数
+    arguments: { [arg: string]: ArgumentInterface }
 }

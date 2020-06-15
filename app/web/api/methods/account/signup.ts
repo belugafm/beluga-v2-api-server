@@ -1,7 +1,19 @@
-import { MethodSpecification } from "../../specification"
+import { MethodSpecsInterface, ArgumentInterface } from "../../specification"
 import { ContentTypes } from "../../facts/content_type"
 import { HttpMethods } from "../../facts/http_method"
 import { MethodIdentifiers } from "../../identifier"
+import { define_method } from "../../define"
+
+type ArgumentTypes = {
+    [ArgumentName in typeof ArgumentNames[keyof typeof ArgumentNames]]: ArgumentInterface
+}
+
+type ExpectedErrorsType = {
+    [ErrorId in typeof ErrorIds[keyof typeof ErrorIds]]: {
+        description: string
+        hint: string | null
+    }
+}
 
 const ErrorIds = {
     InvalidName: "invalid_name",
@@ -11,12 +23,14 @@ const ErrorIds = {
     InternalError: "internal_error",
 } as const
 
-const Errors = {
+const Errors: ExpectedErrorsType = {
     [ErrorIds.InvalidName]: {
         description: "ユーザー名が基準を満たしていません",
+        hint: null,
     },
     [ErrorIds.InvalidPassword]: {
         description: "パスワードが基準を満たしていません",
+        hint: null,
     },
     [ErrorIds.NameTaken]: {
         description:
@@ -28,18 +42,39 @@ const Errors = {
         hint: "パスワードと確認用パスワードは同じものを入力してください",
     },
     [ErrorIds.InternalError]: {
-        description: "サーバー内で問題が発生し、リクエストを完了できません",
+        description:
+            "サーバー内で問題が発生したため、リクエストを完了できません",
         hint: "サイトの管理者に問い合わせてください",
     },
+}
+
+const ArgumentNames = {
+    Name: "name",
+    Password: "password",
+    ConfirmedPassword: "confirmed_password",
 } as const
 
-interface Specs extends MethodSpecification {
-    expected_errors: {
-        [ErrorId in typeof ErrorIds[keyof typeof ErrorIds]]: {
-            description: string
-            hint?: string
-        }
-    }
+const Arguments: ArgumentTypes = {
+    [ArgumentNames.Name]: {
+        description: ["ユーザー名"],
+        examples: ["beluga"],
+        required: true,
+    },
+    [ArgumentNames.Password]: {
+        description: ["パスワード"],
+        examples: null,
+        required: true,
+    },
+    [ArgumentNames.ConfirmedPassword]: {
+        description: ["確認用のパスワード"],
+        examples: null,
+        required: true,
+    },
+}
+
+interface Specs extends MethodSpecsInterface {
+    expected_errors: ExpectedErrorsType
+    arguments: ArgumentTypes
 }
 
 export const specs: Specs = {
@@ -55,4 +90,9 @@ export const specs: Specs = {
     accepted_scopes: [],
     description: ["新規アカウントを作成します"],
     expected_errors: Errors,
+    arguments: Arguments,
 }
+
+export default define_method(specs, async (args) => {
+    console.log(args.name, args.confirmed_password, args.password)
+})
