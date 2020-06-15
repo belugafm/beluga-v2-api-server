@@ -1,8 +1,8 @@
 import { TokenTypes } from "./token_type"
 
 export const Scopes = {
-    WriteApp: "app:write",
-    ReadApp: "app:read",
+    AdminWriteUser: "admin:user:write",
+    AdminReadUser: "admin:user:read",
     ReadTimeline: "timeline:read",
     WriteTimeline: "timeline:write",
 } as const

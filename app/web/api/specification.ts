@@ -10,7 +10,7 @@ interface AcceptedScopeItem {
     scope: ScopesUnion
 }
 
-export interface MethodMetadata {
+export interface MethodSpecification {
     // Web APIのURLの末尾
     // https://beluga.cx/api/xxxx/yyyy
     // ↑xsxx/yyyyの部分
