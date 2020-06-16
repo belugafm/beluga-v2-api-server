@@ -4,11 +4,11 @@ import { MethodIdentifiers } from "../../identifier"
 import {
     MethodFacts,
     define_method,
-    define_method_arguments,
-    define_method_expected_errors,
+    define_arguments,
+    define_expected_errors,
 } from "../../define"
 
-export const argument_specs = define_method_arguments(
+export const argument_specs = define_arguments(
     ["name", "password", "confirmed_password"] as const,
     {
         name: {
@@ -29,7 +29,7 @@ export const argument_specs = define_method_arguments(
     }
 )
 
-export const expected_error_specs = define_method_expected_errors(
+export const expected_error_specs = define_expected_errors(
     [
         "invalid_name",
         "invalid_password",

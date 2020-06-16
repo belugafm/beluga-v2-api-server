@@ -50,7 +50,7 @@ type Argument = {
     default_value?: any
 }
 
-export function define_method_arguments<T>(
+export function define_arguments<T>(
     argument_names: readonly T[],
     argument_specs: {
         [P in T]: Argument
@@ -66,7 +66,7 @@ type ExpectedError {
     hint: string | null
 }
 
-export function define_method_expected_errors<T>(
+export function define_expected_errors<T>(
     error_names: readonly T[],
     error_specs: {
         [P in T]: ExpectedError
