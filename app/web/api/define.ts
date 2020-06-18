@@ -1,7 +1,13 @@
+import { TokenTypesLiteralUnion } from "./facts/token_type"
+import { ScopesLiteralUnion } from "./facts/scope"
+import { HttpMethodLiteralUnion } from "./facts/http_method"
+import { RateLimitLiteralUnion } from "./facts/rate_limit"
+import { ContentTypesLiteralUnion } from "./facts/content_type"
+import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
 
 interface AcceptedScopeItem {
     token_type: TokenTypesLiteralUnion
-    scope: ScopesUnion
+    scope: ScopesLiteralUnion
 }
 
 export interface MethodFacts {
@@ -42,7 +48,6 @@ export interface MethodFacts {
     description: string[]
 }
 
-
 type Argument = {
     description: string[]
     examples: string[] | null
@@ -50,7 +55,7 @@ type Argument = {
     default_value?: any
 }
 
-export function define_arguments<T>(
+export function define_arguments<T extends string>(
     argument_names: readonly T[],
     argument_specs: {
         [P in T]: Argument
@@ -61,25 +66,27 @@ export function define_arguments<T>(
     return argument_specs
 }
 
-type ExpectedError {
+type ExpectedError<Arguments> = {
     description: string
-    hint: string | null
+    hint?: string
+    argument?: keyof Arguments
 }
 
-export function define_expected_errors<T>(
-    error_names: readonly T[],
+export function define_expected_errors<ErrorNames extends string, Arguments>(
+    error_names: readonly ErrorNames[],
+    argument_specs: Arguments,
     error_specs: {
-        [P in T]: ExpectedError
+        [ErrorName in ErrorNames]: ExpectedError<Arguments>
     }
 ): {
-    [P in T]: ExpectedError
+    [ErrorName in ErrorNames]: ExpectedError<Arguments>
 } {
     return error_specs
 }
 
 type Callback<Arguments, ExpectedErrors> = (
     args: Arguments,
-    expected_errors:ExpectedErrors
+    expected_errors: ExpectedErrors
 ) => Promise<void>
 
 export function define_method<Arguments, ExpectedErrors>(
@@ -88,5 +95,5 @@ export function define_method<Arguments, ExpectedErrors>(
     expected_errors: ExpectedErrors,
     callback: Callback<Arguments, ExpectedErrors>
 ) {
-    return 0
+    return (args: { [ArgumentName in keyof Arguments]: any }) => {}
 }

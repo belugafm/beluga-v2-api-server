@@ -1,5 +1,3 @@
-import { TokenTypes } from "./token_type"
-
 export const Scopes = {
     AdminWriteUser: "admin:user:write",
     AdminReadUser: "admin:user:read",
@@ -7,9 +5,9 @@ export const Scopes = {
     WriteTimeline: "timeline:write",
 } as const
 
-export type ScopesUnion = typeof Scopes[keyof typeof Scopes]
+export type ScopesLiteralUnion = typeof Scopes[keyof typeof Scopes]
 
-export const ScopeConfiguration = {
+export const ScopeSpecs = {
     [Scopes.ReadTimeline]: {
         description: ["チャンネル・スレッドの投稿の読み込み"],
     },

@@ -31,29 +31,31 @@ export const argument_specs = define_arguments(
 
 export const expected_error_specs = define_expected_errors(
     [
-        "invalid_name",
-        "invalid_password",
-        "invalid_confirmed_password",
+        "invalid_arg_name",
+        "invalid_arg_password",
+        "invalid_arg_confirmed_password",
         "name_taken",
         "internal_error",
     ] as const,
+    argument_specs,
     {
-        invalid_name: {
+        invalid_arg_name: {
             description: "ユーザー名が基準を満たしていません",
-            hint: null,
+            argument: "name",
         },
-        invalid_password: {
+        invalid_arg_password: {
             description: "パスワードが基準を満たしていません",
-            hint: null,
+            argument: "password",
+        },
+        invalid_arg_confirmed_password: {
+            description: "確認用のパスワードが一致しません",
+            hint: "パスワードと確認用パスワードは同じものを入力してください",
+            argument: "confirmed_password",
         },
         name_taken: {
             description:
                 "このユーザー名はすでに取得されているため、新規作成できません",
             hint: "別のユーザー名でアカウントを作成してください",
-        },
-        invalid_confirmed_password: {
-            description: "確認用のパスワードが一致しません",
-            hint: "パスワードと確認用パスワードは同じものを入力してください",
         },
         internal_error: {
             description:
@@ -81,8 +83,8 @@ export default define_method(
     facts,
     argument_specs,
     expected_error_specs,
-    async (args, expected_errors) => {
+    async (args, errors) => {
         console.log(args.name, args.confirmed_password, args.password)
-        throw new Error(expected_errors.name_taken.description)
+        throw new Error(errors.name_taken.description)
     }
 )

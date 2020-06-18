@@ -1,10 +1,10 @@
 export const TokenTypes = {
-    User: "User",
-    Bot: "Bot",
-    Admin: "Admin",
+    User: "user",
+    Bot: "bot",
+    Admin: "admin",
 } as const
 
-export const TokenTypeConfiguration = {
+export const TokenTypeSpecs = {
     [TokenTypes.User]: {
         description: [],
     },

@@ -12,5 +12,6 @@ sudo npm install -g typescript eslint
 ## Examples
 
 ```
+npm install
 npx ts-node examples/turbo/simple_server.ts
 ```
