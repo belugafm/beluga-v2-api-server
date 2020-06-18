@@ -40,27 +40,29 @@ export const expected_error_specs = define_expected_errors(
     argument_specs,
     {
         invalid_arg_name: {
-            description: "ユーザー名が基準を満たしていません",
+            description: ["ユーザー名が基準を満たしていません"],
             argument: "name",
         },
         invalid_arg_password: {
-            description: "パスワードが基準を満たしていません",
+            description: ["パスワードが基準を満たしていません"],
             argument: "password",
         },
         invalid_arg_confirmed_password: {
-            description: "確認用のパスワードが一致しません",
-            hint: "パスワードと確認用パスワードは同じものを入力してください",
+            description: ["確認用のパスワードが一致しません"],
+            hint: ["パスワードと確認用パスワードは同じものを入力してください"],
             argument: "confirmed_password",
         },
         name_taken: {
-            description:
+            description: [
                 "このユーザー名はすでに取得されているため、新規作成できません",
-            hint: "別のユーザー名でアカウントを作成してください",
+            ],
+            hint: ["別のユーザー名でアカウントを作成してください"],
         },
         internal_error: {
-            description:
+            description: [
                 "サーバー内で問題が発生したため、リクエストを完了できません",
-            hint: "サイトの管理者に問い合わせてください",
+            ],
+            hint: ["サイトの管理者に問い合わせてください"],
         },
     }
 )
@@ -85,6 +87,6 @@ export default define_method(
     expected_error_specs,
     async (args, errors) => {
         console.log(args.name, args.confirmed_password, args.password)
-        throw new Error(errors.name_taken.description)
+        throw new Error(errors.name_taken.description[0])
     }
 )

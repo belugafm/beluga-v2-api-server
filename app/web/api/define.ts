@@ -4,6 +4,7 @@ import { HttpMethodLiteralUnion } from "./facts/http_method"
 import { RateLimitLiteralUnion } from "./facts/rate_limit"
 import { ContentTypesLiteralUnion } from "./facts/content_type"
 import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
+import { assert } from "console"
 
 interface AcceptedScopeItem {
     token_type: TokenTypesLiteralUnion
@@ -67,8 +68,8 @@ export function define_arguments<T extends string>(
 }
 
 type ExpectedError<Arguments> = {
-    description: string
-    hint?: string
+    description: string[]
+    hint?: string[]
     argument?: keyof Arguments
 }
 
@@ -87,13 +88,40 @@ export function define_expected_errors<ErrorNames extends string, Arguments>(
 type Callback<Arguments, ExpectedErrors> = (
     args: Arguments,
     expected_errors: ExpectedErrors
-) => Promise<void>
+) => Promise<any>
 
-export function define_method<Arguments, ExpectedErrors>(
+type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
+    [ErrorCode in keyof ErrorSpecs]: ExpectedError<Arguments>
+}
+
+type ReturnType<ArgumentSpecs> = (
+    args: { [ArgumentName in keyof ArgumentSpecs]: any }
+) => Promise<any>
+
+export function define_method<
+    ArgumentSpecs,
+    ErrorSpecs extends { [key: string]: any }
+>(
     facts: MethodFacts,
-    method_arguments: Arguments,
-    expected_errors: ExpectedErrors,
-    callback: Callback<Arguments, ExpectedErrors>
-) {
-    return (args: { [ArgumentName in keyof Arguments]: any }) => {}
+    method_argument_specs: ArgumentSpecs,
+    expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
+    callback: Callback<
+        ArgumentSpecs,
+        ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>
+    >
+): ReturnType<ArgumentSpecs> {
+    return (args: { [ArgumentName in keyof ArgumentSpecs]: any }) => {
+        const errors_associated_with_args: {
+            [argument_name: string]: ExpectedError<ArgumentSpecs>
+        } = {}
+        Object.keys(args).forEach((argument_name) => {
+            Object.values(expected_error_specs).forEach((error) => {
+                if (error.argument === argument_name) {
+                    errors_associated_with_args[argument_name] = error
+                }
+            })
+        })
+        console.log(errors_associated_with_args)
+        return callback(args, expected_error_specs)
+    }
 }
