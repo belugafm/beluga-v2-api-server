@@ -1,7 +1,7 @@
 import { Schema } from "../schema"
 import { check_min_value } from "../validator/string/min_length"
 import { check_max_value } from "../validator/string/max_length"
-import { check_regex_pattern } from "../validator/string/regex_pattern"
+import { check_regex_pattern } from "../validator/string/regex"
 import { Options } from "./string"
 
 export function user_name() {
