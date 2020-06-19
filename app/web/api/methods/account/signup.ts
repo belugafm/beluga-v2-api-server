@@ -7,6 +7,7 @@ import {
     define_arguments,
     define_expected_errors,
 } from "../../define"
+import * as vs from "../../validation"
 
 export const argument_specs = define_arguments(
     ["name", "password", "confirmed_password"] as const,
@@ -15,16 +16,22 @@ export const argument_specs = define_arguments(
             description: ["ユーザー名"],
             examples: ["beluga"],
             required: true,
+            schema: vs.string({
+                min_length: 1,
+                max_length: 32,
+            }),
         },
         password: {
             description: ["パスワード"],
             examples: null,
             required: true,
+            schema: vs.string({}),
         },
         confirmed_password: {
             description: ["確認用のパスワード"],
             examples: null,
             required: true,
+            schema: vs.string({}),
         },
     }
 )

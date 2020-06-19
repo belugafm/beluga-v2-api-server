@@ -4,13 +4,14 @@ import { HttpMethodLiteralUnion } from "./facts/http_method"
 import { RateLimitLiteralUnion } from "./facts/rate_limit"
 import { ContentTypesLiteralUnion } from "./facts/content_type"
 import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
-import { assert } from "console"
+import { Schema } from "./validation/schema"
 
 interface AcceptedScopeItem {
     token_type: TokenTypesLiteralUnion
     scope: ScopesLiteralUnion
 }
 
+// Web APIの仕様を定義
 export interface MethodFacts {
     // Web APIのURLの末尾
     // https://beluga.cx/api/xxxx/yyyy
@@ -49,24 +50,27 @@ export interface MethodFacts {
     description: string[]
 }
 
-type Argument = {
+// Web APIの引数を定義
+type Argument<ValueType> = {
     description: string[]
     examples: string[] | null
     required: true
     default_value?: any
+    schema: Schema<ValueType>
 }
 
-export function define_arguments<T extends string>(
-    argument_names: readonly T[],
+export function define_arguments<ArgumentNames extends string, ValueType>(
+    argument_names: readonly ArgumentNames[],
     argument_specs: {
-        [P in T]: Argument
+        [P in ArgumentNames]: Argument<ValueType>
     }
 ): {
-    [P in T]: Argument
+    [P in ArgumentNames]: Argument<ValueType>
 } {
     return argument_specs
 }
 
+// Web APIが送出しうるエラーを定義
 type ExpectedError<Arguments> = {
     description: string[]
     hint?: string[]
@@ -85,9 +89,10 @@ export function define_expected_errors<ErrorNames extends string, Arguments>(
     return error_specs
 }
 
-type Callback<Arguments, ExpectedErrors> = (
+// Web APIの定義
+type Callback<Arguments, E> = (
     args: Arguments,
-    expected_errors: ExpectedErrors
+    expected_errors: E
 ) => Promise<any>
 
 type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
@@ -98,21 +103,47 @@ type ReturnType<ArgumentSpecs> = (
     args: { [ArgumentName in keyof ArgumentSpecs]: any }
 ) => Promise<any>
 
+type ArgumentSpecs<ArgumentNames extends string, ArgumentValue> = {
+    [P in ArgumentNames]: Argument<ArgumentValue>
+}
+
+// 各Web APIはLiteral Typesで書かれるのでジェネリクスで補完可能にする
 export function define_method<
-    ArgumentSpecs,
-    ErrorSpecs extends { [key: string]: any }
+    ErrorSpecs extends { [key: string]: any },
+    ArgumentNames extends string,
+    ArgumentValue
 >(
     facts: MethodFacts,
-    method_argument_specs: ArgumentSpecs,
-    expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
+    method_argument_specs: ArgumentSpecs<ArgumentNames, ArgumentValue>,
+    expected_error_specs: ExpectedErrorSpecs<
+        ArgumentSpecs<ArgumentNames, ArgumentValue>,
+        ErrorSpecs
+    >,
     callback: Callback<
-        ArgumentSpecs,
-        ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>
+        {
+            [ArgumentName in keyof ArgumentSpecs<
+                ArgumentNames,
+                ArgumentValue
+            >]: ArgumentValue
+        },
+        ExpectedErrorSpecs<
+            ArgumentSpecs<ArgumentNames, ArgumentValue>,
+            ErrorSpecs
+        >
     >
-): ReturnType<ArgumentSpecs> {
-    return (args: { [ArgumentName in keyof ArgumentSpecs]: any }) => {
+): ReturnType<ArgumentSpecs<ArgumentNames, ArgumentValue>> {
+    return (
+        args: {
+            [ArgumentName in keyof ArgumentSpecs<
+                ArgumentNames,
+                ArgumentValue
+            >]: ArgumentValue
+        }
+    ) => {
         const errors_associated_with_args: {
-            [argument_name: string]: ExpectedError<ArgumentSpecs>
+            [argument_name: string]: ExpectedError<
+                ArgumentSpecs<ArgumentNames, ArgumentValue>
+            >
         } = {}
         Object.keys(args).forEach((argument_name) => {
             Object.values(expected_error_specs).forEach((error) => {
