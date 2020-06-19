@@ -5,6 +5,8 @@ import { RateLimitLiteralUnion } from "./facts/rate_limit"
 import { ContentTypesLiteralUnion } from "./facts/content_type"
 import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
 import { Schema } from "./validation/schema"
+import { ValidationError } from "./validation/error"
+import { ApiRuntimeError, InternalErrorSpec } from "./error"
 
 interface AcceptedScopeItem {
     token_type: TokenTypesLiteralUnion
@@ -62,10 +64,10 @@ type Argument<ValueType> = {
 export function define_arguments<ArgumentNames extends string, ValueType>(
     argument_names: readonly ArgumentNames[],
     argument_specs: {
-        [P in ArgumentNames]: Argument<ValueType>
+        [ArgumentName in ArgumentNames]: Argument<ValueType>
     }
 ): {
-    [P in ArgumentNames]: Argument<ValueType>
+    [ArgumentName in ArgumentNames]: Argument<ValueType>
 } {
     return argument_specs
 }
@@ -90,9 +92,9 @@ export function define_expected_errors<ErrorNames extends string, Arguments>(
 }
 
 // Web APIの定義
-type Callback<Arguments, E> = (
+type Callback<Arguments, Errors> = (
     args: Arguments,
-    expected_errors: E
+    expected_errors: Errors
 ) => Promise<any>
 
 type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
@@ -103,8 +105,12 @@ type ReturnType<ArgumentSpecs> = (
     args: { [ArgumentName in keyof ArgumentSpecs]: any }
 ) => Promise<any>
 
-type ArgumentSpecs<ArgumentNames extends string, ArgumentValue> = {
-    [P in ArgumentNames]: Argument<ArgumentValue>
+type ArgumentSpecs<ArgumentNames extends string, ValueType> = {
+    [Argumentname in ArgumentNames]: Argument<ValueType>
+}
+
+function _get_argument_value(args: { [key: string]: any }, key: string): any {
+    return args[key]
 }
 
 // 各Web APIはLiteral Typesで書かれるのでジェネリクスで補完可能にする
@@ -140,19 +146,43 @@ export function define_method<
             >]: ArgumentValue
         }
     ) => {
+        // 各argumentに関連付けられた、値チェック失敗時のエラーを送出できるようにする
         const errors_associated_with_args: {
             [argument_name: string]: ExpectedError<
                 ArgumentSpecs<ArgumentNames, ArgumentValue>
             >
         } = {}
-        Object.keys(args).forEach((argument_name) => {
+        for (const argument_name in args) {
             Object.values(expected_error_specs).forEach((error) => {
                 if (error.argument === argument_name) {
                     errors_associated_with_args[argument_name] = error
                 }
             })
-        })
-        console.log(errors_associated_with_args)
+        }
+        // 各argumentの値チェック
+        for (const argument_name in args) {
+            const value = args[argument_name]
+            const { schema } = method_argument_specs[argument_name]
+            try {
+                schema.check(value)
+            } catch (validation_error) {
+                if (validation_error instanceof ValidationError) {
+                    const error = errors_associated_with_args[argument_name]
+                    throw new ApiRuntimeError(
+                        validation_error.message,
+                        error.description,
+                        error.hint
+                    )
+                } else {
+                    const error = new InternalErrorSpec()
+                    throw new ApiRuntimeError(
+                        "引数の値チェックを完了できません",
+                        error.description,
+                        error.hint
+                    )
+                }
+            }
+        }
         return callback(args, expected_error_specs)
     }
 }

@@ -8,6 +8,7 @@ import {
     define_expected_errors,
 } from "../../define"
 import * as vs from "../../validation"
+import { InternalErrorSpec } from "../../error"
 
 export const argument_specs = define_arguments(
     ["name", "password", "confirmed_password"] as const,
@@ -16,22 +17,19 @@ export const argument_specs = define_arguments(
             description: ["ユーザー名"],
             examples: ["beluga"],
             required: true,
-            schema: vs.string({
-                min_length: 1,
-                max_length: 32,
-            }),
+            schema: vs.user_name(),
         },
         password: {
             description: ["パスワード"],
             examples: null,
             required: true,
-            schema: vs.string({}),
+            schema: vs.password(),
         },
         confirmed_password: {
             description: ["確認用のパスワード"],
             examples: null,
             required: true,
-            schema: vs.string({}),
+            schema: vs.password(),
         },
     }
 )
@@ -65,12 +63,7 @@ export const expected_error_specs = define_expected_errors(
             ],
             hint: ["別のユーザー名でアカウントを作成してください"],
         },
-        internal_error: {
-            description: [
-                "サーバー内で問題が発生したため、リクエストを完了できません",
-            ],
-            hint: ["サイトの管理者に問い合わせてください"],
-        },
+        internal_error: new InternalErrorSpec(),
     }
 )
 
