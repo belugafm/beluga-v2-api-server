@@ -1,10 +1,16 @@
-export class WebApiRuntimeError extends Error {
+import { ExpectedError } from "./define"
+
+export class WebApiRuntimeError<T> extends Error {
     description?: string[]
     hint?: string[]
-    constructor(message?: string, description?: string[], hint?: string[]) {
-        super(message)
-        this.description = description
-        this.hint = hint
+    argument?: any
+    additional_message?: string
+    constructor(spec: ExpectedError<T>, additional_message?: string) {
+        super()
+        this.description = spec.description
+        this.hint = spec.hint
+        this.argument = spec.argument
+        this.additional_message = additional_message
         Object.setPrototypeOf(this, WebApiRuntimeError.prototype)
     }
 }

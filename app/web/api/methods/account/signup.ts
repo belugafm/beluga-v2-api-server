@@ -93,27 +93,30 @@ export const facts: MethodFacts = {
     description: ["新規アカウントを作成します"],
 }
 
-function raise<T>(e: Error, spec: ExpectedError<T>) {
-    throw new WebApiRuntimeError(e.message, spec.description, spec.hint)
+function raise<T>(spec: ExpectedError<T>, source_error: Error) {
+    throw new WebApiRuntimeError(spec, source_error.message)
 }
 
 export default define_method(
     facts,
     argument_specs,
     expected_error_specs,
-    async (args, expected_errors) => {
+    async (args, errors) => {
+        if (args.password !== args.confirmed_password) {
+            throw new WebApiRuntimeError(errors.invalid_arg_confirmed_password)
+        }
         try {
             const user = await signup(args.name, args.password)
             console.log(user)
-        } catch (e) {
-            if (e instanceof ModelRuntimeError) {
-                if (e.error_code === ModelErrorCodes.NameTaken) {
-                    raise(e, expected_errors.name_taken)
+        } catch (error) {
+            if (error instanceof ModelRuntimeError) {
+                if (error.code === ModelErrorCodes.NameTaken) {
+                    raise(errors.name_taken, error)
                 } else {
-                    raise(e, expected_errors.internal_error)
+                    raise(errors.internal_error, error)
                 }
             } else {
-                raise(e, expected_errors.unexpected_error)
+                raise(errors.unexpected_error, error)
             }
         }
     }

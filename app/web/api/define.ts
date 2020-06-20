@@ -169,16 +169,13 @@ export function define_method<
                 if (validation_error instanceof ValueSchemaValidationError) {
                     const error = errors_associated_with_args[argument_name]
                     throw new WebApiRuntimeError(
-                        validation_error.message,
-                        error.description,
-                        error.hint
+                        error,
+                        validation_error.message
                     )
                 } else {
-                    const error = new InternalErrorSpec()
                     throw new WebApiRuntimeError(
-                        "引数の値チェックを完了できません",
-                        error.description,
-                        error.hint
+                        new InternalErrorSpec(),
+                        "引数の値チェックを完了できません"
                     )
                 }
             }

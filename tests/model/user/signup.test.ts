@@ -18,10 +18,10 @@ describe("signup", () => {
         expect.assertions(2)
         try {
             await signup("", "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidName)
             }
         }
     })
@@ -30,10 +30,10 @@ describe("signup", () => {
         try {
             // @ts-ignore
             await signup(2, "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidName)
             }
         }
     })
@@ -42,10 +42,10 @@ describe("signup", () => {
         try {
             // @ts-ignore
             await signup({}, "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidName)
             }
         }
     })
@@ -53,10 +53,10 @@ describe("signup", () => {
         expect.assertions(2)
         try {
             await signup("", "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidName)
             }
         }
     })
@@ -64,10 +64,10 @@ describe("signup", () => {
         expect.assertions(2)
         try {
             await signup("0123456789012345678901234567890123456789", "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidName)
             }
         }
     })
@@ -75,10 +75,10 @@ describe("signup", () => {
         expect.assertions(2)
         try {
             await signup("beluga", "")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidPassword)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidPassword)
             }
         }
     })
@@ -87,10 +87,10 @@ describe("signup", () => {
         try {
             // @ts-ignore
             await signup("beluga", 2)
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidPassword)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidPassword)
             }
         }
     })
@@ -99,10 +99,10 @@ describe("signup", () => {
         try {
             // @ts-ignore
             await signup("beluga", {})
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.InvalidPassword)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.InvalidPassword)
             }
         }
     })
@@ -111,10 +111,10 @@ describe("signup", () => {
         try {
             await signup("beluga", "password")
             await signup("beluga", "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.NameTaken)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.NameTaken)
             }
         }
     })
@@ -123,10 +123,10 @@ describe("signup", () => {
         try {
             await signup("beluga", "password")
             await signup("Beluga", "password")
-        } catch (e) {
-            expect(e).toBeInstanceOf(ModelRuntimeError)
-            if (e instanceof ModelRuntimeError) {
-                expect(e.error_code).toMatch(ErrorCodes.NameTaken)
+        } catch (error) {
+            expect(error).toBeInstanceOf(ModelRuntimeError)
+            if (error instanceof ModelRuntimeError) {
+                expect(error.code).toMatch(ErrorCodes.NameTaken)
             }
         }
     })
