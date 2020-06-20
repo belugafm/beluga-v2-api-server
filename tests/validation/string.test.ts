@@ -1,5 +1,5 @@
-import { string } from "../../../app/validation"
-import { ValueSchemaValidationError } from "../../../app/validation/error"
+import { string } from "../../app/validation"
+import { ValueSchemaValidationError } from "../../app/validation/error"
 
 describe("input type", () => {
     test("invalid string", () => {

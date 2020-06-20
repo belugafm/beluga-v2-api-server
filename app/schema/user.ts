@@ -16,7 +16,7 @@ export interface UserSchema extends Document {
         statuses_count?: number
     }
     created_at: Date
-    schema_version?: number
+    _schema_version?: number
 }
 
 const UndefinedString = {
@@ -46,7 +46,7 @@ export const User = mongoose.model<UserSchema>(
             },
         },
         created_at: Date,
-        schema_version: {
+        _schema_version: {
             type: Number,
             default: schema_version,
         },

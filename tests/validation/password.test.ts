@@ -1,5 +1,5 @@
-import { password } from "../../../app/validation"
-import { ValueSchemaValidationError } from "../../../app/validation/error"
+import { password } from "../../app/validation"
+import { ValueSchemaValidationError } from "../../app/validation/error"
 
 describe("password", () => {
     test("password", () => {

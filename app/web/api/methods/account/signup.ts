@@ -103,7 +103,8 @@ export default define_method(
     expected_error_specs,
     async (args, expected_errors) => {
         try {
-            await signup(args.name, args.password)
+            const user = await signup(args.name, args.password)
+            console.log(user)
         } catch (e) {
             if (e instanceof ModelRuntimeError) {
                 if (e.error_code === ModelErrorCodes.NameTaken) {
