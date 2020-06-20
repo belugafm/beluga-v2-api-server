@@ -20,7 +20,7 @@ mongodb.getUri().then(async (uri) => {
         })
         try {
             await signup({
-                name: "beluga",
+                name: "Beluga",
                 password: "password",
                 confirmed_password: "password",
             })

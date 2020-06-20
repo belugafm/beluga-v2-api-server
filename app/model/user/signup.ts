@@ -19,7 +19,7 @@ export async function signup(
     if (vs.password().ok(password) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidPassword)
     }
-    const existing_user = await mongo.findOne(User, { name: name })
+    const existing_user = await mongo.findOne(User, { name: name }, false)
     if (existing_user) {
         throw new ModelRuntimeError(ErrorCodes.NameTaken)
     }

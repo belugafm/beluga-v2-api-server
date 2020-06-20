@@ -5,11 +5,11 @@ import { ModelRuntimeError } from "../../../app/model/error"
 
 describe("signup", () => {
     let mongodb: MongoMemoryServer | null = null
-    beforeAll(async () => {
+    beforeEach(async () => {
         mongodb = await connect()
     })
 
-    afterAll(async () => {
+    afterEach(async () => {
         if (mongodb) {
             await mongodb.stop()
         }
@@ -42,6 +42,28 @@ describe("signup", () => {
         try {
             // @ts-ignore
             await signup({}, "password")
+        } catch (e) {
+            expect(e).toBeInstanceOf(ModelRuntimeError)
+            if (e instanceof ModelRuntimeError) {
+                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+            }
+        }
+    })
+    test("min length", async () => {
+        expect.assertions(2)
+        try {
+            await signup("", "password")
+        } catch (e) {
+            expect(e).toBeInstanceOf(ModelRuntimeError)
+            if (e instanceof ModelRuntimeError) {
+                expect(e.error_code).toMatch(ErrorCodes.InvalidName)
+            }
+        }
+    })
+    test("max length", async () => {
+        expect.assertions(2)
+        try {
+            await signup("0123456789012345678901234567890123456789", "password")
         } catch (e) {
             expect(e).toBeInstanceOf(ModelRuntimeError)
             if (e instanceof ModelRuntimeError) {
@@ -89,6 +111,18 @@ describe("signup", () => {
         try {
             await signup("beluga", "password")
             await signup("beluga", "password")
+        } catch (e) {
+            expect(e).toBeInstanceOf(ModelRuntimeError)
+            if (e instanceof ModelRuntimeError) {
+                expect(e.error_code).toMatch(ErrorCodes.NameTaken)
+            }
+        }
+    })
+    test("case insensitive", async () => {
+        expect.assertions(2)
+        try {
+            await signup("beluga", "password")
+            await signup("Beluga", "password")
         } catch (e) {
             expect(e).toBeInstanceOf(ModelRuntimeError)
             if (e instanceof ModelRuntimeError) {
