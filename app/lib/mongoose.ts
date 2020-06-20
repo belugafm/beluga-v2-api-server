@@ -1,12 +1,12 @@
-import mongoose, { Document, FilterQuery } from "mongoose"
+import mongoose, { Document, FilterQuery, DocumentQuery } from "mongoose"
 
 export async function findOne<T extends Document>(
     cls: mongoose.Model<T, {}>,
     condition: FilterQuery<T>,
-    case_sensitive: boolean = true
+    additional_query_func: (query: DocumentQuery<T | null, T>) => void
 ): Promise<T | null> {
     return new Promise((resolve, reject) => {
-        if (case_sensitive) {
+        additional_query_func(
             cls.findOne(condition, (error, result) => {
                 if (error) {
                     reject(error)
@@ -14,17 +14,6 @@ export async function findOne<T extends Document>(
                     resolve(result)
                 }
             })
-        } else {
-            cls.findOne(condition, (error, result) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(result)
-                }
-            }).collation({
-                locale: "en_US",
-                strength: 2,
-            })
-        }
+        )
     })
 }
