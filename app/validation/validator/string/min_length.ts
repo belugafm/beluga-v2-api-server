@@ -1,5 +1,5 @@
 import { is_string } from "../../functions"
-import { ValidationError, CommonErrorMessages } from "../../error"
+import { ValueSchemaValidationError, CommonErrorMessages } from "../../error"
 
 export type Options = {
     min_length?: number
@@ -9,10 +9,10 @@ export function check_min_value(value: string, options: Options): void {
         return
     }
     if (is_string(value) !== true) {
-        throw new ValidationError(CommonErrorMessages.InvalidType)
+        throw new ValueSchemaValidationError(CommonErrorMessages.InvalidType)
     }
     if (value.length < options.min_length) {
-        throw new ValidationError(
+        throw new ValueSchemaValidationError(
             `${options.min_length - 1}文字以下に設定することはできません`
         )
     }

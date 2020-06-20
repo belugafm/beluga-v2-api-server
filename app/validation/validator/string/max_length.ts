@@ -1,5 +1,5 @@
 import { is_string } from "../../functions"
-import { ValidationError, CommonErrorMessages } from "../../error"
+import { ValueSchemaValidationError, CommonErrorMessages } from "../../error"
 
 export type Options = {
     max_length?: number
@@ -9,10 +9,10 @@ export function check_max_value(value: string, options: Options): void {
         return
     }
     if (is_string(value) !== true) {
-        throw new ValidationError(CommonErrorMessages.InvalidType)
+        throw new ValueSchemaValidationError(CommonErrorMessages.InvalidType)
     }
     if (value.length > options.max_length) {
-        throw new ValidationError(
+        throw new ValueSchemaValidationError(
             `${options.max_length + 1}文字以上に設定することはできません`
         )
     }

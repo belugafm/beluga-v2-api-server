@@ -7,8 +7,9 @@ import {
     define_arguments,
     define_expected_errors,
 } from "../../define"
-import * as vs from "../../validation"
-import { InternalErrorSpec } from "../../error"
+import * as vs from "../../../../validation"
+import { InternalErrorSpec, UnexpectedErrorSpec } from "../../error"
+import { signup } from "../../../../model/user/signup"
 
 export const argument_specs = define_arguments(
     ["name", "password", "confirmed_password"] as const,
@@ -41,6 +42,7 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_confirmed_password",
         "name_taken",
         "internal_error",
+        "unexpected_error",
     ] as const,
     argument_specs,
     {
@@ -64,6 +66,7 @@ export const expected_error_specs = define_expected_errors(
             hint: ["別のユーザー名でアカウントを作成してください"],
         },
         internal_error: new InternalErrorSpec(),
+        unexpected_error: new UnexpectedErrorSpec(),
     }
 )
 
@@ -86,7 +89,6 @@ export default define_method(
     argument_specs,
     expected_error_specs,
     async (args, errors) => {
-        console.log(args.name, args.confirmed_password, args.password)
-        throw new Error(errors.name_taken.description[0])
+        await signup(args.name, args.password)
     }
 )

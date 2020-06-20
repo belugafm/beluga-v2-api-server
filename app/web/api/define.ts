@@ -4,9 +4,9 @@ import { HttpMethodLiteralUnion } from "./facts/http_method"
 import { RateLimitLiteralUnion } from "./facts/rate_limit"
 import { ContentTypesLiteralUnion } from "./facts/content_type"
 import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
-import { Schema } from "./validation/schema"
-import { ValidationError } from "./validation/error"
-import { ApiRuntimeError, InternalErrorSpec } from "./error"
+import { Schema } from "../../validation/schema"
+import { ValueSchemaValidationError } from "../../validation/error"
+import { WebApiRuntimeError, InternalErrorSpec } from "./error"
 
 interface AcceptedScopeItem {
     token_type: TokenTypesLiteralUnion
@@ -166,16 +166,16 @@ export function define_method<
             try {
                 schema.check(value)
             } catch (validation_error) {
-                if (validation_error instanceof ValidationError) {
+                if (validation_error instanceof ValueSchemaValidationError) {
                     const error = errors_associated_with_args[argument_name]
-                    throw new ApiRuntimeError(
+                    throw new WebApiRuntimeError(
                         validation_error.message,
                         error.description,
                         error.hint
                     )
                 } else {
                     const error = new InternalErrorSpec()
-                    throw new ApiRuntimeError(
+                    throw new WebApiRuntimeError(
                         "引数の値チェックを完了できません",
                         error.description,
                         error.hint

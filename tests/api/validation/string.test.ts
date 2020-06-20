@@ -1,5 +1,5 @@
-import { string } from "../../../app/web/api/validation"
-import { ValidationError } from "../../../app/web/api/validation/error"
+import { string } from "../../../app/validation"
+import { ValueSchemaValidationError } from "../../../app/validation/error"
 
 describe("input type", () => {
     test("invalid string", () => {
@@ -7,15 +7,15 @@ describe("input type", () => {
         expect(() => {
             // @ts-ignore
             schema.check(1)
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             // @ts-ignore
             schema.check([])
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             // @ts-ignore
             schema.check({})
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
     })
 })
 
@@ -31,10 +31,10 @@ describe("min_length", () => {
         })
         expect(() => {
             schema.check("")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             schema.check("beluga")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(schema.check("belugabeluga")).toBeUndefined()
     })
 })
@@ -46,7 +46,7 @@ describe("max_length", () => {
         })
         expect(() => {
             schema.check("belugabelugabelugabeluga")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(schema.check("beluga")).toBeUndefined()
         expect(schema.check("")).toBeUndefined()
     })
@@ -60,10 +60,10 @@ describe("max_length & min_length", () => {
         })
         expect(() => {
             schema.check("belugabelugabelugabeluga")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             schema.check("belu")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(schema.check("beluga")).toBeUndefined()
     })
 })
@@ -75,7 +75,7 @@ describe("regexp", () => {
         })
         expect(() => {
             schema.check("AAA")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(schema.check("beluga")).toBeUndefined()
     })
 })

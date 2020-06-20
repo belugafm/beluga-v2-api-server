@@ -1,15 +1,15 @@
-import { password } from "../../../app/web/api/validation"
-import { ValidationError } from "../../../app/web/api/validation/error"
+import { password } from "../../../app/validation"
+import { ValueSchemaValidationError } from "../../../app/validation/error"
 
 describe("password", () => {
     test("password", () => {
         const schema = password()
         expect(() => {
             schema.check("")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             schema.check("aaaa")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(schema.check("password")).toBeUndefined()
     })
 })

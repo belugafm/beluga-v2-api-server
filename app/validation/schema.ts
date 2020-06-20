@@ -5,9 +5,19 @@ export class Schema<T> {
         this.options = options
         this.validation_funcs = validation_funcs
     }
-    check(value: T) {
+    check(value: T): void {
         this.validation_funcs.forEach((check) => {
             check(value, this.options)
         })
+    }
+    ok(value: T): boolean {
+        try {
+            this.validation_funcs.forEach((check) => {
+                check(value, this.options)
+            })
+        } catch (error) {
+            return false
+        }
+        return true
     }
 }

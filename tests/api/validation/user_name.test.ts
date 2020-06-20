@@ -1,20 +1,20 @@
-import { user_name } from "../../../app/web/api/validation"
-import { ValidationError } from "../../../app/web/api/validation/error"
+import { user_name } from "../../../app/validation"
+import { ValueSchemaValidationError } from "../../../app/validation/error"
 
 describe("user_name", () => {
     test("user_name", () => {
         const schema = user_name()
         expect(() => {
             schema.check("")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             schema.check("*")
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(() => {
             schema.check(
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             )
-        }).toThrow(ValidationError)
+        }).toThrow(ValueSchemaValidationError)
         expect(schema.check("beluga")).toBeUndefined()
     })
 })
