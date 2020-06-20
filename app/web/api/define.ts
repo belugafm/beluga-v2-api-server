@@ -73,7 +73,7 @@ export function define_arguments<ArgumentNames extends string, ValueType>(
 }
 
 // Web APIが送出しうるエラーを定義
-type ExpectedError<Arguments> = {
+export type ExpectedError<Arguments> = {
     description: string[]
     hint?: string[]
     argument?: keyof Arguments

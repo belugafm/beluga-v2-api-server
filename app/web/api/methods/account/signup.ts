@@ -6,10 +6,19 @@ import {
     define_method,
     define_arguments,
     define_expected_errors,
+    ExpectedError,
 } from "../../define"
 import * as vs from "../../../../validation"
-import { InternalErrorSpec, UnexpectedErrorSpec } from "../../error"
-import { signup } from "../../../../model/user/signup"
+import {
+    InternalErrorSpec,
+    UnexpectedErrorSpec,
+    WebApiRuntimeError,
+} from "../../error"
+import {
+    signup,
+    ErrorCodes as ModelErrorCodes,
+} from "../../../../model/user/signup"
+import { ModelRuntimeError } from "../../../../model/error"
 
 export const argument_specs = define_arguments(
     ["name", "password", "confirmed_password"] as const,
@@ -84,11 +93,27 @@ export const facts: MethodFacts = {
     description: ["新規アカウントを作成します"],
 }
 
+function raise<T>(e: Error, spec: ExpectedError<T>) {
+    throw new WebApiRuntimeError(e.message, spec.description, spec.hint)
+}
+
 export default define_method(
     facts,
     argument_specs,
     expected_error_specs,
-    async (args, errors) => {
-        await signup(args.name, args.password)
+    async (args, expected_errors) => {
+        try {
+            await signup(args.name, args.password)
+        } catch (e) {
+            if (e instanceof ModelRuntimeError) {
+                if (e.error_code === ModelErrorCodes.NameTaken) {
+                    raise(e, expected_errors.name_taken)
+                } else {
+                    raise(e, expected_errors.internal_error)
+                }
+            } else {
+                raise(e, expected_errors.unexpected_error)
+            }
+        }
     }
 )
