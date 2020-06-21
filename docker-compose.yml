@@ -20,7 +20,3 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
     depends_on:
       - mongo
-  redis:
-    restart: always
-    image: redis
-    container_name: redis
