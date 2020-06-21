@@ -73,20 +73,24 @@ export function define_arguments<ArgumentNames extends string, ValueType>(
 }
 
 // Web APIが送出しうるエラーを定義
-export type ExpectedError<Arguments> = {
+export type ExpectedError<
+    ErrorCode extends string | number | symbol,
+    Arguments
+> = {
+    code: ErrorCode
     description: string[]
     hint?: string[]
     argument?: keyof Arguments
 }
 
-export function define_expected_errors<ErrorNames extends string, Arguments>(
-    error_names: readonly ErrorNames[],
+export function define_expected_errors<ErrorCodes extends string, Arguments>(
+    error_names: readonly ErrorCodes[],
     argument_specs: Arguments,
     error_specs: {
-        [ErrorName in ErrorNames]: ExpectedError<Arguments>
+        [ErrorCode in ErrorCodes]: ExpectedError<ErrorCode, Arguments>
     }
 ): {
-    [ErrorName in ErrorNames]: ExpectedError<Arguments>
+    [ErrorCode in ErrorCodes]: ExpectedError<ErrorCode, Arguments>
 } {
     return error_specs
 }
@@ -98,7 +102,7 @@ type Callback<Arguments, Errors> = (
 ) => Promise<any>
 
 type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
-    [ErrorCode in keyof ErrorSpecs]: ExpectedError<Arguments>
+    [ErrorCode in keyof ErrorSpecs]: ExpectedError<ErrorCode, Arguments>
 }
 
 type ReturnType<ArgumentSpecs> = (
@@ -149,6 +153,7 @@ export function define_method<
         // 各argumentに関連付けられた、値チェック失敗時のエラーを送出できるようにする
         const errors_associated_with_args: {
             [argument_name: string]: ExpectedError<
+                string,
                 ArgumentSpecs<ArgumentNames, ArgumentValue>
             >
         } = {}

@@ -1,8 +1,10 @@
 import { MongoClient } from "mongodb"
+import { MongoMemoryServer } from "mongodb-memory-server"
 import Router from "find-my-way"
 import turbo from "turbo-http"
 import { Request, Response, read_body } from "./turbo"
 import qs from "qs"
+import { WebApiRuntimeError } from "../api/error"
 
 export { Request, Response }
 
@@ -104,11 +106,13 @@ function check_content_type(content_type?: string) {
     }
 }
 
+const base_url = "/api/v1/"
+
 export class TurboServer {
     router: Router.Instance
     server: turbo.Server
-    db: MongoClient
-    constructor(opt: Router.Config, db: MongoClient) {
+    db: MongoClient | MongoMemoryServer
+    constructor(opt: Router.Config, db: MongoClient | MongoMemoryServer) {
         if (!opt.defaultRoute) {
             opt.defaultRoute = default_route
         }
@@ -123,7 +127,7 @@ export class TurboServer {
     }
     get(url: string, handler: Router.Handler, content_type?: string) {
         this.router.get(
-            url,
+            base_url + url,
             async (req, res, params, store) => {
                 const { content_type } = store
                 check_content_type(content_type)
@@ -155,12 +159,15 @@ export class TurboServer {
                 }
                 res.end()
             },
-            { content_type: content_type ? content_type : ContentType.JSON }
+            {
+                content_type: content_type ? content_type : ContentType.JSON,
+            }
         )
     }
     post(url: string, handler: Router.Handler) {
-        this.router.post(url, async (req, res, params) => {
+        this.router.post(base_url + url, async (req, res, params) => {
             res.setHeader("Content-Type", "application/json") // サーバーの応答はjson
+            res.setStatusCode(200)
             try {
                 const body = await read_body(req) // これは必ず一番最初に呼ぶ
 
@@ -174,18 +181,33 @@ export class TurboServer {
                 }
                 res.write(Buffer.from(JSON.stringify(data)))
             } catch (error) {
-                console.error(error)
-                res.write(
-                    Buffer.from(
-                        JSON.stringify({
-                            ok: false,
-                            error: error.toString(),
-                            details: {
-                                stack: error.stack.split("\n"),
-                            },
-                        })
+                if (error instanceof WebApiRuntimeError) {
+                    res.write(
+                        Buffer.from(
+                            JSON.stringify({
+                                ok: false,
+                                error_code: error.code,
+                                description: error.description,
+                                argument: error.argument,
+                                hint: error.hint,
+                                additional_message: error.additional_message,
+                                stack: null,
+                            })
+                        )
                     )
-                )
+                } else {
+                    res.write(
+                        Buffer.from(
+                            JSON.stringify({
+                                ok: false,
+                                error_code: "unexpected_error",
+                                description: [error.toString()],
+                                stack: error.stack.split("\n"),
+                            })
+                        )
+                    )
+                }
+                console.error(error)
             }
             res.end()
         })

@@ -66,7 +66,7 @@ export function read_body(req: Request) {
         req.onEnd(() => {
             try {
                 const buffer = Buffer.concat(chunks)
-                const content_type = headers["content-type"]
+                const content_type = headers["content-type"].split(";")[0]
                 if (content_type === "application/json") {
                     return resolve(JSON.parse(buffer.toString()))
                 }

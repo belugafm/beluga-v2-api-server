@@ -58,21 +58,25 @@ export const expected_error_specs = define_expected_errors(
         invalid_arg_name: {
             description: ["ユーザー名が基準を満たしていません"],
             argument: "name",
+            code: "invalid_arg_name",
         },
         invalid_arg_password: {
             description: ["パスワードが基準を満たしていません"],
             argument: "password",
+            code: "invalid_arg_password",
         },
         invalid_arg_confirmed_password: {
             description: ["確認用のパスワードが一致しません"],
             hint: ["パスワードと確認用パスワードは同じものを入力してください"],
             argument: "confirmed_password",
+            code: "invalid_arg_confirmed_password",
         },
         name_taken: {
             description: [
                 "このユーザー名はすでに取得されているため、新規作成できません",
             ],
             hint: ["別のユーザー名でアカウントを作成してください"],
+            code: "name_taken",
         },
         internal_error: new InternalErrorSpec(),
         unexpected_error: new UnexpectedErrorSpec(),
@@ -93,7 +97,10 @@ export const facts: MethodFacts = {
     description: ["新規アカウントを作成します"],
 }
 
-function raise<T>(spec: ExpectedError<T>, source_error?: Error) {
+function raise<T extends string, S>(
+    spec: ExpectedError<T, S>,
+    source_error?: Error
+) {
     if (source_error) {
         throw new WebApiRuntimeError(spec, source_error.message)
     } else {
