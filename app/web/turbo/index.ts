@@ -8,7 +8,7 @@ export { Request, Response }
 
 const default_route = (req: Request, res: Response) => {
     res.setHeader("Content-Type", "application/json")
-    res.statusCode = 404
+    res.setStatusCode(404)
     res.write(
         Buffer.from(
             JSON.stringify({

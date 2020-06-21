@@ -27,7 +27,6 @@ export class Request {
 
 export class Response {
     _res: turbo.Response
-    statusCode: number = -1
     constructor(res: turbo.Response) {
         Object.assign(this, res)
         this._res = res
@@ -48,6 +47,9 @@ export class Response {
         }
         const cookie_str = cookie.serialize(name, value, opt)
         this.setHeader("Set-Cookie", cookie_str)
+    }
+    setStatusCode(code: number) {
+        this._res.statusCode = code
     }
 }
 
