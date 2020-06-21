@@ -28,9 +28,9 @@ function init(db: MongoClient | MongoMemoryServer) {
     )
     server.post(facts.url, async (req, res, params) => {
         await signup({
-            name: "beluga",
-            password: "password",
-            confirmed_password: "password",
+            name: req.body.name,
+            password: req.body.password,
+            confirmed_password: req.body.confirmed_password,
         })
         return {
             ok: true,
