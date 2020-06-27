@@ -26,17 +26,7 @@ function init(db: MongoClient | MongoMemoryServer) {
         },
         db
     )
-    server.post(facts.url, async (req, res, params) => {
-        await signup({
-            name: req.body.name,
-            password: req.body.password,
-            confirmed_password: req.body.confirmed_password,
-        })
-        return {
-            ok: true,
-            message: "hoge page",
-        }
-    })
+    server.register(require("./web/endpoint/account/signup"))
     server.listen(8080)
 }
 

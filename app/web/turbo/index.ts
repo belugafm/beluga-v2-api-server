@@ -212,8 +212,8 @@ export class TurboServer {
             res.end()
         })
     }
-    register(module: any, opt: any) {
-        module(this, opt)
+    register(module: any) {
+        module.default(this)
         return this
     }
     listen(port: number) {
