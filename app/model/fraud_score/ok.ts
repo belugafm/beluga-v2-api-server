@@ -35,10 +35,10 @@ export const ok = async (
     console.log(result)
 
     const { fraud_score, ISP, country_code, proxy, vpn, tor } = result
-    if (config.fraud_prevention.isp.allow_list.includes(ISP)) {
+    if (config.fraud_prevention.isp_allow_list.includes(ISP)) {
         return true
     }
-    if (config.fraud_prevention.isp.deny_list.includes(ISP)) {
+    if (config.fraud_prevention.isp_deny_list.includes(ISP)) {
         return false
     }
     if (fraud_score > 75) {

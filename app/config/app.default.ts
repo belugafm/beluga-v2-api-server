@@ -1,10 +1,8 @@
 const config: {
     fraud_prevention: {
         enabled: boolean
-        isp: {
-            deny_list: string[]
-            allow_list: string[]
-        }
+        isp_deny_list: string[]
+        isp_allow_list: string[]
         ipqs_api_secret: string
     }
 } = {
@@ -12,10 +10,8 @@ const config: {
     // ユーザーのBeluga利用を制限する
     fraud_prevention: {
         enabled: false,
-        isp: {
-            deny_list: [],
-            allow_list: [],
-        },
+        isp_deny_list: [],
+        isp_allow_list: [],
         ipqs_api_secret: "",
     },
 }
