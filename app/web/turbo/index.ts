@@ -4,7 +4,12 @@ import Router from "find-my-way"
 import turbo from "turbo-http"
 import { Request, Response, read_body } from "./turbo"
 import qs from "qs"
-import { WebApiRuntimeError } from "../api/error"
+import {
+    WebApiRuntimeError,
+    FraudPreventionAccessDeniedErrorSpec,
+} from "../api/error"
+import config from "../../config/app"
+import * as fraud_prevention from "../../model/fraud_score/ok"
 
 export { Request, Response }
 
@@ -173,6 +178,15 @@ export class TurboServer {
 
                 // IPアドレス等を使ってアクセス制限をする場合はここで行う
                 const ip_address = req.headers["x-real-ip"]
+                if (config.fraud_prevention.enabled) {
+                    if ((await fraud_prevention.ok(ip_address)) === true) {
+                        console.log("OK")
+                    } else {
+                        throw new WebApiRuntimeError(
+                            new FraudPreventionAccessDeniedErrorSpec()
+                        )
+                    }
+                }
 
                 req.body = body
                 const data = await handler(req, res, params)
