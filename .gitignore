@@ -2,6 +2,7 @@ node_modules/
 build/
 volumes/
 www/
+app/config/app.ts
 .vscode/
 .DS_Store
 npm-debug.log

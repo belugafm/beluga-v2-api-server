@@ -9,10 +9,10 @@ export const ErrorCodes = {
     NameTaken: "name_taken",
 }
 
-export async function signup(
+export const signup = async (
     name: UserSchema["name"],
     password: string
-): Promise<UserSchema> {
+): Promise<UserSchema> => {
     if (vs.user_name().ok(name) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidName)
     }
