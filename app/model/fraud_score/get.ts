@@ -7,7 +7,7 @@ export const ErrorCodes = {
     InvalidIpAddress: "invalid_ip_address",
 } as const
 
-export const show = async (
+export const get = async (
     ip_address: FraudScoreSchema["ip_address"]
 ): Promise<FraudScoreSchema | null> => {
     if (vs.ip_address().ok(ip_address) !== true) {

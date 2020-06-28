@@ -2,11 +2,8 @@ import { TurboServer, Request, Response } from "./web/turbo"
 import { MongoClient } from "mongodb"
 import { MongoMemoryServer } from "mongodb-memory-server"
 import mongoose from "mongoose"
-import { facts } from "./web/api/methods/account/signup"
-import signup from "./web/api/methods/account/signup"
 
 function init(db: MongoClient | MongoMemoryServer) {
-    console.log("接続しました")
     const server = new TurboServer(
         {
             maxParamLength: 128,
@@ -32,6 +29,7 @@ function init(db: MongoClient | MongoMemoryServer) {
 
 const mongodb = new MongoMemoryServer()
 mongodb.getUri().then(async (uri) => {
+    console.log(uri)
     mongoose.connect(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,

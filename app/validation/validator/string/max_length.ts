@@ -4,7 +4,7 @@ import { ValueSchemaValidationError, CommonErrorMessages } from "../../error"
 export type Options = {
     max_length?: number
 }
-export function check_max_value(value: string, options: Options): void {
+export function check_max_length(value: string, options: Options): void {
     if (options.max_length == null) {
         return
     }

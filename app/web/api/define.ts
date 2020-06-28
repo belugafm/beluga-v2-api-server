@@ -56,7 +56,7 @@ export interface MethodFacts {
 type Argument<ValueType> = {
     description: string[]
     examples: string[] | null
-    required: true
+    required: boolean
     default_value?: any
     schema: Schema<ValueType>
 }
@@ -107,7 +107,7 @@ type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
 
 type ReturnType<ArgumentSpecs> = (
     args: { [ArgumentName in keyof ArgumentSpecs]: any }
-) => Promise<any>
+) => Promise<(args: { [ArgumentName in keyof ArgumentSpecs]: any }) => any>
 
 type ArgumentSpecs<ArgumentNames extends string, ValueType> = {
     [Argumentname in ArgumentNames]: Argument<ValueType>
@@ -157,7 +157,7 @@ export function define_method<
                 ArgumentSpecs<ArgumentNames, ArgumentValue>
             >
         } = {}
-        for (const argument_name in args) {
+        for (const argument_name in method_argument_specs) {
             Object.values(expected_error_specs).forEach((error) => {
                 if (error.argument === argument_name) {
                     errors_associated_with_args[argument_name] = error
@@ -165,23 +165,39 @@ export function define_method<
             })
         }
         // 各argumentの値チェック
-        for (const argument_name in args) {
+        for (const argument_name in method_argument_specs) {
+            const { required } = method_argument_specs[argument_name]
+            if (required) {
+                if (argument_name in args === false) {
+                    const error_code =
+                        errors_associated_with_args[argument_name].code
+                    throw new WebApiRuntimeError({
+                        code: error_code,
+                        description: [`"${argument_name}"を指定してください`],
+                    })
+                }
+            }
             const value = args[argument_name]
-            const { schema } = method_argument_specs[argument_name]
-            try {
-                schema.check(value)
-            } catch (validation_error) {
-                if (validation_error instanceof ValueSchemaValidationError) {
-                    const error = errors_associated_with_args[argument_name]
-                    throw new WebApiRuntimeError(
-                        error,
-                        validation_error.message
-                    )
-                } else {
-                    throw new WebApiRuntimeError(
-                        new InternalErrorSpec(),
-                        "引数の値チェックを完了できません"
-                    )
+            if (required || value != null) {
+                try {
+                    const { schema } = method_argument_specs[argument_name]
+                    schema.check(value)
+                } catch (validation_error) {
+                    console.log(validation_error)
+                    if (
+                        validation_error instanceof ValueSchemaValidationError
+                    ) {
+                        const error = errors_associated_with_args[argument_name]
+                        throw new WebApiRuntimeError(
+                            error,
+                            validation_error.message
+                        )
+                    } else {
+                        throw new WebApiRuntimeError(
+                            new InternalErrorSpec(),
+                            "引数の値チェックを完了できません"
+                        )
+                    }
                 }
             }
         }

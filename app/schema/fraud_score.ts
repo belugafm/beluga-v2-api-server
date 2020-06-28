@@ -11,7 +11,7 @@ export interface FraudScoreSchema extends Document {
 }
 
 export const FraudScore = mongoose.model<FraudScoreSchema>(
-    "FraudScore",
+    "fraud_score",
     new Schema({
         ip_address: String,
         result: Object,

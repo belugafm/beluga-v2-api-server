@@ -178,6 +178,7 @@ export class TurboServer {
 
                 // IPアドレス等を使ってアクセス制限をする場合はここで行う
                 const ip_address = req.headers["x-real-ip"]
+                params["ip_address"] = ip_address
                 if (config.fraud_prevention.enabled) {
                     if ((await fraud_prevention.ok(ip_address)) === true) {
                         console.log("OK")

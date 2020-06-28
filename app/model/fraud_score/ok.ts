@@ -4,7 +4,7 @@ import { ModelRuntimeError } from "../error"
 import * as ipqs from "../../lib/ipqs"
 import { add } from "./add"
 import config from "../../config/app"
-import { show } from "./show"
+import { get } from "./get"
 
 export const ErrorCodes = {
     InvalidIpAddress: "invalid_ip_address",
@@ -12,7 +12,7 @@ export const ErrorCodes = {
 } as const
 
 const fetch_result = async (ip_address: string): Promise<ipqs.IpqsResult> => {
-    const existing_result = await show(ip_address)
+    const existing_result = await get(ip_address)
     if (existing_result) {
         return existing_result.result
     }

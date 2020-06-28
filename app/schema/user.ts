@@ -25,7 +25,7 @@ const UndefinedString = {
 }
 
 export const User = mongoose.model<UserSchema>(
-    "User",
+    "user",
     new Schema({
         name: {
             type: String,

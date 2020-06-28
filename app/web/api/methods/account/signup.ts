@@ -21,7 +21,13 @@ import {
 import { ModelRuntimeError } from "../../../../model/error"
 
 export const argument_specs = define_arguments(
-    ["name", "password", "confirmed_password"] as const,
+    [
+        "name",
+        "password",
+        "confirmed_password",
+        "fingerprint",
+        "ip_address",
+    ] as const,
     {
         name: {
             description: ["ユーザー名"],
@@ -41,6 +47,21 @@ export const argument_specs = define_arguments(
             required: true,
             schema: vs.password(),
         },
+        fingerprint: {
+            description: ["Browser Fingerprint"],
+            examples: null,
+            required: false,
+            schema: vs.string({
+                min_length: 64,
+                max_length: 64,
+            }),
+        },
+        ip_address: {
+            description: ["登録時のIPアドレス"],
+            examples: null,
+            required: true,
+            schema: vs.ip_address(),
+        },
     }
 )
 
@@ -49,6 +70,8 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_name",
         "invalid_arg_password",
         "invalid_arg_confirmed_password",
+        "invalid_arg_ip_address",
+        "invalid_arg_fingerprint",
         "name_taken",
         "internal_error",
         "unexpected_error",
@@ -70,6 +93,18 @@ export const expected_error_specs = define_expected_errors(
             hint: ["パスワードと確認用パスワードは同じものを入力してください"],
             argument: "confirmed_password",
             code: "invalid_arg_confirmed_password",
+        },
+        invalid_arg_ip_address: {
+            description: ["登録ユーザーのIPアドレスを正しく指定してください"],
+            hint: [],
+            argument: "ip_address",
+            code: "invalid_arg_ip_address",
+        },
+        invalid_arg_fingerprint: {
+            description: ["不正なfingerprintです"],
+            hint: [],
+            argument: "fingerprint",
+            code: "invalid_arg_fingerprint",
         },
         name_taken: {
             description: [
@@ -117,8 +152,12 @@ export default define_method(
             raise(errors.invalid_arg_confirmed_password)
         }
         try {
-            const user = await signup(args.name, args.password)
-            console.log(user)
+            await signup({
+                name: args.name,
+                password: args.password,
+                ip_address: args.ip_address,
+                fingerprint: args.fingerprint,
+            })
         } catch (error) {
             if (error instanceof ModelRuntimeError) {
                 if (error.code === ModelErrorCodes.NameTaken) {

@@ -4,7 +4,7 @@ import { Options } from "./string"
 
 export function ip_address() {
     const options: Options = {
-        regexp: new RegExp(/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/),
+        regexp: new RegExp(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/),
     }
     return new Schema<string>(options, [check_regex_pattern])
 }

@@ -4,7 +4,7 @@ import { ValueSchemaValidationError, CommonErrorMessages } from "../../error"
 export type Options = {
     min_length?: number
 }
-export function check_min_value(value: string, options: Options): void {
+export function check_min_length(value: string, options: Options): void {
     if (options.min_length == null) {
         return
     }

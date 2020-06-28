@@ -7,6 +7,8 @@ export default (server: TurboServer) => {
             name: req.body.name,
             password: req.body.password,
             confirmed_password: req.body.confirmed_password,
+            ip_address: params["ip_address"],
+            fingerprint: req.body.fingerprint,
         })
         return {
             ok: true,
