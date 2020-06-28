@@ -13,7 +13,7 @@ export function check_min_value(value: string, options: Options): void {
     }
     if (value.length < options.min_length) {
         throw new ValueSchemaValidationError(
-            `${options.min_length - 1}文字以下に設定することはできません`
+            `${options.min_length}文字以上に設定してください`
         )
     }
 }

@@ -5,6 +5,9 @@ const config: {
         isp_allow_list: string[]
         ipqs_api_secret: string
     }
+    password: {
+        salt_rounds: number
+    }
 } = {
     // IP Quality ScoreのサービスによるIPアドレスの不信度スコアを利用して
     // ユーザーのBeluga利用を制限する
@@ -13,6 +16,9 @@ const config: {
         isp_deny_list: [],
         isp_allow_list: [],
         ipqs_api_secret: "",
+    },
+    password: {
+        salt_rounds: 10,
     },
 }
 

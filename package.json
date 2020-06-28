@@ -4,11 +4,13 @@
     "description": "",
     "main": "index.js",
     "dependencies": {
+        "@types/bcrypt": "^3.0.0",
         "@types/jest": "^26.0.0",
         "@types/mongodb": "^3.5.14",
         "@types/mongoose": "^5.7.27",
         "@types/node": "^13.13.4",
         "@types/node-fetch": "^2.5.7",
+        "bcrypt": "^5.0.0",
         "cookie": "^0.4.1",
         "find-my-way": "^3.0.0",
         "jest": "^26.0.1",

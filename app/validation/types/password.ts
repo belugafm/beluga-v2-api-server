@@ -6,8 +6,8 @@ import { Options } from "./string"
 
 export function password() {
     const options: Options = {
-        min_length: 5,
-        max_length: 256,
+        min_length: 8,
+        max_length: 72,
     }
     return new Schema<string>(options, [
         check_min_value,
