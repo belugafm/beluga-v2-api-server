@@ -188,7 +188,10 @@ export class TurboServer {
                         ? options.fraud_prevention_rule
                         : fraud_prevention.DefaultRule
                     if (
-                        (await fraud_prevention.ok(ip_address, rule)) === true
+                        (await fraud_prevention.ok({
+                            ip_address,
+                            apply_rule: rule,
+                        })) === true
                     ) {
                         console.log("OK")
                     } else {

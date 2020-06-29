@@ -10,10 +10,15 @@ export const ErrorCodes = {
     InvalidPasswordHash: "invalid_password_hash",
 }
 
-export const add = async (
-    user_id: UserLoginCredentialSchema["user_id"],
+type Argument = {
+    user_id: UserLoginCredentialSchema["user_id"]
     password_hash: UserLoginCredentialSchema["password_hash"]
-): Promise<UserLoginCredentialSchema> => {
+}
+
+export const add = async ({
+    user_id,
+    password_hash,
+}: Argument): Promise<UserLoginCredentialSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
         throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
     }

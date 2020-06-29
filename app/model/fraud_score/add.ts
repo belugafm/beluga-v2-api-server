@@ -7,10 +7,15 @@ export const ErrorCodes = {
     InvalidResult: "invalid_result",
 } as const
 
-export const add = async (
-    ip_address: FraudScoreSchema["ip_address"],
+type Argument = {
+    ip_address: FraudScoreSchema["ip_address"]
     result: FraudScoreSchema["result"]
-): Promise<FraudScoreSchema> => {
+}
+
+export const add = async ({
+    ip_address,
+    result,
+}: Argument): Promise<FraudScoreSchema> => {
     if (vs.ip_address().ok(ip_address) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
     }

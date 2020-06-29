@@ -20,3 +20,24 @@ export async function findOne<T extends Document>(
         )
     })
 }
+
+export async function find<T extends Document>(
+    cls: mongoose.Model<T, {}>,
+    condition: FilterQuery<T>,
+    additional_query_func?: (
+        query: DocumentQuery<T[], T, {}>
+    ) => DocumentQuery<T[], T, {}>
+): Promise<T[] | null> {
+    return new Promise((resolve, reject) => {
+        additional_query_func = additional_query_func
+            ? additional_query_func
+            : (x: DocumentQuery<T[], T, {}>) => x
+        additional_query_func(cls.find(condition)).exec((error, docs) => {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(docs)
+            }
+        })
+    })
+}

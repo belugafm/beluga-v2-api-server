@@ -14,10 +14,10 @@ export const ErrorCodes = {
 import * as vs from "../../../validation"
 
 type Argument = {
-    user_id: UserRegistrationSchema["user_id"]
-    ip_address: UserRegistrationSchema["ip_address"]
-    fraud_score_id: UserRegistrationSchema["fraud_score_id"]
-    fingerprint: UserRegistrationSchema["fingerprint"]
+    user_id?: UserRegistrationSchema["user_id"]
+    ip_address?: UserRegistrationSchema["ip_address"]
+    fraud_score_id?: UserRegistrationSchema["fraud_score_id"]
+    fingerprint?: UserRegistrationSchema["fingerprint"]
 }
 
 export const add = async ({
@@ -26,11 +26,16 @@ export const add = async ({
     fraud_score_id,
     fingerprint,
 }: Argument): Promise<UserRegistrationSchema> => {
-    if (user_id instanceof mongoose.Types.ObjectId === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+    const query: { user_id?: UserRegistrationSchema["user_id"] } = {}
+    if (user_id) {
+        if (user_id instanceof mongoose.Types.ObjectId === false) {
+            throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+        }
     }
-    if (vs.ip_address().ok(ip_address) === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+    if (ip_address) {
+        if (vs.ip_address().ok(ip_address) === false) {
+            throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        }
     }
     if (fraud_score_id) {
         if (fraud_score_id instanceof mongoose.Types.ObjectId === false) {

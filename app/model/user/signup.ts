@@ -26,7 +26,7 @@ const generate_fraud_score_if_needed = async (
     if (config.fraud_prevention.enabled === false) {
         return null
     }
-    const existing_fraud_score = await get_fraud_score(ip_address)
+    const existing_fraud_score = await get_fraud_score({ ip_address })
     if (existing_fraud_score) {
         return existing_fraud_score
     }
@@ -34,7 +34,14 @@ const generate_fraud_score_if_needed = async (
     if (result.success === false) {
         return null
     }
-    return add_fraud_score(ip_address, result)
+    return add_fraud_score({ ip_address, result })
+}
+
+type Argument = {
+    name: UserSchema["name"]
+    password: string
+    ip_address: string
+    fingerprint?: string
 }
 
 export const signup = async ({
@@ -42,12 +49,7 @@ export const signup = async ({
     password,
     ip_address,
     fingerprint,
-}: {
-    name: UserSchema["name"]
-    password: string
-    ip_address: string
-    fingerprint?: string
-}): Promise<UserSchema> => {
+}: Argument): Promise<UserSchema> => {
     if (vs.user_name().ok(name) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidName)
     }
@@ -65,6 +67,8 @@ export const signup = async ({
             throw new ModelRuntimeError(ErrorCodes.InvalidFingerprint)
         }
     }
+
+    // すでに同じ名前のユーザーがいるかどうかを調べる
     const existing_user = await mongo.findOne(User, { name: name }, (query) => {
         // case insensitiveにする
         query.collation({
@@ -75,6 +79,9 @@ export const signup = async ({
     if (existing_user) {
         throw new ModelRuntimeError(ErrorCodes.NameTaken)
     }
+
+    // 同じIPアドレスの場合一定期間は作成禁止
+
     const password_hash = await bcrypt.hash(
         password,
         config.password.salt_rounds
@@ -90,16 +97,19 @@ export const signup = async ({
         stats: {},
         created_at: Date.now(),
     })
-    const credential = await add_login_credential(user._id, password_hash)
+    const credential = await add_login_credential({
+        user_id: user._id,
+        password_hash,
+    })
 
     const fraud_score = await generate_fraud_score_if_needed(ip_address)
     const fraud_score_id = fraud_score ? fraud_score._id : null
-    const registration_info = await add_registration_info(
-        user._id,
+    const registration_info = await add_registration_info({
+        user_id: user._id,
         ip_address,
         fraud_score_id,
-        fingerprint
-    )
+        fingerprint,
+    })
 
     session.commitTransaction()
     session.endSession()

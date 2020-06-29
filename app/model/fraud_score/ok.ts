@@ -12,7 +12,7 @@ export const ErrorCodes = {
 } as const
 
 const fetch_result = async (ip_address: string): Promise<ipqs.IpqsResult> => {
-    const existing_result = await get(ip_address)
+    const existing_result = await get({ ip_address })
     if (existing_result) {
         return existing_result.result
     }
@@ -20,7 +20,7 @@ const fetch_result = async (ip_address: string): Promise<ipqs.IpqsResult> => {
     if (result.success === false) {
         throw new ModelRuntimeError(ErrorCodes.ApiRequestFailed)
     }
-    add(ip_address, result)
+    add({ ip_address, result })
     return result
 }
 
@@ -69,10 +69,15 @@ export const StrictRule: FraudPreventionRule = (result) => {
     return true
 }
 
-export const ok = async (
-    ip_address: FraudScoreSchema["ip_address"],
-    apply_rule: FraudPreventionRule = DefaultRule
-): Promise<boolean> => {
+type Argument = {
+    ip_address: FraudScoreSchema["ip_address"]
+    apply_rule: FraudPreventionRule
+}
+
+export const ok = async ({
+    ip_address,
+    apply_rule = DefaultRule,
+}: Argument): Promise<boolean> => {
     if (vs.ip_address().ok(ip_address) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
     }

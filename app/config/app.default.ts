@@ -5,6 +5,9 @@ const config: {
         isp_allow_list: string[]
         ipqs_api_secret: string
     }
+    user_registration: {
+        limit: number
+    }
     password: {
         salt_rounds: number
     }
@@ -16,6 +19,10 @@ const config: {
         isp_deny_list: [],
         isp_allow_list: [],
         ipqs_api_secret: "",
+    },
+    user_registration: {
+        // 同じIPアドレスで連続作成可能になる待ち時間（秒）
+        limit: 86400,
     },
     password: {
         salt_rounds: 10,
