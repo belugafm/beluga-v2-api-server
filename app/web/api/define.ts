@@ -134,7 +134,7 @@ export function define_method<
             [ArgumentName in keyof ArgumentSpecs<
                 ArgumentNames,
                 ArgumentValue
-            >]?: ArgumentValue
+            >]: ArgumentValue
         },
         ExpectedErrorSpecs<
             ArgumentSpecs<ArgumentNames, ArgumentValue>,
@@ -201,6 +201,7 @@ export function define_method<
                 }
             }
         }
+        // @ts-ignore
         return callback(args, expected_error_specs)
     }
 }
