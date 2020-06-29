@@ -66,6 +66,7 @@ export const signup = async ({
         }
     }
     const existing_user = await mongo.findOne(User, { name: name }, (query) => {
+        // case insensitiveにする
         query.collation({
             locale: "en_US",
             strength: 2,
@@ -99,10 +100,6 @@ export const signup = async ({
         fraud_score_id,
         fingerprint
     )
-
-    console.log(credential)
-    console.log(fraud_score)
-    console.log(registration_info)
 
     session.commitTransaction()
     session.endSession()

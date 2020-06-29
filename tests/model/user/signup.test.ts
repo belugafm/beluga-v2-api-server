@@ -17,7 +17,11 @@ describe("signup", () => {
     test("invalid name", async () => {
         expect.assertions(2)
         try {
-            await signup("", "password")
+            // @ts-ignore
+            await signup({
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -28,8 +32,12 @@ describe("signup", () => {
     test("invalid name", async () => {
         expect.assertions(2)
         try {
-            // @ts-ignore
-            await signup(2, "password")
+            await signup({
+                // @ts-ignore
+                name: 2,
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -40,8 +48,12 @@ describe("signup", () => {
     test("invalid name", async () => {
         expect.assertions(2)
         try {
-            // @ts-ignore
-            await signup({}, "password")
+            await signup({
+                // @ts-ignore
+                name: {},
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -52,7 +64,11 @@ describe("signup", () => {
     test("min length", async () => {
         expect.assertions(2)
         try {
-            await signup("", "password")
+            await signup({
+                name: "",
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -63,7 +79,11 @@ describe("signup", () => {
     test("max length", async () => {
         expect.assertions(2)
         try {
-            await signup("0123456789012345678901234567890123456789", "password")
+            await signup({
+                name: "0123456789012345678901234567890123456789",
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -71,10 +91,15 @@ describe("signup", () => {
             }
         }
     })
+
     test("invalid password", async () => {
         expect.assertions(2)
         try {
-            await signup("beluga", "")
+            // @ts-ignore
+            await signup({
+                name: "beluga",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -85,8 +110,12 @@ describe("signup", () => {
     test("invalid password", async () => {
         expect.assertions(2)
         try {
-            // @ts-ignore
-            await signup("beluga", 2)
+            await signup({
+                name: "beluga",
+                // @ts-ignore
+                password: 2,
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -97,8 +126,12 @@ describe("signup", () => {
     test("invalid password", async () => {
         expect.assertions(2)
         try {
-            // @ts-ignore
-            await signup("beluga", {})
+            await signup({
+                name: "beluga",
+                // @ts-ignore
+                password: {},
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -109,8 +142,16 @@ describe("signup", () => {
     test("name taken", async () => {
         expect.assertions(2)
         try {
-            await signup("beluga", "password")
-            await signup("beluga", "password")
+            await signup({
+                name: "beluga",
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
+            await signup({
+                name: "beluga",
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -121,8 +162,16 @@ describe("signup", () => {
     test("case insensitive", async () => {
         expect.assertions(2)
         try {
-            await signup("beluga", "password")
-            await signup("Beluga", "password")
+            await signup({
+                name: "beluga",
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
+            await signup({
+                name: "Beluga",
+                password: "password",
+                ip_address: "0.0.0.0",
+            })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {

@@ -106,8 +106,8 @@ type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
 }
 
 type ReturnType<ArgumentSpecs> = (
-    args: { [ArgumentName in keyof ArgumentSpecs]: any }
-) => Promise<(args: { [ArgumentName in keyof ArgumentSpecs]: any }) => any>
+    args: { [ArgumentName in keyof ArgumentSpecs]?: any }
+) => Promise<any>
 
 type ArgumentSpecs<ArgumentNames extends string, ValueType> = {
     [Argumentname in ArgumentNames]: Argument<ValueType>
@@ -134,7 +134,7 @@ export function define_method<
             [ArgumentName in keyof ArgumentSpecs<
                 ArgumentNames,
                 ArgumentValue
-            >]: ArgumentValue
+            >]?: ArgumentValue
         },
         ExpectedErrorSpecs<
             ArgumentSpecs<ArgumentNames, ArgumentValue>,
@@ -147,7 +147,7 @@ export function define_method<
             [ArgumentName in keyof ArgumentSpecs<
                 ArgumentNames,
                 ArgumentValue
-            >]: ArgumentValue
+            >]?: ArgumentValue
         }
     ) => {
         // 各argumentに関連付けられた、値チェック失敗時のエラーを送出できるようにする
@@ -178,12 +178,12 @@ export function define_method<
                 }
             }
             const value = args[argument_name]
-            if (required || value != null) {
+            if (required || value) {
                 try {
                     const { schema } = method_argument_specs[argument_name]
+                    // @ts-ignore
                     schema.check(value)
                 } catch (validation_error) {
-                    console.log(validation_error)
                     if (
                         validation_error instanceof ValueSchemaValidationError
                     ) {

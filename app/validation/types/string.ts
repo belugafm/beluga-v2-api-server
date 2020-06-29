@@ -9,8 +9,8 @@ export type Options = {
     max_length?: number
     regexp?: object
 }
-export function string(options: Options) {
-    return new Schema<string>(options, [
+export function string(options?: Options) {
+    return new Schema<string>(options || {}, [
         check_is_string,
         check_min_length,
         check_max_length,
