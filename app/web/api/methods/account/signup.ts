@@ -152,7 +152,7 @@ export default define_method(
             raise(errors.invalid_arg_confirmed_password)
         }
         try {
-            await signup({
+            return await signup({
                 name: args.name,
                 password: args.password,
                 ip_address: args.ip_address,
@@ -169,5 +169,6 @@ export default define_method(
                 raise(errors.unexpected_error, error)
             }
         }
+        return null
     }
 )

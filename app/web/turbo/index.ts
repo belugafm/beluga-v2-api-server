@@ -113,6 +113,10 @@ function check_content_type(content_type?: string) {
 
 const base_url = "/api/v1/"
 
+type Options = {
+    fraud_prevention_rule?: fraud_prevention.FraudPreventionRule
+}
+
 export class TurboServer {
     router: Router.Instance
     server: turbo.Server
@@ -169,7 +173,7 @@ export class TurboServer {
             }
         )
     }
-    post(url: string, handler: Router.Handler) {
+    post(url: string, handler: Router.Handler, options: Options = {}) {
         this.router.post(base_url + url, async (req, res, params) => {
             res.setHeader("Content-Type", "application/json") // サーバーの応答はjson
             res.setStatusCode(200)
@@ -180,7 +184,12 @@ export class TurboServer {
                 const ip_address = req.headers["x-real-ip"]
                 params["ip_address"] = ip_address
                 if (config.fraud_prevention.enabled) {
-                    if ((await fraud_prevention.ok(ip_address)) === true) {
+                    const rule = options.fraud_prevention_rule
+                        ? options.fraud_prevention_rule
+                        : fraud_prevention.DefaultRule
+                    if (
+                        (await fraud_prevention.ok(ip_address, rule)) === true
+                    ) {
                         console.log("OK")
                     } else {
                         throw new WebApiRuntimeError(

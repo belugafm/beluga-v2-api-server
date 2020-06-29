@@ -24,10 +24,10 @@ const fetch_result = async (ip_address: string): Promise<ipqs.IpqsResult> => {
     return result
 }
 
-type FraudPreventionRule = (result: ipqs.IpqsResult) => boolean
+export type FraudPreventionRule = (result: ipqs.IpqsResult) => boolean
 
-export const FraudPreventionDefaultRule: FraudPreventionRule = (result) => {
-    const { fraud_score, ISP, country_code, proxy, vpn, tor } = result
+export const DefaultRule: FraudPreventionRule = (result) => {
+    const { fraud_score, ISP, country_code, tor } = result
     if (config.fraud_prevention.isp_allow_list.includes(ISP)) {
         return true
     }
@@ -37,10 +37,33 @@ export const FraudPreventionDefaultRule: FraudPreventionRule = (result) => {
     if (fraud_score >= 85) {
         return false
     }
-    if (country_code !== "JP") {
+    // if (country_code !== "JP") {
+    //     return false
+    // }
+    if (tor === true) {
+        return false
+    }
+    return true
+}
+
+export const StrictRule: FraudPreventionRule = (result) => {
+    const { fraud_score, ISP, proxy, vpn, tor } = result
+    if (config.fraud_prevention.isp_allow_list.includes(ISP)) {
+        return true
+    }
+    if (config.fraud_prevention.isp_deny_list.includes(ISP)) {
+        return false
+    }
+    if (fraud_score >= 85) {
         return false
     }
     if (tor === true) {
+        return false
+    }
+    if (proxy === true) {
+        return false
+    }
+    if (vpn === true) {
         return false
     }
     return true
@@ -48,7 +71,7 @@ export const FraudPreventionDefaultRule: FraudPreventionRule = (result) => {
 
 export const ok = async (
     ip_address: FraudScoreSchema["ip_address"],
-    apply_rule: FraudPreventionRule = FraudPreventionDefaultRule
+    apply_rule: FraudPreventionRule = DefaultRule
 ): Promise<boolean> => {
     if (vs.ip_address().ok(ip_address) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
