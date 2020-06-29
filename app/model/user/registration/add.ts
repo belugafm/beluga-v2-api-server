@@ -42,10 +42,12 @@ export const add = async ({
             throw new ModelRuntimeError(ErrorCodes.InvalidFingerprint)
         }
     }
+    const date = new Date()
     return await UserRegistration.create({
         user_id,
         ip_address,
         fraud_score_id,
         fingerprint,
+        date,
     })
 }

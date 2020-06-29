@@ -7,6 +7,7 @@ import config from "../../config/app"
 import mongoose from "mongoose"
 import { add as add_login_credential } from "./login_credential/add"
 import { add as add_registration_info } from "./registration/add"
+import { get as get_registration_info } from "./registration/get"
 import { get as get_fraud_score } from "./../fraud_score/get"
 import { add as add_fraud_score } from "./../fraud_score/add"
 import { FraudScoreSchema } from "app/schema/fraud_score"
@@ -17,6 +18,7 @@ export const ErrorCodes = {
     InvalidPassword: "invalid_password",
     InvalidIpAddress: "invalid_ip_address",
     InvalidFingerprint: "invalid_fingerprint",
+    TooManyRequests: "too_many_requests",
     NameTaken: "name_taken",
 }
 
@@ -81,6 +83,19 @@ export const signup = async ({
     }
 
     // 同じIPアドレスの場合一定期間は作成禁止
+    const existing_registrations = await get_registration_info({
+        ip_address: ip_address,
+        sort_args: { date: -1 },
+    })
+    if (existing_registrations.length > 0) {
+        const prev_registration = existing_registrations[0]
+        const current = new Date()
+        const seconds =
+            (current.getTime() - prev_registration.date.getTime()) / 1000
+        if (seconds < config.user_registration.limit) {
+            throw new ModelRuntimeError(ErrorCodes.TooManyRequests)
+        }
+    }
 
     const password_hash = await bcrypt.hash(
         password,
@@ -95,7 +110,7 @@ export const signup = async ({
         avatar_url: "",
         profile: {},
         stats: {},
-        created_at: Date.now(),
+        created_at: new Date(),
     })
     const credential = await add_login_credential({
         user_id: user._id,

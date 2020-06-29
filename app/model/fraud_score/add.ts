@@ -25,6 +25,6 @@ export const add = async ({
     return await FraudScore.create({
         ip_address: ip_address,
         result: result,
-        created_at: Date.now(),
+        created_at: new Date(),
     })
 }

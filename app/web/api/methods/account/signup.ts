@@ -73,6 +73,7 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_ip_address",
         "invalid_arg_fingerprint",
         "name_taken",
+        "too_many_requests",
         "internal_error",
         "unexpected_error",
     ] as const,
@@ -112,6 +113,11 @@ export const expected_error_specs = define_expected_errors(
             ],
             hint: ["別のユーザー名でアカウントを作成してください"],
             code: "name_taken",
+        },
+        too_many_requests: {
+            description: ["アカウントの連続作成はできません"],
+            hint: ["しばらく時間をおいてから再度登録してください"],
+            code: "too_many_requests",
         },
         internal_error: new InternalErrorSpec(),
         unexpected_error: new UnexpectedErrorSpec(),
@@ -162,6 +168,8 @@ export default define_method(
             if (error instanceof ModelRuntimeError) {
                 if (error.code === ModelErrorCodes.NameTaken) {
                     raise(errors.name_taken, error)
+                } else if (error.code === ModelErrorCodes.TooManyRequests) {
+                    raise(errors.too_many_requests, error)
                 } else {
                     raise(errors.internal_error, error)
                 }

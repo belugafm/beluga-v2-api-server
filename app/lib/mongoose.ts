@@ -27,7 +27,7 @@ export async function find<T extends Document>(
     additional_query_func?: (
         query: DocumentQuery<T[], T, {}>
     ) => DocumentQuery<T[], T, {}>
-): Promise<T[] | null> {
+): Promise<T[]> {
     return new Promise((resolve, reject) => {
         additional_query_func = additional_query_func
             ? additional_query_func

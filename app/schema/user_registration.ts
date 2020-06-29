@@ -7,6 +7,7 @@ export interface UserRegistrationSchema extends Document {
     fraud_score_id?: Schema.Types.ObjectId
     ip_address: string
     fingerprint?: string
+    date: Date
     _schema_version?: number
 }
 
@@ -16,6 +17,7 @@ export const UserRegistration = mongoose.model<UserRegistrationSchema>(
         user_id: Schema.Types.ObjectId,
         fraud_score_id: Schema.Types.ObjectId,
         ip_address: String,
+        date: Date,
         fingerprint: {
             type: String,
             required: false,
