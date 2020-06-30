@@ -16,6 +16,21 @@ type Argument = {
     user?: UserSchema | null
 }
 
+export const _unsafe_classify_as_dormant = async (user: UserSchema) => {
+    await DormantUser.create({
+        _id: user._id,
+        name: user.name,
+        avatar_url: user.avatar_url,
+        profile: user.profile,
+        stats: user.stats,
+        created_at: user.created_at,
+        active: user.active,
+        dormant: true,
+        last_activity_date: user.last_activity_date,
+    })
+    user.remove()
+}
+
 export const classify_as_dormant = async ({
     user_id,
     user,
@@ -36,18 +51,15 @@ export const classify_as_dormant = async ({
     if (user == null) {
         throw new ModelRuntimeError(ErrorCodes.UserNotFound)
     }
-    const dormant_user = await DormantUser.create({
-        _id: user._id,
-        name: user.name,
-        avatar_url: user.avatar_url,
-        profile: user.profile,
-        stats: user.stats,
-        created_at: user.created_at,
-        active: user.active,
-        dormant: true,
-        last_activity_date: user.last_activity_date,
-    })
-    if (dormant_user == null) {
-        throw new ModelRuntimeError(ErrorCodes.UnexpectedError)
+    const session = await mongoose.startSession()
+    session.startTransaction()
+    try {
+        await _unsafe_classify_as_dormant(user)
+        session.commitTransaction()
+        session.endSession()
+    } catch (error) {
+        session.abortTransaction()
+        session.endSession()
+        throw error
     }
 }

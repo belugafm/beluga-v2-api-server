@@ -1,7 +1,10 @@
-import { connect } from "../../mongodb"
+import { connect } from "../../../mongodb"
 import { MongoMemoryServer } from "mongodb-memory-server"
-import { signup, ErrorCodes } from "../../../app/model/user/signup"
-import { ModelRuntimeError } from "../../../app/model/error"
+import { signup, ErrorCodes } from "../../../../app/model/user/signup"
+import { ModelRuntimeError } from "../../../../app/model/error"
+import config from "../../../../app/config/app"
+
+config.user_registration.limit = 0
 
 describe("signup", () => {
     let mongodb: MongoMemoryServer | null = null
@@ -20,7 +23,7 @@ describe("signup", () => {
             // @ts-ignore
             await signup({
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -36,7 +39,7 @@ describe("signup", () => {
                 // @ts-ignore
                 name: 2,
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -52,7 +55,7 @@ describe("signup", () => {
                 // @ts-ignore
                 name: {},
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -67,7 +70,7 @@ describe("signup", () => {
             await signup({
                 name: "",
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -82,7 +85,7 @@ describe("signup", () => {
             await signup({
                 name: "0123456789012345678901234567890123456789",
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -98,7 +101,7 @@ describe("signup", () => {
             // @ts-ignore
             await signup({
                 name: "beluga",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -114,7 +117,7 @@ describe("signup", () => {
                 name: "beluga",
                 // @ts-ignore
                 password: 2,
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -130,7 +133,7 @@ describe("signup", () => {
                 name: "beluga",
                 // @ts-ignore
                 password: {},
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -145,12 +148,12 @@ describe("signup", () => {
             await signup({
                 name: "beluga",
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
             await signup({
                 name: "beluga",
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -165,12 +168,12 @@ describe("signup", () => {
             await signup({
                 name: "beluga",
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
             await signup({
                 name: "Beluga",
                 password: "password",
-                ip_address: "0.0.0.0",
+                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
