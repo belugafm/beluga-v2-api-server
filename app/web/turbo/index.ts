@@ -7,9 +7,12 @@ import qs from "qs"
 import {
     WebApiRuntimeError,
     FraudPreventionAccessDeniedErrorSpec,
+    InvalidContentTypeErrorSpec,
 } from "../api/error"
 import config from "../../config/app"
 import * as fraud_prevention from "../../model/fraud_score/ok"
+import { MethodFacts } from "../api/define"
+import { ContentTypesLiteralUnion } from "../api/facts/content_type"
 
 export { Request, Response }
 
@@ -192,12 +195,27 @@ export class TurboServer {
             }
         )
     }
-    post(url: string, handler: Router.Handler, options: Options = {}) {
-        this.router.post(base_url + url, async (req, res, params) => {
+    post(facts: MethodFacts, handler: Router.Handler, options: Options = {}) {
+        this.router.post(base_url + facts.url, async (req, res, params) => {
             res.setHeader("Content-Type", "application/json") // サーバーの応答はjson
             res.setStatusCode(200)
             try {
                 const body = await read_body(req) // これは必ず一番最初に呼ぶ
+
+                const content_type = req.headers["content-type"].split(
+                    ";"
+                )[0] as ContentTypesLiteralUnion
+                if (
+                    facts.accepted_content_types.includes(content_type) !== true
+                ) {
+                    throw new WebApiRuntimeError(
+                        new InvalidContentTypeErrorSpec()
+                    )
+                }
+
+                if (facts.authentication_required) {
+                    // TODO: アクセストークンの認証
+                }
 
                 // IPアドレス等を使ってアクセス制限をする場合はここで行う
                 const ip_address = req.headers["x-real-ip"]

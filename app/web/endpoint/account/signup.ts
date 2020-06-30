@@ -4,7 +4,7 @@ import { StrictRule } from "../../../model/fraud_score/ok"
 
 export default (server: TurboServer) => {
     server.post(
-        facts.url,
+        facts,
         async (req: Request, res: Response, params: any) => {
             await signup({
                 name: req.body.name,

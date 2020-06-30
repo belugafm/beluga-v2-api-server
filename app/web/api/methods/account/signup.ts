@@ -128,10 +128,7 @@ export const facts: MethodFacts = {
     url: MethodIdentifiers.CreateAccount,
     http_method: HttpMethods.POST,
     rate_limiting: {},
-    accepted_content_types: [
-        ContentTypes.ApplicationFormUrlEncoded,
-        ContentTypes.ApplicationJson,
-    ],
+    accepted_content_types: [ContentTypes.ApplicationJson],
     authentication_required: false,
     accepted_authentication_methods: [],
     accepted_scopes: [],

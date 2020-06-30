@@ -28,6 +28,12 @@ export class FraudPreventionAccessDeniedErrorSpec {
     code = "fraud_prevention_access_denied" as const
 }
 
+export class InvalidContentTypeErrorSpec {
+    description = ["許可されていないContent-Typeです"]
+    hint = []
+    code = "invalid_content_type" as const
+}
+
 // modelから送出されたエラー
 export class InternalErrorSpec {
     description = ["問題が発生したためリクエストを完了できません"]
