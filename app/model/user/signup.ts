@@ -11,7 +11,7 @@ import { get as get_registration_info } from "./registration/get"
 import { get as get_fraud_score } from "./../fraud_score/get"
 import { add as add_fraud_score } from "./../fraud_score/add"
 import { FraudScoreSchema } from "app/schema/fraud_score"
-import { _unsafe_classify_as_dormant } from "./classify_as_dormant"
+import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
 
 export const ErrorCodes = {
@@ -104,7 +104,7 @@ export const signup = async ({
         if (existing_user) {
             // 既存ユーザーがinactiveな場合swapする
             if (existing_user.needsReclassifyAsDormant() === true) {
-                await _unsafe_classify_as_dormant(existing_user)
+                await _unsafe_reclassify_as_dormant(existing_user)
                 existing_user.remove()
             } else {
                 throw new ModelRuntimeError(ErrorCodes.NameTaken)

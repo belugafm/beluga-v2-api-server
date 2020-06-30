@@ -16,7 +16,7 @@ type Argument = {
     user?: UserSchema | null
 }
 
-export const _unsafe_classify_as_dormant = async (user: UserSchema) => {
+export const _unsafe_reclassify_as_dormant = async (user: UserSchema) => {
     await DormantUser.create({
         _id: user._id,
         name: user.name,
@@ -31,7 +31,7 @@ export const _unsafe_classify_as_dormant = async (user: UserSchema) => {
     user.remove()
 }
 
-export const classify_as_dormant = async ({
+export const reclassify_as_dormant = async ({
     user_id,
     user,
 }: Argument): Promise<void> => {
@@ -54,7 +54,7 @@ export const classify_as_dormant = async ({
     const session = await mongoose.startSession()
     session.startTransaction()
     try {
-        await _unsafe_classify_as_dormant(user)
+        await _unsafe_reclassify_as_dormant(user)
         session.commitTransaction()
         session.endSession()
     } catch (error) {
