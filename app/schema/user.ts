@@ -1,8 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose"
+import config from "../config/app"
 
 const schema_version = 1
 
 export interface UserSchema extends Document {
+    _id: Schema.Types.ObjectId
     name: string
     display_name?: string
     avatar_url: string
@@ -18,7 +20,11 @@ export interface UserSchema extends Document {
     created_at: Date
     active: boolean // 登録後サイトを利用したかどうか
     dormant: boolean // サイトを長期間利用しなかったかどうか
+    last_activity_date: Date
     _schema_version?: number
+
+    // methods
+    needsReclassifyAsDormant: () => boolean
 }
 
 const UndefinedString = {
@@ -26,9 +32,8 @@ const UndefinedString = {
     default: undefined,
 }
 
-export const User = mongoose.model<UserSchema>(
-    "user",
-    new Schema({
+function define_schema(): any {
+    return {
         name: {
             type: String,
             unique: true,
@@ -56,9 +61,56 @@ export const User = mongoose.model<UserSchema>(
             type: Boolean,
             default: false,
         },
+        last_activity_date: {
+            type: Date,
+            default: null,
+        },
         _schema_version: {
             type: Number,
             default: schema_version,
         },
-    })
+    }
+}
+
+const user_schema = new Schema(define_schema())
+
+// 休眠アカウントとみなすかどうか
+user_schema.methods.needsReclassifyAsDormant = function (
+    this: UserSchema
+): boolean {
+    const current = new Date()
+    if (this.active) {
+        const seconds =
+            (current.getTime() - this.last_activity_date.getTime()) / 1000
+        if (
+            seconds >
+            config.user_registration.reclassify_active_as_dormant_period
+        ) {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        const seconds = (current.getTime() - this.created_at.getTime()) / 1000
+        if (
+            seconds >
+            config.user_registration.reclassify_inactive_as_dormant_period
+        ) {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
+export const User = mongoose.model<UserSchema>("user", user_schema)
+
+// dormant_userコレクションには同じ名前のユーザーが複数入る可能性がある
+const dormant_user_schema_definition = define_schema()
+dormant_user_schema_definition.name.unique = false
+dormant_user_schema_definition._id = mongoose.Types.ObjectId
+
+export const DormantUser = mongoose.model<UserSchema>(
+    "dormant_user",
+    new Schema(dormant_user_schema_definition)
 )

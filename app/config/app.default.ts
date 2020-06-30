@@ -34,11 +34,11 @@ const config: {
     },
     user_registration: {
         // 同じIPアドレスでの登録はこの秒数の間隔より短く行えないようになる
-        limit: 86400,
+        limit: 2,
 
         // 登録後にサイトを利用しないままこの秒数が経過したアカウントは
         // 休眠アカウントにする
-        reclassify_inactive_as_dormant_period: 86400 * 3,
+        reclassify_inactive_as_dormant_period: 2 * 3,
 
         // サイトを利用していたユーザーが最後に利用してから
         // この秒数経過した場合は休眠アカウントにする

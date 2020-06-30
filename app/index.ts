@@ -29,7 +29,6 @@ function init(db: MongoClient | MongoMemoryServer) {
 
 const mongodb = new MongoMemoryServer()
 mongodb.getUri().then(async (uri) => {
-    console.log(uri)
     mongoose.connect(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -40,6 +39,7 @@ mongodb.getUri().then(async (uri) => {
     })
     mongoose.connection.once("open", async () => {
         init(mongodb)
+        console.log(uri)
     })
 })
 

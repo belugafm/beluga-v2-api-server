@@ -30,6 +30,35 @@ export type IpqsResult = {
 }
 
 export const get_score = async (ip_address: string): Promise<IpqsResult> => {
+    if (ip_address === "127.0.0.1") {
+        return {
+            success: true,
+            message: "",
+            fraud_score: 0,
+            country_code: "JP",
+            region: "",
+            city: "",
+            ISP: "N/A",
+            ASN: 0,
+            organization: "",
+            latitude: 0,
+            longitude: 0,
+            is_crawler: false,
+            timezone: "",
+            mobile: false,
+            host: "",
+            proxy: false,
+            vpn: false,
+            tor: false,
+            active_vpn: false,
+            active_tor: false,
+            recent_abuse: false,
+            bot_status: false,
+            connection_type: "",
+            abuse_velocity: "",
+            request_id: "",
+        }
+    }
     const url = `https://www.ipqualityscore.com/api/json/ip/${config.fraud_prevention.ipqs_api_secret}/${ip_address}?strictness=1&allow_public_access_points=true&fast=true&lighter_penalties=true`
     const result = await fetch(url)
     return await result.json()

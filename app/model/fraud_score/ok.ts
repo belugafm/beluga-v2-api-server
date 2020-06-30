@@ -82,7 +82,5 @@ export const ok = async ({
         throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
     }
     const result = await fetch_result(ip_address)
-    console.log(result)
-
     return apply_rule(result)
 }

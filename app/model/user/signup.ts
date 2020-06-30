@@ -1,4 +1,4 @@
-import { UserSchema, User } from "../../schema/user"
+import { UserSchema, User, DormantUser } from "../../schema/user"
 import * as vs from "../../validation"
 import { ModelRuntimeError } from "../error"
 import * as mongo from "../../lib/mongoose"
@@ -11,6 +11,7 @@ import { get as get_registration_info } from "./registration/get"
 import { get as get_fraud_score } from "./../fraud_score/get"
 import { add as add_fraud_score } from "./../fraud_score/add"
 import { FraudScoreSchema } from "app/schema/fraud_score"
+import { classify_as_dormant } from "./classify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
 
 export const ErrorCodes = {
@@ -70,63 +71,78 @@ export const signup = async ({
         }
     }
 
-    // すでに同じ名前のユーザーがいるかどうかを調べる
-    const existing_user = await mongo.findOne(User, { name: name }, (query) => {
-        // case insensitiveにする
-        query.collation({
-            locale: "en_US",
-            strength: 2,
-        })
-    })
-    if (existing_user) {
-        throw new ModelRuntimeError(ErrorCodes.NameTaken)
-    }
-
-    // 同じIPアドレスの場合一定期間は作成禁止
-    const existing_registrations = await get_registration_info({
-        ip_address: ip_address,
-        sort_args: { date: -1 },
-    })
-    if (existing_registrations.length > 0) {
-        const prev_registration = existing_registrations[0]
-        const current = new Date()
-        const seconds =
-            (current.getTime() - prev_registration.date.getTime()) / 1000
-        if (seconds < config.user_registration.limit) {
-            throw new ModelRuntimeError(ErrorCodes.TooManyRequests)
-        }
-    }
-
-    const password_hash = await bcrypt.hash(
-        password,
-        config.password.salt_rounds
-    )
-
     const session = await mongoose.startSession()
     session.startTransaction()
+    try {
+        // 同じIPアドレスの場合一定期間は作成禁止
+        const existing_registrations = await get_registration_info({
+            ip_address: ip_address,
+            sort_args: { date: -1 },
+        })
+        if (existing_registrations.length > 0) {
+            const prev_registration = existing_registrations[0]
+            const current = new Date()
+            const seconds =
+                (current.getTime() - prev_registration.date.getTime()) / 1000
+            if (seconds < config.user_registration.limit) {
+                throw new ModelRuntimeError(ErrorCodes.TooManyRequests)
+            }
+        }
 
-    const user = await User.create({
-        name: name,
-        avatar_url: "",
-        profile: {},
-        stats: {},
-        created_at: new Date(),
-    })
-    const credential = await add_login_credential({
-        user_id: user._id,
-        password_hash,
-    })
+        // すでに同じ名前のユーザーがいるかどうかを調べる
+        const existing_user = await mongo.findOne(
+            User,
+            { name: name },
+            (query) => {
+                // case insensitiveにする
+                query.collation({
+                    locale: "en_US",
+                    strength: 2,
+                })
+            }
+        )
+        if (existing_user) {
+            // 既存ユーザーがinactiveな場合swapする
+            if (existing_user.needsReclassifyAsDormant() === true) {
+                await classify_as_dormant({ user: existing_user })
+                existing_user.remove()
+            } else {
+                throw new ModelRuntimeError(ErrorCodes.NameTaken)
+            }
+        }
 
-    const fraud_score = await generate_fraud_score_if_needed(ip_address)
-    const fraud_score_id = fraud_score ? fraud_score._id : null
-    const registration_info = await add_registration_info({
-        user_id: user._id,
-        ip_address,
-        fraud_score_id,
-        fingerprint,
-    })
+        // @ts-ignore
+        const user = await User.create({
+            name: name,
+            avatar_url: "",
+            profile: {},
+            stats: {},
+            created_at: new Date(),
+        })
+        const password_hash = await bcrypt.hash(
+            password,
+            config.user_login_credential.password.salt_rounds
+        )
+        const credential = await add_login_credential({
+            user_id: user._id,
+            password_hash,
+        })
 
-    session.commitTransaction()
-    session.endSession()
-    return user
+        const fraud_score = await generate_fraud_score_if_needed(ip_address)
+        const fraud_score_id = fraud_score ? fraud_score._id : null
+        const registration_info = await add_registration_info({
+            user_id: user._id,
+            ip_address,
+            fraud_score_id,
+            fingerprint,
+        })
+
+        session.commitTransaction()
+        session.endSession()
+        return user
+    } catch (error) {
+        session.abortTransaction()
+        session.endSession()
+        throw error
+    }
 }
