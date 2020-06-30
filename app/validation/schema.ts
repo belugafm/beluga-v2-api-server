@@ -1,4 +1,5 @@
 export class Schema<T> {
+    type?: T
     options: { [key: string]: any }
     validation_funcs: ((value: T, options: { [key: string]: any }) => void)[]
     constructor(options: { [key: string]: any }, validation_funcs: any[]) {

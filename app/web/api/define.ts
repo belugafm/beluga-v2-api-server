@@ -53,121 +53,102 @@ export interface MethodFacts {
 }
 
 // Web APIの引数を定義
-type Argument<ValueType> = {
+type Argument = {
     description: string[]
     examples: string[] | null
     required: boolean
     default_value?: any
-    schema: Schema<ValueType>
+    schema: Schema<any>
 }
 
-export function define_arguments<ArgumentNames extends string, ValueType>(
-    argument_names: readonly ArgumentNames[],
-    argument_specs: {
-        [ArgumentName in ArgumentNames]: Argument<ValueType>
+export function define_arguments<
+    ArgumentNames extends string,
+    ArgumentSpecs extends {
+        [ArgumentName in ArgumentNames]: Argument
     }
+>(
+    argument_names: readonly ArgumentNames[],
+    argument_specs: ArgumentSpecs
 ): {
-    [ArgumentName in ArgumentNames]: Argument<ValueType>
+    [ArgumentName in keyof ArgumentSpecs]: ArgumentSpecs[ArgumentName]
 } {
     return argument_specs
 }
 
 // Web APIが送出しうるエラーを定義
-export type ExpectedError<
-    ErrorCode extends string | number | symbol,
-    Arguments
-> = {
+export type ExpectedError<ErrorCode, ArgumentSpecs> = {
     code: ErrorCode
     description: string[]
     hint?: string[]
-    argument?: keyof Arguments
+    argument?: keyof ArgumentSpecs
 }
 
-export function define_expected_errors<ErrorCodes extends string, Arguments>(
+export function define_expected_errors<
+    ErrorCodes extends string,
+    ArgumentSpecs
+>(
     error_names: readonly ErrorCodes[],
-    argument_specs: Arguments,
+    argument_specs: ArgumentSpecs,
     error_specs: {
-        [ErrorCode in ErrorCodes]: ExpectedError<ErrorCode, Arguments>
+        [ErrorCode in ErrorCodes]: ExpectedError<ErrorCode, ArgumentSpecs>
     }
 ): {
-    [ErrorCode in ErrorCodes]: ExpectedError<ErrorCode, Arguments>
+    [ErrorCode in ErrorCodes]: ExpectedError<ErrorCode, ArgumentSpecs>
 } {
     return error_specs
 }
 
 // Web APIの定義
-type Callback<Arguments, Errors, CallbackReturnType> = (
-    args: Arguments,
-    expected_errors: Errors
-) => Promise<CallbackReturnType>
-
-type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
-    [ErrorCode in keyof ErrorSpecs]: ExpectedError<ErrorCode, Arguments>
-}
-
-type DefinedMethod<ArgumentSpecs, CallbackReturnType> = (
-    args: { [ArgumentName in keyof ArgumentSpecs]?: any }
-) => Promise<CallbackReturnType>
-
-type ArgumentSpecs<ArgumentNames extends string, ValueType> = {
-    [Argumentname in ArgumentNames]: Argument<ValueType>
-}
-
-function _get_argument_value(args: { [key: string]: any }, key: string): any {
-    return args[key]
-}
-
 // 各Web APIはLiteral Typesで書かれるのでジェネリクスで補完可能にする
+
+type ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs> = {
+    [ErrorCode in keyof ErrorSpecs]: ExpectedError<ErrorCode, ArgumentSpecs>
+}
+
 export function define_method<
-    ErrorSpecs extends { [key: string]: any },
     ArgumentNames extends string,
-    ArgumentValue,
+    ArgumentSpecs extends {
+        [ArgumentName in ArgumentNames]: Argument
+    },
+    ErrorSpecs,
     CallbackReturnType
 >(
     facts: MethodFacts,
-    method_argument_specs: ArgumentSpecs<ArgumentNames, ArgumentValue>,
-    expected_error_specs: ExpectedErrorSpecs<
-        ArgumentSpecs<ArgumentNames, ArgumentValue>,
-        ErrorSpecs
-    >,
-    callback: Callback<
-        {
-            [ArgumentName in keyof ArgumentSpecs<
-                ArgumentNames,
-                ArgumentValue
-            >]: ArgumentValue
+    method_argument_specs: ArgumentSpecs,
+    expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
+    callback: (
+        args: {
+            [ArgumentName in keyof ArgumentSpecs]: NonNullable<
+                ArgumentSpecs[ArgumentName]["schema"]["type"]
+            >
         },
-        ExpectedErrorSpecs<
-            ArgumentSpecs<ArgumentNames, ArgumentValue>,
-            ErrorSpecs
-        >,
-        CallbackReturnType
-    >
-): DefinedMethod<
-    ArgumentSpecs<ArgumentNames, ArgumentValue>,
-    CallbackReturnType
-> {
+        errors: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>
+    ) => Promise<CallbackReturnType>
+): (
+    args: {
+        [ArgumentName in keyof ArgumentSpecs]: NonNullable<
+            ArgumentSpecs[ArgumentName]["schema"]["type"]
+        >
+    }
+) => Promise<CallbackReturnType> {
     return (
         args: {
-            [ArgumentName in keyof ArgumentSpecs<
-                ArgumentNames,
-                ArgumentValue
-            >]?: ArgumentValue
+            [ArgumentName in keyof ArgumentSpecs]: NonNullable<
+                ArgumentSpecs[ArgumentName]["schema"]["type"]
+            >
         }
     ) => {
         // 各argumentに関連付けられた、値チェック失敗時のエラーを送出できるようにする
         const errors_associated_with_args: {
-            [argument_name: string]: ExpectedError<
-                string,
-                ArgumentSpecs<ArgumentNames, ArgumentValue>
-            >
+            [argument_name: string]: ExpectedError<string, ArgumentSpecs>
         } = {}
         for (const argument_name in method_argument_specs) {
-            Object.values(expected_error_specs).forEach((error) => {
+            for (const error_code in expected_error_specs) {
+                const error = expected_error_specs[error_code]
                 if (error.argument === argument_name) {
                     errors_associated_with_args[argument_name] = error
                 }
-            })
+            }
         }
         // 各argumentの値チェック
         for (const argument_name in method_argument_specs) {
@@ -206,7 +187,6 @@ export function define_method<
                 }
             }
         }
-        // @ts-ignore
         return callback(args, expected_error_specs)
     }
 }
