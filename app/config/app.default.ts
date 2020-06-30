@@ -7,9 +7,21 @@ const config: {
     }
     user_registration: {
         limit: number
+        reclassify_inactive_as_dormant_period: number
+        reclassify_active_as_dormant_period: number
     }
-    password: {
-        salt_rounds: number
+    user_login_credential: {
+        password: {
+            salt_rounds: number
+            min_length: number
+        }
+    }
+    user: {
+        name: {
+            min_length: number
+            max_length: number
+            regexp: object
+        }
     }
 } = {
     // IP Quality ScoreのサービスによるIPアドレスの不信度スコアを利用して
@@ -21,11 +33,29 @@ const config: {
         ipqs_api_secret: "",
     },
     user_registration: {
-        // 同じIPアドレスで連続作成可能になる待ち時間（秒）
+        // 同じIPアドレスでの登録はこの秒数の間隔より短く行えないようになる
         limit: 86400,
+
+        // 登録後にサイトを利用しないままこの秒数が経過したアカウントは
+        // 休眠アカウントにする
+        reclassify_inactive_as_dormant_period: 86400 * 3,
+
+        // サイトを利用していたユーザーが最後に利用してから
+        // この秒数経過した場合は休眠アカウントにする
+        reclassify_active_as_dormant_period: 86400 * 365 * 3,
     },
-    password: {
-        salt_rounds: 10,
+    user_login_credential: {
+        password: {
+            salt_rounds: 10,
+            min_length: 8,
+        },
+    },
+    user: {
+        name: {
+            min_length: 1,
+            max_length: 32,
+            regexp: new RegExp(/^[a-zA-Z0-9_]+$/),
+        },
     },
 }
 

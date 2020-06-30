@@ -16,6 +16,8 @@ export interface UserSchema extends Document {
         statuses_count?: number
     }
     created_at: Date
+    active: boolean // 登録後サイトを利用したかどうか
+    dormant: boolean // サイトを長期間利用しなかったかどうか
     _schema_version?: number
 }
 
@@ -46,6 +48,14 @@ export const User = mongoose.model<UserSchema>(
             },
         },
         created_at: Date,
+        active: {
+            type: Boolean,
+            default: false,
+        },
+        dormant: {
+            type: Boolean,
+            default: false,
+        },
         _schema_version: {
             type: Number,
             default: schema_version,
