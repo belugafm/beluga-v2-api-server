@@ -3,7 +3,7 @@ import {
     UserRegistrationSchema,
 } from "../../../schema/user_registration"
 import { ModelRuntimeError } from "../../error"
-import mongoose, { DocumentQuery } from "mongoose"
+import mongoose from "mongoose"
 import * as mongo from "../../../lib/mongoose"
 import * as vs from "../../../validation"
 

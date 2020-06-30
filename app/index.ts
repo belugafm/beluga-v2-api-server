@@ -24,6 +24,7 @@ function init(db: MongoClient | MongoMemoryServer) {
         db
     )
     server.register(require("./web/endpoint/account/signup"))
+    server.register(require("./web/endpoint/account/signin"))
     server.listen(8080)
 }
 

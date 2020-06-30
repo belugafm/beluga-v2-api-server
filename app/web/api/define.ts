@@ -96,18 +96,18 @@ export function define_expected_errors<ErrorCodes extends string, Arguments>(
 }
 
 // Web APIの定義
-type Callback<Arguments, Errors> = (
+type Callback<Arguments, Errors, CallbackReturnType> = (
     args: Arguments,
     expected_errors: Errors
-) => Promise<any>
+) => Promise<CallbackReturnType>
 
 type ExpectedErrorSpecs<Arguments, ErrorSpecs> = {
     [ErrorCode in keyof ErrorSpecs]: ExpectedError<ErrorCode, Arguments>
 }
 
-type ReturnType<ArgumentSpecs> = (
+type DefinedMethod<ArgumentSpecs, CallbackReturnType> = (
     args: { [ArgumentName in keyof ArgumentSpecs]?: any }
-) => Promise<any>
+) => Promise<CallbackReturnType>
 
 type ArgumentSpecs<ArgumentNames extends string, ValueType> = {
     [Argumentname in ArgumentNames]: Argument<ValueType>
@@ -121,7 +121,8 @@ function _get_argument_value(args: { [key: string]: any }, key: string): any {
 export function define_method<
     ErrorSpecs extends { [key: string]: any },
     ArgumentNames extends string,
-    ArgumentValue
+    ArgumentValue,
+    CallbackReturnType
 >(
     facts: MethodFacts,
     method_argument_specs: ArgumentSpecs<ArgumentNames, ArgumentValue>,
@@ -139,9 +140,13 @@ export function define_method<
         ExpectedErrorSpecs<
             ArgumentSpecs<ArgumentNames, ArgumentValue>,
             ErrorSpecs
-        >
+        >,
+        CallbackReturnType
     >
-): ReturnType<ArgumentSpecs<ArgumentNames, ArgumentValue>> {
+): DefinedMethod<
+    ArgumentSpecs<ArgumentNames, ArgumentValue>,
+    CallbackReturnType
+> {
     return (
         args: {
             [ArgumentName in keyof ArgumentSpecs<

@@ -23,7 +23,7 @@ export class FraudPreventionAccessDeniedErrorSpec {
         "問題のあるネットワークからのアクセスを検出したため、処理を中断しました",
     ]
     hint = [
-        "当サイトでは荒らし対策を強化するため、国外、VPN、プロキシからのアクセスを遮断しています",
+        "荒らし対策を強化するため、VPN、プロキシ、Torからのアクセスを遮断しています",
     ]
     code = "fraud_prevention_access_denied" as const
 }

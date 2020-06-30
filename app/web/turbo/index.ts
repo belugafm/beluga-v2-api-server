@@ -198,7 +198,7 @@ export class TurboServer {
     post(facts: MethodFacts, handler: Router.Handler, options: Options = {}) {
         if (facts.http_method !== "POST") {
             throw new Error(
-                "GETが指定されているendpointをPOSTに登録することはできません"
+                "GETリクエストが要求されているendpointをPOSTに登録することはできません"
             )
         }
         this.router.post(base_url + facts.url, async (req, res, params) => {
@@ -233,10 +233,8 @@ export class TurboServer {
                         (await fraud_prevention.ok({
                             ip_address,
                             apply_rule: rule,
-                        })) === true
+                        })) !== true
                     ) {
-                        console.log("OK")
-                    } else {
                         throw new WebApiRuntimeError(
                             new FraudPreventionAccessDeniedErrorSpec()
                         )

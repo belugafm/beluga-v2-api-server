@@ -19,6 +19,9 @@ const config: {
             min_length: number
         }
     }
+    user_login_session: {
+        lifetime: number
+    }
     user: {
         name: {
             min_length: number
@@ -55,6 +58,10 @@ const config: {
             salt_rounds: 10,
             min_length: 8,
         },
+    },
+    user_login_session: {
+        // セッションの期限（秒）
+        lifetime: 86400 * 30,
     },
     user: {
         name: {

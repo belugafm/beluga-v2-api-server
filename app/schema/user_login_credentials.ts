@@ -11,7 +11,10 @@ export interface UserLoginCredentialSchema extends Document {
 export const UserLoginCredential = mongoose.model<UserLoginCredentialSchema>(
     "user_login_credential",
     new Schema({
-        user_id: Schema.Types.ObjectId,
+        user_id: {
+            type: Schema.Types.ObjectId,
+            unique: true,
+        },
         password_hash: String,
         _schema_version: {
             type: Number,
