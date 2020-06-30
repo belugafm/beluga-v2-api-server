@@ -6,19 +6,19 @@ import { ModelRuntimeError } from "../../error"
 import mongoose from "mongoose"
 import * as vs from "../../../validation"
 import bcrypt from "bcrypt"
-import config from "../../../config/app"
 
 export const ErrorCodes = {
     InvalidUserId: "invalid_id",
     InvalidIpAddress: "invalid_ip_address",
     InvalidPasswordHash: "invalid_password_hash",
+    InvalidLifetime: "invalid_lifetime",
 }
 
 type Argument = {
     user_id: UserLoginSessionSchema["user_id"]
     ip_address: UserLoginSessionSchema["ip_address"]
     fraud_score_id?: UserLoginSessionSchema["fraud_score_id"]
-    lifetime?: number
+    lifetime: number
 }
 
 export const generate = async ({
@@ -38,6 +38,9 @@ export const generate = async ({
             throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
         }
     }
+    if (typeof lifetime !== "number") {
+        throw new ModelRuntimeError(ErrorCodes.InvalidLifetime)
+    }
 
     const source = {
         ip_address: ip_address,
@@ -45,8 +48,6 @@ export const generate = async ({
         user_id: user_id.toString(),
     }
     const session_id = await bcrypt.hash(JSON.stringify(source), 1)
-
-    lifetime = lifetime ? lifetime : config.user_login_session.lifetime
 
     return await UserLoginSession.create({
         user_id: user_id,

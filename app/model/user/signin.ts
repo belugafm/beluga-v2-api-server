@@ -41,12 +41,14 @@ type Argument = {
     name: UserSchema["name"]
     password: string
     ip_address: string
+    session_lifetime: number
 }
 
 export const signin = async ({
     name,
     password,
     ip_address,
+    session_lifetime,
 }: Argument): Promise<[UserSchema, UserLoginSessionSchema]> => {
     if (vs.user_name().ok(name) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidName)
@@ -82,6 +84,7 @@ export const signin = async ({
         const fraud_score_id = fraud_score ? fraud_score._id : null
 
         const login_session = await generate_session({
+            lifetime: session_lifetime,
             user_id: user._id,
             ip_address,
             fraud_score_id,
@@ -89,7 +92,6 @@ export const signin = async ({
 
         sess.commitTransaction()
         sess.endSession()
-
         return [user, login_session]
     } catch (error) {
         sess.abortTransaction()

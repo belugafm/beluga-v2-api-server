@@ -16,11 +16,9 @@ import {
 } from "../../error"
 import { signin } from "../../../../model/user/signin"
 import { ModelRuntimeError } from "../../../../model/error"
-import { UserSchema } from "app/schema/user"
-import { UserLoginSessionSchema } from "app/schema/user_login_session"
 
 export const argument_specs = define_arguments(
-    ["name", "password", "ip_address"] as const,
+    ["name", "password", "ip_address", "session_lifetime"] as const,
     {
         name: {
             description: ["ユーザー名"],
@@ -40,6 +38,12 @@ export const argument_specs = define_arguments(
             required: true,
             schema: vs.ip_address(),
         },
+        session_lifetime: {
+            description: ["セッションの有効期限（秒）"],
+            examples: null,
+            required: true,
+            schema: vs.number(),
+        },
     }
 )
 
@@ -48,26 +52,31 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_name",
         "invalid_arg_password",
         "invalid_arg_ip_address",
+        "invalid_arg_session_lifetime",
         "internal_error",
         "unexpected_error",
     ] as const,
     argument_specs,
     {
         invalid_arg_name: {
-            description: ["ユーザー名が基準を満たしていません"],
-            argument: "name",
+            description: ["ユーザー名またはパスワードが間違っています"],
             code: "invalid_arg_name",
         },
         invalid_arg_password: {
-            description: ["パスワードが基準を満たしていません"],
-            argument: "password",
+            description: ["ユーザー名またはパスワードが間違っています"],
             code: "invalid_arg_password",
         },
         invalid_arg_ip_address: {
-            description: ["登録ユーザーのIPアドレスを正しく指定してください"],
+            description: ["ユーザーのIPアドレスを正しく指定してください"],
             hint: [],
             argument: "ip_address",
             code: "invalid_arg_ip_address",
+        },
+        invalid_arg_session_lifetime: {
+            description: ["セッションの有効期限を正しく指定してください"],
+            hint: [],
+            argument: "session_lifetime",
+            code: "invalid_arg_session_lifetime",
         },
         internal_error: new InternalErrorSpec(),
         unexpected_error: new UnexpectedErrorSpec(),
@@ -106,6 +115,7 @@ export default define_method(
                 name: args.name,
                 password: args.password,
                 ip_address: args.ip_address,
+                session_lifetime: args.session_lifetime,
             })
         } catch (error) {
             if (error instanceof ModelRuntimeError) {
