@@ -13,7 +13,7 @@ import * as fraud_prevention from "../../model/fraud_score/ok"
 
 export { Request, Response }
 
-const default_route = (req: Request, res: Response) => {
+const DefaultRoute = (req: Request, res: Response) => {
     res.setHeader("Content-Type", "application/json")
     res.setStatusCode(404)
     res.write(
@@ -26,6 +26,21 @@ const default_route = (req: Request, res: Response) => {
     )
     res.end()
 }
+
+const AccessDeniedRoute = (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "application/json")
+    res.setStatusCode(403)
+    res.write(
+        Buffer.from(
+            JSON.stringify({
+                ok: false,
+                error: "access_denied",
+            })
+        )
+    )
+    res.end()
+}
+
 declare module "find-my-way" {
     type Handler = (
         req: Request,
@@ -122,14 +137,18 @@ export class TurboServer {
     server: turbo.Server
     db: MongoClient | MongoMemoryServer
     constructor(opt: Router.Config, db: MongoClient | MongoMemoryServer) {
-        if (!opt.defaultRoute) {
-            opt.defaultRoute = default_route
+        if (opt.defaultRoute == null) {
+            opt.defaultRoute = DefaultRoute
         }
         this.router = Router(opt)
         this.server = turbo.createServer(async (_req, _res) => {
             // アクセスがあるたびここを通る
             const req = new Request(_req)
             const res = new Response(_res)
+            const { host } = req.headers
+            if (host !== config.server.domain) {
+                return AccessDeniedRoute(req, res)
+            }
             return this.router.lookup(req, res)
         })
         this.db = db

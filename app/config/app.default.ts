@@ -1,4 +1,7 @@
 const config: {
+    server: {
+        domain: string
+    }
     fraud_prevention: {
         enabled: boolean
         isp_deny_list: string[]
@@ -24,6 +27,9 @@ const config: {
         }
     }
 } = {
+    server: {
+        domain: "localhost.beluga.fm",
+    },
     // IP Quality ScoreのサービスによるIPアドレスの不信度スコアを利用して
     // ユーザーのBeluga利用を制限する
     fraud_prevention: {

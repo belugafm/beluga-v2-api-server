@@ -26,7 +26,7 @@ export const ErrorCodes = {
 const request_fraud_score_if_needed = async (
     ip_address: string
 ): Promise<FraudScoreSchema | null> => {
-    if (config.fraud_prevention.enabled === false) {
+    if (config.fraud_prevention.enabled !== true) {
         return null
     }
     const existing_fraud_score = await get_fraud_score({ ip_address })
@@ -34,7 +34,7 @@ const request_fraud_score_if_needed = async (
         return existing_fraud_score
     }
     const result = await ipqs.get_score(ip_address)
-    if (result.success === false) {
+    if (result.success !== true) {
         return null
     }
     return add_fraud_score({ ip_address, result })
@@ -104,8 +104,8 @@ export const signup = async ({
         if (existing_user) {
             // 既存ユーザーがinactiveな場合swapする
             if (existing_user.needsReclassifyAsDormant() === true) {
+                // existing_userは削除されるので注意
                 await _unsafe_reclassify_as_dormant(existing_user)
-                existing_user.remove()
             } else {
                 throw new ModelRuntimeError(ErrorCodes.NameTaken)
             }
