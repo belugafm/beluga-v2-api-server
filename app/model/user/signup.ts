@@ -23,7 +23,7 @@ export const ErrorCodes = {
     NameTaken: "name_taken",
 }
 
-const generate_fraud_score_if_needed = async (
+const request_fraud_score_if_needed = async (
     ip_address: string
 ): Promise<FraudScoreSchema | null> => {
     if (config.fraud_prevention.enabled === false) {
@@ -128,7 +128,7 @@ export const signup = async ({
             password_hash,
         })
 
-        const fraud_score = await generate_fraud_score_if_needed(ip_address)
+        const fraud_score = await request_fraud_score_if_needed(ip_address)
         const fraud_score_id = fraud_score ? fraud_score._id : null
         const registration_info = await add_registration_info({
             user_id: user._id,
