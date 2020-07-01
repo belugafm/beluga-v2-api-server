@@ -30,10 +30,14 @@ export default (server: TurboServer) => {
             }
             const [user, session] = result
             res.setCookie("session_id", session.session_id, {
-                expires: session.expire_date.getTime(),
+                expires: session.expire_date,
+                domain: config.server.domain,
+                path: "/",
             })
             res.setCookie("user_id", session.user_id.toString(), {
-                expires: session.expire_date.getTime(),
+                expires: session.expire_date,
+                domain: config.server.domain,
+                path: "/",
             })
             return {
                 ok: true,

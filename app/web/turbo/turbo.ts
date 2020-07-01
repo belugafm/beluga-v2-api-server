@@ -25,6 +25,14 @@ export class Request {
     }
 }
 
+type CookieOptions = {
+    maxAge?: number
+    expires?: Date
+    path?: string
+    domain?: string
+    secure?: boolean
+}
+
 export class Response {
     _res: turbo.Response
     constructor(res: turbo.Response) {
@@ -40,11 +48,8 @@ export class Response {
     setHeader(name: string, value: string) {
         this._res.setHeader(name, value)
     }
-    setCookie(name: string, value: string, opt: { [key: string]: any }) {
+    setCookie(name: string, value: string, opt?: CookieOptions) {
         opt = opt || {}
-        if (opt.expires && Number.isInteger(opt.expires)) {
-            opt.expires = new Date(opt.expires)
-        }
         const cookie_str = cookie.serialize(name, value, opt)
         this.setHeader("Set-Cookie", cookie_str)
     }
