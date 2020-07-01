@@ -22,11 +22,13 @@ export default (server: TurboServer) => {
                 expires: session.expire_date,
                 domain: config.server.domain,
                 path: "/",
+                httpOnly: true,
             })
             res.setCookie("user_id", session.user_id.toString(), {
                 expires: session.expire_date,
                 domain: config.server.domain,
                 path: "/",
+                httpOnly: true,
             })
             return {
                 ok: true,

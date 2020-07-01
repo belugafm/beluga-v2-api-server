@@ -131,7 +131,7 @@ export const facts: MethodFacts = {
     accepted_content_types: [ContentTypes.ApplicationJson],
     authentication_required: false,
     accepted_authentication_methods: [],
-    accepted_scopes: [],
+    accepted_scopes: {},
     description: ["新規アカウントを作成します"],
 }
 

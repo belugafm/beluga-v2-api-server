@@ -17,66 +17,48 @@ import {
 import { signin } from "../../../../model/user/signin"
 import { ModelRuntimeError } from "../../../../model/error"
 
-export const argument_specs = define_arguments(
-    ["name", "password", "ip_address", "session_lifetime"] as const,
-    {
-        name: {
-            description: ["ユーザー名"],
-            examples: ["beluga"],
-            required: true,
-            schema: vs.user_name(),
-        },
-        password: {
-            description: ["パスワード"],
-            examples: null,
-            required: true,
-            schema: vs.password(),
-        },
-        ip_address: {
-            description: ["登録時のIPアドレス"],
-            examples: null,
-            required: true,
-            schema: vs.ip_address(),
-        },
-        session_lifetime: {
-            description: ["セッションの有効期限（秒）"],
-            examples: null,
-            required: true,
-            schema: vs.number(),
-        },
-    }
-)
+export const argument_specs = define_arguments(["name", "user_id"] as const, {
+    name: {
+        description: [
+            "ユーザー名",
+            "`user_id`を指定しない場合に必須のパラメータです",
+        ],
+        examples: ["beluga"],
+        required: false,
+        schema: vs.user_name(),
+    },
+    user_id: {
+        description: [
+            "ユーザーID",
+            "`name`を指定しない場合に必須のパラメータです",
+        ],
+        examples: null,
+        required: false,
+        schema: vs.object_id(),
+    },
+})
 
 export const expected_error_specs = define_expected_errors(
     [
         "invalid_arg_name",
-        "invalid_arg_password",
-        "invalid_arg_ip_address",
-        "invalid_arg_session_lifetime",
+        "invalid_arg_user_id",
+        "user_not_found",
         "internal_error",
         "unexpected_error",
     ] as const,
     argument_specs,
     {
         invalid_arg_name: {
-            description: ["ユーザー名またはパスワードが間違っています"],
+            description: ["ユーザー名が不正です"],
             code: "invalid_arg_name",
         },
-        invalid_arg_password: {
-            description: ["ユーザー名またはパスワードが間違っています"],
-            code: "invalid_arg_password",
+        invalid_arg_user_id: {
+            description: ["ユーザーIDが不正です"],
+            code: "invalid_arg_user_id",
         },
-        invalid_arg_ip_address: {
-            description: ["ユーザーのIPアドレスを正しく指定してください"],
-            hint: [],
-            argument: "ip_address",
-            code: "invalid_arg_ip_address",
-        },
-        invalid_arg_session_lifetime: {
-            description: ["セッションの有効期限を正しく指定してください"],
-            hint: [],
-            argument: "session_lifetime",
-            code: "invalid_arg_session_lifetime",
+        user_not_found: {
+            description: ["ユーザーが見つかりません"],
+            code: "user_not_found",
         },
         internal_error: new InternalErrorSpec(),
         unexpected_error: new UnexpectedErrorSpec(),
@@ -84,14 +66,22 @@ export const expected_error_specs = define_expected_errors(
 )
 
 export const facts: MethodFacts = {
-    url: MethodIdentifiers.Login,
+    url: MethodIdentifiers.ShowUser,
     http_method: HttpMethods.POST,
-    rate_limiting: {},
+    rate_limiting: {
+        User: "WebTier3",
+        Bot: "WebTier4",
+        Admin: "InternalSystem",
+    },
     accepted_content_types: [ContentTypes.ApplicationJson],
     authentication_required: false,
-    accepted_authentication_methods: [],
-    accepted_scopes: {},
-    description: ["アカウントにログインします"],
+    accepted_authentication_methods: ["AccessToken", "OAuth", "Cookie"],
+    accepted_scopes: {
+        User: "user:read",
+        Bot: "user:read",
+        Admin: "user:read",
+    },
+    description: ["ユーザーの情報を表示します"],
 }
 
 function raise<T extends string, S>(

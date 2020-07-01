@@ -8,7 +8,7 @@ import * as mongo from "../../../lib/mongoose"
 import * as vs from "../../../validation"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_id",
+    InvalidUserId: "invalid_user_id",
     InvalidIpAddress: "invalid_ip_address",
     InvalidFraudScoreId: "invalid_fraud_score_id",
     InvalidFingerprint: "invalid_fingerprint",

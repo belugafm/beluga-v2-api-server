@@ -5,7 +5,7 @@ import multipart from "./multipart"
 export class Request {
     _req: turbo.Request
     headers: { [key: string]: string }
-    cookies: {}
+    cookies: any
     url: string = ""
     query: any = null
     body: any
@@ -31,6 +31,7 @@ type CookieOptions = {
     path?: string
     domain?: string
     secure?: boolean
+    httpOnly?: boolean
 }
 
 export class Response {

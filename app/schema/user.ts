@@ -4,7 +4,7 @@ import config from "../config/app"
 const schema_version = 1
 
 export interface UserSchema extends Document {
-    _id: Schema.Types.ObjectId
+    _id: mongoose.Types.ObjectId
     name: string
     display_name?: string
     avatar_url: string
@@ -25,6 +25,7 @@ export interface UserSchema extends Document {
 
     // methods
     needsReclassifyAsDormant: () => boolean
+    transform: () => any
 }
 
 const UndefinedString = {
@@ -100,6 +101,19 @@ user_schema.methods.needsReclassifyAsDormant = function (
         } else {
             return false
         }
+    }
+}
+
+user_schema.methods.transform = function (this: UserSchema): any {
+    return {
+        id: this._id,
+        name: this.name,
+        display_name: this.display_name,
+        avatar_url: this.avatar_url,
+        profile: this.profile,
+        stats: this.stats,
+        created_at: this.created_at,
+        last_activity_date: this.last_activity_date,
     }
 }
 

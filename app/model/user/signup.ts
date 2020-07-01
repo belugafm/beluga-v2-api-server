@@ -10,6 +10,7 @@ import { add as add_registration_info } from "./registration/add"
 import { get as get_registration_info } from "./registration/get"
 import { get as get_fraud_score } from "../fraud_score/get"
 import { add as add_fraud_score } from "../fraud_score/add"
+import { get as get_user } from "../user/get"
 import { FraudScoreSchema } from "app/schema/fraud_score"
 import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
@@ -90,17 +91,7 @@ export const signup = async ({
         }
 
         // すでに同じ名前のユーザーがいるかどうかを調べる
-        const existing_user = await mongo.findOne(
-            User,
-            { name: name },
-            (query) => {
-                // case insensitiveにする
-                query.collation({
-                    locale: "en_US",
-                    strength: 2,
-                })
-            }
-        )
+        const existing_user = await get_user({ name })
         if (existing_user) {
             // 既存ユーザーがinactiveな場合swapする
             if (existing_user.needsReclassifyAsDormant() === true) {

@@ -8,11 +8,6 @@ import { Schema } from "../../validation/schema"
 import { ValueSchemaValidationError } from "../../validation/error"
 import { WebApiRuntimeError, InternalErrorSpec } from "./error"
 
-interface AcceptedScopeItem {
-    token_type: TokenTypesLiteralUnion
-    scope: ScopesLiteralUnion
-}
-
 // Web APIの仕様を定義
 export interface MethodFacts {
     // Web APIのURLの末尾
@@ -45,7 +40,9 @@ export interface MethodFacts {
 
     // Web APIを利用可能なスコープを指定
     // 複数指定可
-    accepted_scopes: AcceptedScopeItem[]
+    accepted_scopes: {
+        [TokenType in TokenTypesLiteralUnion]?: ScopesLiteralUnion
+    }
 
     // 簡易的な説明
     // 詳細な説明はドキュメントの方で書く

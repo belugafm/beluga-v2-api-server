@@ -29,9 +29,7 @@ export const RateLimitConfiguration = {
     [RateLimits.WebTier4]: {
         limit_per_minite: 200,
         label: "Web API Tier 4",
-        description: [
-            "ユーザーとのインタラクションが多いボットのための高頻度なリクエストが可能な規制レベルです",
-        ],
+        description: ["高頻度なリクエストが可能な規制レベルです"],
     },
     [RateLimits.InternalSystem]: {
         limit_per_minite: -1,
