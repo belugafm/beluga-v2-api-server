@@ -1,11 +1,11 @@
-import { TurboServer, Request, Response } from "../../../turbo"
+import { TurboServer } from "../../../turbo"
 import authenticate, {
     facts,
 } from "../../../api/methods/auth/cookie/authenticate"
 import mongoose from "mongoose"
 
 export default (server: TurboServer) => {
-    server.post(facts, async (req: Request, res: Response, params: any) => {
+    server.post(facts, async (req, res, params) => {
         const user_id_str = req.cookies["user_id"]
         const session_id = req.cookies["session_id"]
         if ((!!user_id_str && !!session_id) !== true) {

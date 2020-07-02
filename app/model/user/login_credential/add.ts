@@ -6,8 +6,8 @@ import { ModelRuntimeError } from "../../error"
 import mongoose from "mongoose"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_id",
-    InvalidPasswordHash: "invalid_password_hash",
+    InvalidUserId: "invalid_arg_id",
+    InvalidPasswordHash: "invalid_arg_password_hash",
 }
 
 type Argument = {

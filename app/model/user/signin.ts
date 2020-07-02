@@ -15,9 +15,9 @@ import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
 
 export const ErrorCodes = {
-    InvalidName: "invalid_name",
-    InvalidPassword: "invalid_password",
-    InvalidIpAddress: "invalid_ip_address",
+    InvalidName: "invalid_arg_name",
+    InvalidPassword: "invalid_arg_password",
+    InvalidIpAddress: "invalid_arg_ip_address",
 }
 
 const request_fraud_score_if_needed = async (
@@ -50,7 +50,7 @@ export const signin = async ({
     ip_address,
     session_lifetime,
 }: Argument): Promise<[UserSchema, UserLoginSessionSchema]> => {
-    if (vs.user_name().ok(name) !== true) {
+    if (vs.user.name().ok(name) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidName)
     }
     if (vs.password().ok(password) !== true) {

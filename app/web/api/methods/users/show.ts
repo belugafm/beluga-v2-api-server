@@ -20,7 +20,7 @@ export const argument_specs = define_arguments(["name", "user_id"] as const, {
         ],
         examples: ["beluga"],
         required: false,
-        schema: vs.user_name(),
+        schema: vs.user.name(),
     },
     user_id: {
         description: [
@@ -98,5 +98,6 @@ export default define_method(
                 raise(errors.unexpected_error, error)
             }
         }
+        return null
     }
 )

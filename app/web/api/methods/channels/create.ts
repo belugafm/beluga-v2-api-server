@@ -11,18 +11,45 @@ import {
 import * as vs from "../../../../validation"
 import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
+import {
+    create as create_channel,
+    ErrorCodes as ModelErrorCodes,
+} from "../../../../model/channel/create"
 
 export const argument_specs = define_arguments(
-    ["name", "community_id"] as const,
+    ["name", "description", "is_public", "community_id", "creator_id"] as const,
     {
         name: {
             description: ["チャンネル名"],
             examples: ["雑談"],
             required: true,
-            schema: vs.user_name(),
+            schema: vs.string(),
+        },
+        description: {
+            description: ["チャンネルの説明文"],
+            examples: null,
+            required: false,
+            schema: vs.string(),
+        },
+        is_public: {
+            description: [
+                "グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか",
+            ],
+            examples: null,
+            required: true,
+            schema: vs.boolean(),
         },
         community_id: {
-            description: ["属するコミュニティのID"],
+            description: [
+                "属するコミュニティのID",
+                "指定しない場合はコミュニティに属さないチャンネルになる",
+            ],
+            examples: [ExampleObjectId, "null"],
+            required: false,
+            schema: vs.optional_object_id(),
+        },
+        creator_id: {
+            description: ["作成者のユーザーID"],
             examples: [ExampleObjectId],
             required: false,
             schema: vs.object_id(),
@@ -33,24 +60,51 @@ export const argument_specs = define_arguments(
 export const expected_error_specs = define_expected_errors(
     [
         "invalid_arg_name",
-        "invalid_arg_user_id",
-        "user_not_found",
+        "invalid_arg_description",
+        "invalid_arg_is_public",
+        "invalid_arg_community_id",
+        "invalid_arg_creator_id",
+        "community_not_found",
+        "creator_not_found",
         "internal_error",
         "unexpected_error",
     ] as const,
     argument_specs,
     {
         invalid_arg_name: {
-            description: ["ユーザー名が不正です"],
+            description: ["チャンネル名が不正です"],
             code: "invalid_arg_name",
+            argument: "name",
         },
-        invalid_arg_user_id: {
-            description: ["ユーザーIDが不正です"],
-            code: "invalid_arg_user_id",
+        invalid_arg_description: {
+            description: ["チャンネルの説明文が不正です"],
+            code: "invalid_arg_description",
+            argument: "description",
         },
-        user_not_found: {
+        invalid_arg_is_public: {
+            description: ["`is_public`の値が不正です"],
+            code: "invalid_arg_is_public",
+            argument: "is_public",
+        },
+        invalid_arg_community_id: {
+            description: ["コミュニティIDが不正です"],
+            code: "invalid_arg_community_id",
+            argument: "community_id",
+        },
+        invalid_arg_creator_id: {
+            description: ["作成者のユーザーIDが不正です"],
+            code: "invalid_arg_creator_id",
+            argument: "creator_id",
+        },
+        community_not_found: {
+            description: ["コミュニティが見つかりません"],
+            hint: ["`community_id`を見直してください"],
+            code: "community_not_found",
+        },
+        creator_not_found: {
             description: ["ユーザーが見つかりません"],
-            code: "user_not_found",
+            hint: ["`creator_id`を見直してください"],
+            code: "creator_not_found",
         },
         internal_error: new InternalErrorSpec(),
         unexpected_error: new UnexpectedErrorSpec(),
@@ -58,22 +112,22 @@ export const expected_error_specs = define_expected_errors(
 )
 
 export const facts: MethodFacts = {
-    url: MethodIdentifiers.ShowUser,
+    url: MethodIdentifiers.CreateChannel,
     http_method: HttpMethods.POST,
     rate_limiting: {
-        User: "WebTier3",
-        Bot: "WebTier4",
+        User: "WebTier1",
+        Bot: "WebTier1",
         Admin: "InternalSystem",
     },
     accepted_content_types: [ContentTypes.ApplicationJson],
-    authentication_required: false,
+    authentication_required: true,
     accepted_authentication_methods: ["AccessToken", "OAuth", "Cookie"],
     accepted_scopes: {
-        User: "user:read",
-        Bot: "user:read",
-        Admin: "user:read",
+        User: "channel:write",
+        Bot: "channel:write",
+        Admin: "channel:write",
     },
-    description: ["ユーザーの情報を表示します"],
+    description: ["チャンネルを新規作成します"],
 }
 
 export default define_method(
@@ -82,12 +136,26 @@ export default define_method(
     expected_error_specs,
     async (args, errors) => {
         try {
+            return await create_channel({
+                name: args.name,
+                description: args.description,
+                creator_id: args.creator_id,
+                is_public: args.is_public,
+                community_id: args.community_id,
+            })
         } catch (error) {
-            if (error instanceof ModelRuntimeError) {
+            if (error.code === ModelErrorCodes.InvalidArgName) {
+                raise(errors.invalid_arg_name, error)
+            } else if (error.code === ModelErrorCodes.InvalidArgDescription) {
+                raise(errors.invalid_arg_description, error)
+            } else if (error.code === ModelErrorCodes.InvalidArgCommunityId) {
+                raise(errors.invalid_arg_community_id, error)
+            } else if (error instanceof ModelRuntimeError) {
                 raise(errors.internal_error, error)
             } else {
                 raise(errors.unexpected_error, error)
             }
         }
+        return null
     }
 )

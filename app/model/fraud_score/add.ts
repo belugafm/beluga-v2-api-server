@@ -3,8 +3,8 @@ import * as vs from "../../validation"
 import { ModelRuntimeError } from "../error"
 
 export const ErrorCodes = {
-    InvalidIpAddress: "invalid_ip_address",
-    InvalidResult: "invalid_result",
+    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidResult: "invalid_arg_result",
 } as const
 
 type Argument = {

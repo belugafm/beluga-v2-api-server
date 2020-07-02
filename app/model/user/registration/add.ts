@@ -6,10 +6,10 @@ import { ModelRuntimeError } from "../../error"
 import mongoose from "mongoose"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_id",
-    InvalidIpAddress: "invalid_ip_address",
-    InvalidFraudScoreId: "invalid_fraud_score_id",
-    InvalidFingerprint: "invalid_fingerprint",
+    InvalidUserId: "invalid_arg_id",
+    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidFraudScoreId: "invalid_arg_fraud_score_id",
+    InvalidFingerprint: "invalid_arg_fingerprint",
 }
 import * as vs from "../../../validation"
 

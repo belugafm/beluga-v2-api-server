@@ -12,6 +12,7 @@ import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../../error"
 import { get as get_user } from "../../../../../model/user/get"
 import { get as get_login_session } from "../../../../../model/user/login_session/get"
 import { ModelRuntimeError } from "../../../../../model/error"
+import { UserSchema } from "app/schema/user"
 
 export const argument_specs = define_arguments(
     ["session_id", "user_id"] as const,
@@ -82,7 +83,7 @@ export default define_method(
             if (session == null) {
                 return null
             }
-            if (session.invalidated === true) {
+            if (session.is_invalidated === true) {
                 return null
             }
             if (session.expired() === true) {
@@ -96,5 +97,6 @@ export default define_method(
                 raise(errors.unexpected_error, error)
             }
         }
+        return null
     }
 )

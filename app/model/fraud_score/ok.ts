@@ -7,7 +7,7 @@ import config from "../../config/app"
 import { get } from "./get"
 
 export const ErrorCodes = {
-    InvalidIpAddress: "invalid_ip_address",
+    InvalidIpAddress: "invalid_arg_ip_address",
     ApiRequestFailed: "api_request_failed",
 } as const
 

@@ -20,7 +20,7 @@ export const argument_specs = define_arguments(
             description: ["ユーザー名"],
             examples: ["beluga"],
             required: true,
-            schema: vs.user_name(),
+            schema: vs.user.name(),
         },
         password: {
             description: ["パスワード"],
@@ -57,10 +57,12 @@ export const expected_error_specs = define_expected_errors(
         invalid_arg_name: {
             description: ["ユーザー名またはパスワードが間違っています"],
             code: "invalid_arg_name",
+            argument: "name",
         },
         invalid_arg_password: {
             description: ["ユーザー名またはパスワードが間違っています"],
             code: "invalid_arg_password",
+            argument: "password",
         },
         invalid_arg_ip_address: {
             description: ["ユーザーのIPアドレスを正しく指定してください"],
@@ -121,5 +123,6 @@ export default define_method(
                 raise(errors.unexpected_error, error)
             }
         }
+        return null
     }
 )

@@ -1,8 +1,10 @@
 export const Scopes = {
-    AdminWriteUser: "admin:user:write",
     AdminReadUser: "admin:user:read",
+    AdminWriteUser: "admin:user:write",
     ReadUser: "user:read",
-    WriteUser: "user:read",
+    WriteUser: "user:write",
+    ReadChannel: "channel:read",
+    WriteChannel: "channel:write",
     ReadTimeline: "timeline:read",
     WriteTimeline: "timeline:write",
 } as const

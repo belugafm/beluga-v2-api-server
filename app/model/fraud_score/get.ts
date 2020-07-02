@@ -4,7 +4,7 @@ import { ModelRuntimeError } from "../error"
 import * as mongo from "../../lib/mongoose"
 
 export const ErrorCodes = {
-    InvalidIpAddress: "invalid_ip_address",
+    InvalidIpAddress: "invalid_arg_ip_address",
 } as const
 
 type Argument = {

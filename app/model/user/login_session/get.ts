@@ -8,8 +8,8 @@ import * as mongo from "../../../lib/mongoose"
 import * as vs from "../../../validation"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_user_id",
-    InvalidSessionId: "invalid_session_id",
+    InvalidUserId: "invalid_arg_user_id",
+    InvalidSessionId: "invalid_arg_session_id",
 }
 
 type Argument = {

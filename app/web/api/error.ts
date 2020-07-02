@@ -41,6 +41,12 @@ export class InternalErrorSpec {
     code = "internal_error" as const
 }
 
+export class InvalidAuth {
+    description = ["ユーザーの認証に失敗しました"]
+    hint = ["ログインしているかどうか確認してください"]
+    code = "invalid_auth" as const
+}
+
 // 実装のバグによるエラー
 export class UnexpectedErrorSpec {
     description = ["問題が発生したためリクエストを完了できません"]

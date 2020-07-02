@@ -1,4 +1,4 @@
-import { TurboServer, Request, Response } from "../../turbo"
+import { TurboServer } from "../../turbo"
 import signin, { facts } from "../../api/methods/account/signin"
 import { StrictRule } from "../../../model/fraud_score/ok"
 import { WebApiRuntimeError, InternalErrorSpec } from "../../api/error"
@@ -7,7 +7,7 @@ import config from "../../../config/app"
 export default (server: TurboServer) => {
     server.post(
         facts,
-        async (req: Request, res: Response, params: any) => {
+        async (req, res, params) => {
             const result = await signin({
                 name: req.body.name,
                 password: req.body.password,

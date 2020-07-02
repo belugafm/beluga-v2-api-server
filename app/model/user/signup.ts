@@ -16,10 +16,10 @@ import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
 
 export const ErrorCodes = {
-    InvalidName: "invalid_name",
-    InvalidPassword: "invalid_password",
-    InvalidIpAddress: "invalid_ip_address",
-    InvalidFingerprint: "invalid_fingerprint",
+    InvalidName: "invalid_arg_name",
+    InvalidPassword: "invalid_arg_password",
+    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidFingerprint: "invalid_arg_fingerprint",
     TooManyRequests: "too_many_requests",
     NameTaken: "name_taken",
 }
@@ -54,7 +54,7 @@ export const signup = async ({
     ip_address,
     fingerprint,
 }: Argument): Promise<UserSchema> => {
-    if (vs.user_name().ok(name) !== true) {
+    if (vs.user.name().ok(name) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidName)
     }
     if (vs.password().ok(password) !== true) {
@@ -108,8 +108,8 @@ export const signup = async ({
             profile: {},
             stats: {},
             created_at: new Date(),
-            active: false,
-            dormant: false,
+            is_active: false,
+            is_dormant: false,
         })
         const password_hash = await bcrypt.hash(
             password,

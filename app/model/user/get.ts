@@ -6,8 +6,8 @@ import mongoose, { ClientSession } from "mongoose"
 import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 
 export const ErrorCodes = {
-    InvalidName: "invalid_name",
-    InvalidUserId: "invalid_user_id",
+    InvalidName: "invalid_arg_name",
+    InvalidUserId: "invalid_arg_user_id",
 }
 
 type Argument = {
@@ -23,7 +23,7 @@ export const get = async ({
 }: Argument): Promise<UserSchema | null> => {
     const condition: any = {}
     if (name) {
-        if (vs.user_name().ok(name) !== true) {
+        if (vs.user.name().ok(name) !== true) {
             throw new ModelRuntimeError(ErrorCodes.InvalidName)
         }
         condition["name"] = name

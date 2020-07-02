@@ -4,9 +4,9 @@ import * as mongo from "../../lib/mongoose"
 import mongoose from "mongoose"
 
 export const ErrorCodes = {
-    InvalidArgument: "invalid_argument",
-    InvalidUserId: "invalid_user_id",
-    InvalidUser: "invalid_user",
+    InvalidArgument: "invalid_arg_argument",
+    InvalidUserId: "invalid_arg_user_id",
+    InvalidUser: "invalid_arg_user",
     UserNotFound: "user_not_found",
     UnexpectedError: "unexpected_error",
 }
@@ -24,8 +24,8 @@ export const _unsafe_reclassify_as_dormant = async (user: UserSchema) => {
         profile: user.profile,
         stats: user.stats,
         created_at: user.created_at,
-        active: user.active,
-        dormant: true,
+        is_active: user.is_active,
+        is_dormant: true,
         last_activity_date: user.last_activity_date,
     })
     user.remove()

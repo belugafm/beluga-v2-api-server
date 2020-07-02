@@ -28,7 +28,7 @@ export const argument_specs = define_arguments(
             description: ["ユーザー名"],
             examples: ["beluga"],
             required: true,
-            schema: vs.user_name(),
+            schema: vs.user.name(),
         },
         password: {
             description: ["パスワード"],

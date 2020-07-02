@@ -18,8 +18,8 @@ export interface UserSchema extends Document {
         statuses_count?: number
     }
     created_at: Date
-    active: boolean // 登録後サイトを利用したかどうか
-    dormant: boolean // サイトを長期間利用しなかったかどうか
+    is_active: boolean // 登録後サイトを利用したかどうか
+    is_dormant: boolean // サイトを長期間利用しなかったかどうか
     last_activity_date?: Date
     _terms_of_service_agreement_date?: Date
     _terms_of_service_agreement_version?: string
@@ -30,9 +30,9 @@ export interface UserSchema extends Document {
     transform: () => any
 }
 
-const UndefinedString = {
+const NullString = {
     type: String,
-    default: undefined,
+    default: null,
 }
 
 function define_schema(): any {
@@ -42,12 +42,12 @@ function define_schema(): any {
             unique: true,
         },
         avatar_url: String,
-        display_name: UndefinedString,
+        display_name: NullString,
         profile: {
-            location: UndefinedString,
-            description: UndefinedString,
-            theme_color: UndefinedString,
-            background_image_url: UndefinedString,
+            location: NullString,
+            description: NullString,
+            theme_color: NullString,
+            background_image_url: NullString,
         },
         stats: {
             statuses_count: {
@@ -56,11 +56,11 @@ function define_schema(): any {
             },
         },
         created_at: Date,
-        active: {
+        is_active: {
             type: Boolean,
             default: false,
         },
-        dormant: {
+        is_dormant: {
             type: Boolean,
             default: false,
         },
@@ -90,7 +90,7 @@ user_schema.methods.needsReclassifyAsDormant = function (
     this: UserSchema
 ): boolean {
     const current = new Date()
-    if (this.active && this.last_activity_date) {
+    if (this.is_active && this.last_activity_date) {
         const seconds =
             (current.getTime() - this.last_activity_date.getTime()) / 1000
         if (

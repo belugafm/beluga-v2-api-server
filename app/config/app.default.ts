@@ -32,6 +32,16 @@ const config: {
             regexp: object
         }
     }
+    channel: {
+        name: {
+            min_length: number
+            max_length: number
+        }
+        description: {
+            min_length: number
+            max_length: number
+        }
+    }
 } = {
     server: {
         domain: "localhost.beluga.fm",
@@ -74,6 +84,16 @@ const config: {
             min_length: 1,
             max_length: 32,
             regexp: new RegExp(/^[a-zA-Z0-9_]+$/),
+        },
+    },
+    channel: {
+        name: {
+            min_length: 1,
+            max_length: 32,
+        },
+        description: {
+            min_length: 0,
+            max_length: 3000,
         },
     },
 }

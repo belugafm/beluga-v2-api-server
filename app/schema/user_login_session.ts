@@ -9,7 +9,7 @@ export interface UserLoginSessionSchema extends Document {
     ip_address: string
     created_at: Date
     expire_date: Date
-    invalidated?: boolean
+    is_invalidated?: boolean
     _schema_version?: number
 
     expired: () => boolean
@@ -25,7 +25,7 @@ const schema = new Schema({
     ip_address: String,
     created_at: Date,
     expire_date: Date,
-    invalidated: {
+    is_invalidated: {
         type: Boolean,
         default: false,
     },

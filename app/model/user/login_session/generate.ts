@@ -8,10 +8,10 @@ import * as vs from "../../../validation"
 import bcrypt from "bcrypt"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_id",
-    InvalidIpAddress: "invalid_ip_address",
-    InvalidPasswordHash: "invalid_password_hash",
-    InvalidLifetime: "invalid_lifetime",
+    InvalidUserId: "invalid_arg_id",
+    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidPasswordHash: "invalid_arg_password_hash",
+    InvalidLifetime: "invalid_arg_lifetime",
 }
 
 type Argument = {

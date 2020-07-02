@@ -4,8 +4,8 @@ import * as vs from "../../validation"
 import { get as get_user } from "../user/get"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_user_id",
-    InvalidDate: "invalid_date",
+    InvalidUserId: "invalid_arg_user_id",
+    InvalidDate: "invalid_arg_date",
 }
 
 type Argument = {

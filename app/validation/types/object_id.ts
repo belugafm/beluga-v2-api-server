@@ -1,5 +1,4 @@
 import { Schema } from "../schema"
-import { check_regex_pattern } from "../validator/string/regex"
 import { Options } from "./string"
 import mongoose from "mongoose"
 

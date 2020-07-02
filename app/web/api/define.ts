@@ -173,10 +173,17 @@ export function define_method<
                         validation_error instanceof ValueSchemaValidationError
                     ) {
                         const error = errors_associated_with_args[argument_name]
-                        throw new WebApiRuntimeError(
-                            error,
-                            validation_error.message
-                        )
+                        if (error == null) {
+                            throw new WebApiRuntimeError(
+                                new InternalErrorSpec(),
+                                "引数の値チェックを完了できません"
+                            )
+                        } else {
+                            throw new WebApiRuntimeError(
+                                error,
+                                validation_error.message
+                            )
+                        }
                     } else {
                         throw new WebApiRuntimeError(
                             new InternalErrorSpec(),
