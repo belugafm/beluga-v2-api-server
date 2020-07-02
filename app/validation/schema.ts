@@ -1,5 +1,8 @@
 export class Schema<T> {
-    type?: T
+    // validatorの対応する型を推論するためにダミーの関数を作って組み込み関数ReturnTypeで型を推論する
+    type(value: T) {
+        return value
+    }
     options: { [key: string]: any }
     validation_funcs: ((value: T, options: { [key: string]: any }) => void)[]
     constructor(options: { [key: string]: any }, validation_funcs: any[]) {

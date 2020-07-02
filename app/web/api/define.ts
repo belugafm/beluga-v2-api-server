@@ -117,7 +117,7 @@ export function define_method<
     expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
     callback: (
         args: {
-            [ArgumentName in keyof ArgumentSpecs]: NonNullable<
+            [ArgumentName in keyof ArgumentSpecs]: ReturnType<
                 ArgumentSpecs[ArgumentName]["schema"]["type"]
             >
         },
@@ -125,14 +125,14 @@ export function define_method<
     ) => Promise<CallbackReturnType>
 ): (
     args: {
-        [ArgumentName in keyof ArgumentSpecs]: NonNullable<
+        [ArgumentName in keyof ArgumentSpecs]: ReturnType<
             ArgumentSpecs[ArgumentName]["schema"]["type"]
         >
     }
 ) => Promise<CallbackReturnType> {
     return (
         args: {
-            [ArgumentName in keyof ArgumentSpecs]: NonNullable<
+            [ArgumentName in keyof ArgumentSpecs]: ReturnType<
                 ArgumentSpecs[ArgumentName]["schema"]["type"]
             >
         }
