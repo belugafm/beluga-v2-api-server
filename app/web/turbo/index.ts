@@ -1,5 +1,3 @@
-import { MongoClient } from "mongodb"
-import { MongoMemoryServer } from "mongodb-memory-server"
 import Router from "find-my-way"
 import turbo from "turbo-http"
 import { Request, Response, read_body } from "./turbo"
@@ -138,8 +136,7 @@ type Options = {
 export class TurboServer {
     router: Router.Instance
     server: turbo.Server
-    db: MongoClient | MongoMemoryServer
-    constructor(opt: Router.Config, db: MongoClient | MongoMemoryServer) {
+    constructor(opt: Router.Config) {
         if (opt.defaultRoute == null) {
             opt.defaultRoute = DefaultRoute
         }
@@ -154,7 +151,6 @@ export class TurboServer {
             }
             return this.router.lookup(req, res)
         })
-        this.db = db
     }
     get(url: string, handler: Router.Handler, content_type?: string) {
         this.router.get(
