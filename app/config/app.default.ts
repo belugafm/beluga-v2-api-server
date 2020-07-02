@@ -45,7 +45,7 @@ const config: {
         ipqs_api_secret: "",
     },
     terms_of_service: {
-        version: "hogehoge",
+        version: "dc96fc180a405bf5c2d1631ab69444e71bbbd0ac",
     },
     user_registration: {
         // 同じIPアドレスでの登録はこの秒数の間隔より短く行えないようになる
