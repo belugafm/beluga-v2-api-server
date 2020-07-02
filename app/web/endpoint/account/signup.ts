@@ -16,7 +16,6 @@ export default (server: TurboServer) => {
                 ip_address: params["ip_address"],
                 fingerprint: req.body.fingerprint,
             })
-
             const result = await signin({
                 name: req.body.name,
                 password: req.body.password,

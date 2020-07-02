@@ -8,6 +8,9 @@ const config: {
         isp_allow_list: string[]
         ipqs_api_secret: string
     }
+    terms_of_service: {
+        version: string
+    }
     user_registration: {
         limit: number
         reclassify_inactive_as_dormant_period: number
@@ -40,6 +43,9 @@ const config: {
         isp_deny_list: [],
         isp_allow_list: [],
         ipqs_api_secret: "",
+    },
+    terms_of_service: {
+        version: "hogehoge",
     },
     user_registration: {
         // 同じIPアドレスでの登録はこの秒数の間隔より短く行えないようになる

@@ -1,7 +1,6 @@
-import { UserSchema, User, DormantUser } from "../../schema/user"
+import { UserSchema, User } from "../../schema/user"
 import * as vs from "../../validation"
 import { ModelRuntimeError } from "../error"
-import * as mongo from "../../lib/mongoose"
 import bcrypt from "bcrypt"
 import config from "../../config/app"
 import mongoose from "mongoose"
@@ -11,6 +10,7 @@ import { get as get_registration_info } from "./registration/get"
 import { get as get_fraud_score } from "../fraud_score/get"
 import { add as add_fraud_score } from "../fraud_score/add"
 import { get as get_user } from "../user/get"
+import { agree_to as agree_to_terms_of_service } from "../terms_of_service/agree_to"
 import { FraudScoreSchema } from "app/schema/fraud_score"
 import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
@@ -102,13 +102,14 @@ export const signup = async ({
             }
         }
 
-        // @ts-ignore
         const user = await User.create({
             name: name,
             avatar_url: "",
             profile: {},
             stats: {},
             created_at: new Date(),
+            active: false,
+            dormant: false,
         })
         const password_hash = await bcrypt.hash(
             password,
@@ -128,11 +129,18 @@ export const signup = async ({
             fingerprint,
         })
 
-        session.commitTransaction()
+        await agree_to_terms_of_service({
+            user_id: user._id,
+            date: new Date(),
+            version: config.terms_of_service.version,
+            session: session,
+        })
+
+        await session.commitTransaction()
         session.endSession()
         return user
     } catch (error) {
-        session.abortTransaction()
+        await session.abortTransaction()
         session.endSession()
         throw error
     }

@@ -6,16 +6,12 @@ import {
     define_method,
     define_arguments,
     define_expected_errors,
-    ExpectedError,
 } from "../../define"
 import * as vs from "../../../../validation"
-import {
-    InternalErrorSpec,
-    UnexpectedErrorSpec,
-    WebApiRuntimeError,
-} from "../../error"
+import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../error"
 import { signin } from "../../../../model/user/signin"
 import { ModelRuntimeError } from "../../../../model/error"
+import { update_last_activity_date } from "../../../../model/user/update_last_activity_date"
 
 export const argument_specs = define_arguments(
     ["name", "password", "ip_address", "session_lifetime"] as const,
@@ -94,29 +90,24 @@ export const facts: MethodFacts = {
     description: ["アカウントにログインします"],
 }
 
-function raise<T extends string, S>(
-    spec: ExpectedError<T, S>,
-    source_error?: Error
-) {
-    if (source_error) {
-        throw new WebApiRuntimeError(spec, source_error.message)
-    } else {
-        throw new WebApiRuntimeError(spec)
-    }
-}
-
 export default define_method(
     facts,
     argument_specs,
     expected_error_specs,
     async (args, errors) => {
         try {
-            return await signin({
+            const ret = await signin({
                 name: args.name,
                 password: args.password,
                 ip_address: args.ip_address,
                 session_lifetime: args.session_lifetime,
             })
+            const [user, login_session] = ret
+            await update_last_activity_date({
+                user_id: user._id,
+                date: new Date(),
+            })
+            return ret
         } catch (error) {
             if (error instanceof ModelRuntimeError) {
                 if (error.code === "invalid_name") {

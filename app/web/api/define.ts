@@ -58,6 +58,8 @@ type Argument = {
     schema: Schema<any>
 }
 
+export const ExampleObjectId = "5efc9d01b8431d8bf6e3611a"
+
 export function define_arguments<
     ArgumentNames extends string,
     ArgumentSpecs extends {

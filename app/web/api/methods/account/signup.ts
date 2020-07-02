@@ -6,14 +6,9 @@ import {
     define_method,
     define_arguments,
     define_expected_errors,
-    ExpectedError,
 } from "../../define"
 import * as vs from "../../../../validation"
-import {
-    InternalErrorSpec,
-    UnexpectedErrorSpec,
-    WebApiRuntimeError,
-} from "../../error"
+import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../error"
 import {
     signup,
     ErrorCodes as ModelErrorCodes,
@@ -133,17 +128,6 @@ export const facts: MethodFacts = {
     accepted_authentication_methods: [],
     accepted_scopes: {},
     description: ["新規アカウントを作成します"],
-}
-
-function raise<T extends string, S>(
-    spec: ExpectedError<T, S>,
-    source_error?: Error
-) {
-    if (source_error) {
-        throw new WebApiRuntimeError(spec, source_error.message)
-    } else {
-        throw new WebApiRuntimeError(spec)
-    }
 }
 
 export default define_method(

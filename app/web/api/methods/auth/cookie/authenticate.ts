@@ -6,14 +6,9 @@ import {
     define_method,
     define_arguments,
     define_expected_errors,
-    ExpectedError,
 } from "../../../define"
 import * as vs from "../../../../../validation"
-import {
-    InternalErrorSpec,
-    UnexpectedErrorSpec,
-    WebApiRuntimeError,
-} from "../../../error"
+import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../../error"
 import { get as get_user } from "../../../../../model/user/get"
 import { get as get_login_session } from "../../../../../model/user/login_session/get"
 import { ModelRuntimeError } from "../../../../../model/error"
@@ -72,17 +67,6 @@ export const facts: MethodFacts = {
     accepted_authentication_methods: [],
     accepted_scopes: {},
     description: ["Webブラウザでログインしているユーザーの情報を取得します"],
-}
-
-function raise<T extends string, S>(
-    spec: ExpectedError<T, S>,
-    source_error?: Error
-) {
-    if (source_error) {
-        throw new WebApiRuntimeError(spec, source_error.message)
-    } else {
-        throw new WebApiRuntimeError(spec)
-    }
 }
 
 export default define_method(

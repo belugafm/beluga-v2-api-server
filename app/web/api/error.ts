@@ -47,3 +47,14 @@ export class UnexpectedErrorSpec {
     hint = ["サイトの管理者に問い合わせてください"]
     code = "unexpected_error" as const
 }
+
+export function raise<ErrorCode extends string, ArgumentSpecs>(
+    spec: ExpectedError<ErrorCode, ArgumentSpecs>,
+    source_error?: Error
+) {
+    if (source_error) {
+        throw new WebApiRuntimeError(spec, source_error.message)
+    } else {
+        throw new WebApiRuntimeError(spec)
+    }
+}
