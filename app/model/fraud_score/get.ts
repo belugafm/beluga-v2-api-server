@@ -4,7 +4,7 @@ import { ModelRuntimeError } from "../error"
 import * as mongo from "../../lib/mongoose"
 
 export const ErrorCodes = {
-    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
 } as const
 
 type Argument = {
@@ -15,7 +15,7 @@ export const get = async ({
     ip_address,
 }: Argument): Promise<FraudScoreSchema | null> => {
     if (vs.ip_address().ok(ip_address) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
     return await mongo.findOne(FraudScore, { ip_address: ip_address })
 }

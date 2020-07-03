@@ -5,7 +5,7 @@ import mongoose from "mongoose"
 
 export const ErrorCodes = {
     InvalidArgument: "invalid_arg_argument",
-    InvalidUserId: "invalid_arg_user_id",
+    InvalidArgUserId: "invalid_arg_user_id",
     InvalidUser: "invalid_arg_user",
     UserNotFound: "user_not_found",
     UnexpectedError: "unexpected_error",
@@ -37,7 +37,7 @@ export const reclassify_as_dormant = async ({
 }: Argument): Promise<void> => {
     if (user_id) {
         if (user_id instanceof mongoose.Types.ObjectId === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
         }
         user = await mongo.findOne(User, { _id: user_id })
     } else if (user) {

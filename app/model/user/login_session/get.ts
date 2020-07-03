@@ -8,8 +8,8 @@ import * as mongo from "../../../lib/mongoose"
 import * as vs from "../../../validation"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_arg_user_id",
-    InvalidSessionId: "invalid_arg_session_id",
+    InvalidArgUserId: "invalid_arg_user_id",
+    InvalidArgSessionId: "invalid_arg_session_id",
 }
 
 type Argument = {
@@ -22,10 +22,10 @@ export const get = async ({
     session_id,
 }: Argument): Promise<UserLoginSessionSchema | null> => {
     if (vs.object_id().ok(user_id) === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
     if (vs.string().ok(session_id) === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
     return await mongo.findOne(UserLoginSession, {
         user_id,

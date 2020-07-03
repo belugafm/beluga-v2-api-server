@@ -6,8 +6,8 @@ import { ModelRuntimeError } from "../../error"
 import mongoose from "mongoose"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_arg_id",
-    InvalidPasswordHash: "invalid_arg_password_hash",
+    InvalidArgUserId: "invalid_arg_id",
+    InvalidArgPasswordHash: "invalid_arg_password_hash",
 }
 
 type Argument = {
@@ -20,10 +20,10 @@ export const add = async ({
     password_hash,
 }: Argument): Promise<UserLoginCredentialSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
     if (typeof password_hash !== "string") {
-        throw new ModelRuntimeError(ErrorCodes.InvalidPasswordHash)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgPasswordHash)
     }
     return await UserLoginCredential.create({
         user_id,

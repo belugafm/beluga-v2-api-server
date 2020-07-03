@@ -15,9 +15,9 @@ import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
 
 export const ErrorCodes = {
-    InvalidName: "invalid_arg_name",
-    InvalidPassword: "invalid_arg_password",
-    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidArgName: "invalid_arg_name",
+    InvalidArgPassword: "invalid_arg_password",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
 }
 
 const request_fraud_score_if_needed = async (
@@ -51,13 +51,13 @@ export const signin = async ({
     session_lifetime,
 }: Argument): Promise<[UserSchema, UserLoginSessionSchema]> => {
     if (vs.user.name().ok(name) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidName)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
     }
     if (vs.password().ok(password) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidPassword)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgPassword)
     }
     if (vs.ip_address().ok(ip_address) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
 
     const sess = await mongoose.startSession()
@@ -65,19 +65,19 @@ export const signin = async ({
     try {
         const user = await mongo.findOne(User, { name: name })
         if (user == null) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidName)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
         }
 
         const credential = await get_login_credential({
             user_id: user._id,
         })
         if (credential == null) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidPassword)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgPassword)
         }
         if (
             (await bcrypt.compare(password, credential.password_hash)) !== true
         ) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidPassword)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgPassword)
         }
 
         const fraud_score = await request_fraud_score_if_needed(ip_address)

@@ -7,7 +7,7 @@ import config from "../../../../app/config/app"
 config.user_registration.limit = 0
 jest.setTimeout(30000)
 
-describe("signup", () => {
+describe("user/signup", () => {
     let mongodb: MongoMemoryReplSet | null = null
     beforeEach(async () => {
         mongodb = await connect()

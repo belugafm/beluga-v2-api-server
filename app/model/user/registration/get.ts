@@ -8,10 +8,10 @@ import * as mongo from "../../../lib/mongoose"
 import * as vs from "../../../validation"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_arg_user_id",
-    InvalidIpAddress: "invalid_arg_ip_address",
-    InvalidFraudScoreId: "invalid_arg_fraud_score_id",
-    InvalidFingerprint: "invalid_arg_fingerprint",
+    InvalidArgUserId: "invalid_arg_user_id",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
+    InvalidArgFraudScoreId: "invalid_arg_fraud_score_id",
+    InvalidArgFingerprint: "invalid_arg_fingerprint",
 }
 
 type Argument = {
@@ -32,25 +32,25 @@ export const get = async ({
     const query: Argument = {}
     if (user_id) {
         if (user_id instanceof mongoose.Types.ObjectId === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
         }
         query.user_id = user_id
     }
     if (ip_address) {
         if (vs.ip_address().ok(ip_address) === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
         }
         query.ip_address = ip_address
     }
     if (fraud_score_id) {
         if (fraud_score_id instanceof mongoose.Types.ObjectId === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidFraudScoreId)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgFraudScoreId)
         }
         query.fraud_score_id = fraud_score_id
     }
     if (fingerprint) {
         if (typeof fingerprint !== "string") {
-            throw new ModelRuntimeError(ErrorCodes.InvalidFingerprint)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgFingerprint)
         }
         query.fingerprint = fingerprint
     }

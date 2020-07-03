@@ -13,8 +13,8 @@ const config: {
     }
     user_registration: {
         limit: number
-        reclassify_inactive_as_dormant_period: number
-        reclassify_active_as_dormant_period: number
+        reclassify_inactive_as_dormant_after: number
+        reclassify_active_as_dormant_after: number
     }
     user_login_credential: {
         password: {
@@ -41,6 +41,21 @@ const config: {
             min_length: number
             max_length: number
         }
+        create_limit_per_day: number
+    }
+    community: {
+        name: {
+            min_length: number
+            max_length: number
+        }
+        description: {
+            min_length: number
+            max_length: number
+        }
+        create_limit_per_day: number
+    }
+    status: {
+        no_editing_after: number
     }
 } = {
     server: {
@@ -63,11 +78,11 @@ const config: {
 
         // 登録後にサイトを利用しないままこの秒数が経過したアカウントは
         // 休眠アカウントにする
-        reclassify_inactive_as_dormant_period: 86400 * 3,
+        reclassify_inactive_as_dormant_after: 86400 * 3,
 
         // サイトを利用していたユーザーが最後に利用してから
         // この秒数経過した場合は休眠アカウントにする
-        reclassify_active_as_dormant_period: 86400 * 365 * 3,
+        reclassify_active_as_dormant_after: 86400 * 365 * 3,
     },
     user_login_credential: {
         password: {
@@ -95,6 +110,24 @@ const config: {
             min_length: 0,
             max_length: 3000,
         },
+        // 1日あたりの新規作成可能なチャンネル数
+        create_limit_per_day: 10,
+    },
+    community: {
+        name: {
+            min_length: 1,
+            max_length: 32,
+        },
+        description: {
+            min_length: 0,
+            max_length: 3000,
+        },
+        // 1日あたりの新規作成可能なコミュニティ数
+        create_limit_per_day: 2,
+    },
+    status: {
+        // 投稿を編集可能な期間（秒）
+        no_editing_after: 60 * 5,
     },
 }
 

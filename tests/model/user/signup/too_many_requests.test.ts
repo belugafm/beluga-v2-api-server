@@ -1,15 +1,15 @@
 import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
 import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
 import { DormantUser, User } from "../../../../app/schema/user"
 import * as mongo from "../../../../app/lib/mongoose"
+import { MongoMemoryReplSet } from "mongodb-memory-server"
 
 config.user_registration.limit = 3
-config.user_registration.reclassify_inactive_as_dormant_period = 10
+config.user_registration.reclassify_inactive_as_dormant_after = 10
 jest.setTimeout(
-    config.user_registration.reclassify_inactive_as_dormant_period * 1000 * 3
+    config.user_registration.reclassify_inactive_as_dormant_after * 1000 * 3
 )
 
 async function sleep(sec: number) {
@@ -20,8 +20,8 @@ async function sleep(sec: number) {
     })
 }
 
-describe("signup", () => {
-    let mongodb: any = null
+describe("user/signup", () => {
+    let mongodb: MongoMemoryReplSet | null = null
     beforeEach(async () => {
         mongodb = await connect()
     })
@@ -69,7 +69,7 @@ describe("signup", () => {
                 }
             }
             await sleep(
-                config.user_registration.reclassify_inactive_as_dormant_period -
+                config.user_registration.reclassify_inactive_as_dormant_after -
                     config.user_registration.limit
             )
             await signup({

@@ -8,10 +8,10 @@ import * as vs from "../../../validation"
 import bcrypt from "bcrypt"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_arg_id",
-    InvalidIpAddress: "invalid_arg_ip_address",
-    InvalidPasswordHash: "invalid_arg_password_hash",
-    InvalidLifetime: "invalid_arg_lifetime",
+    InvalidArgUserId: "invalid_arg_id",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
+    InvalidArgPasswordHash: "invalid_arg_password_hash",
+    InvalidArgLifetime: "invalid_arg_lifetime",
 }
 
 type Argument = {
@@ -28,18 +28,18 @@ export const generate = async ({
     lifetime,
 }: Argument): Promise<UserLoginSessionSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
     if (vs.ip_address().ok(ip_address) === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
     if (fraud_score_id) {
         if (fraud_score_id instanceof mongoose.Types.ObjectId === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
         }
     }
     if (typeof lifetime !== "number") {
-        throw new ModelRuntimeError(ErrorCodes.InvalidLifetime)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgLifetime)
     }
 
     const source = {

@@ -6,10 +6,10 @@ import { ModelRuntimeError } from "../../error"
 import mongoose from "mongoose"
 
 export const ErrorCodes = {
-    InvalidUserId: "invalid_arg_id",
-    InvalidIpAddress: "invalid_arg_ip_address",
-    InvalidFraudScoreId: "invalid_arg_fraud_score_id",
-    InvalidFingerprint: "invalid_arg_fingerprint",
+    InvalidArgUserId: "invalid_arg_id",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
+    InvalidArgFraudScoreId: "invalid_arg_fraud_score_id",
+    InvalidArgFingerprint: "invalid_arg_fingerprint",
 }
 import * as vs from "../../../validation"
 
@@ -27,19 +27,19 @@ export const add = async ({
     fingerprint,
 }: Argument): Promise<UserRegistrationSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidUserId)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
     if (vs.ip_address().ok(ip_address) === false) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
     if (fraud_score_id) {
         if (fraud_score_id instanceof mongoose.Types.ObjectId === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidFraudScoreId)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgFraudScoreId)
         }
     }
     if (fingerprint) {
         if (typeof fingerprint !== "string") {
-            throw new ModelRuntimeError(ErrorCodes.InvalidFingerprint)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgFingerprint)
         }
     }
     const date = new Date()

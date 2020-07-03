@@ -95,7 +95,7 @@ user_schema.methods.needsReclassifyAsDormant = function (
             (current.getTime() - this.last_activity_date.getTime()) / 1000
         if (
             seconds >
-            config.user_registration.reclassify_active_as_dormant_period
+            config.user_registration.reclassify_active_as_dormant_after
         ) {
             return true
         } else {
@@ -105,7 +105,7 @@ user_schema.methods.needsReclassifyAsDormant = function (
         const seconds = (current.getTime() - this.created_at.getTime()) / 1000
         if (
             seconds >
-            config.user_registration.reclassify_inactive_as_dormant_period
+            config.user_registration.reclassify_inactive_as_dormant_after
         ) {
             return true
         } else {

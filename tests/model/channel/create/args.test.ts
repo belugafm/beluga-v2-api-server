@@ -1,13 +1,14 @@
 import { connect } from "../../../mongodb"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
-import { signup, ErrorCodes } from "../../../../app/model/user/signup"
+import { create, ErrorCodes } from "../../../../app/model/channel/create"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
+import mongoose from "mongoose"
+import { ExampleObjectId } from "../../../../app/web/api/define"
 
-config.user_registration.limit = 0
 jest.setTimeout(30000)
 
-describe("user/signup", () => {
+describe("channel/create", () => {
     let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
         mongodb = await connect()
@@ -17,14 +18,19 @@ describe("user/signup", () => {
             await mongodb.stop()
         }
     })
+    test("max length", async () => {
+        expect.assertions(0)
+        await create({
+            name: "チャンネル",
+            creator_id: mongoose.Types.ObjectId(ExampleObjectId),
+            is_public: true,
+        })
+    })
     test("invalid name", async () => {
         expect.assertions(2)
         try {
             // @ts-ignore
-            await signup({
-                password: "password",
-                ip_address: "127.0.0.1",
-            })
+            await create({})
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
@@ -36,11 +42,9 @@ describe("user/signup", () => {
     test("invalid name", async () => {
         expect.assertions(2)
         try {
-            await signup({
+            await create({
                 // @ts-ignore
                 name: 2,
-                password: "password",
-                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -52,11 +56,9 @@ describe("user/signup", () => {
     test("invalid name", async () => {
         expect.assertions(2)
         try {
-            await signup({
+            await create({
                 // @ts-ignore
                 name: {},
-                password: "password",
-                ip_address: "127.0.0.1",
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -68,10 +70,10 @@ describe("user/signup", () => {
     test("min length", async () => {
         expect.assertions(2)
         try {
-            await signup({
+            await create({
                 name: "",
-                password: "password",
-                ip_address: "127.0.0.1",
+                creator_id: mongoose.Types.ObjectId(ExampleObjectId),
+                is_public: true,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -83,63 +85,15 @@ describe("user/signup", () => {
     test("max length", async () => {
         expect.assertions(2)
         try {
-            await signup({
+            await create({
                 name: "0123456789012345678901234567890123456789",
-                password: "password",
-                ip_address: "127.0.0.1",
+                creator_id: mongoose.Types.ObjectId(ExampleObjectId),
+                is_public: true,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
                 expect(error.code).toMatch(ErrorCodes.InvalidArgName)
-            }
-        }
-    })
-
-    test("invalid password", async () => {
-        expect.assertions(2)
-        try {
-            // @ts-ignore
-            await signup({
-                name: "beluga",
-                ip_address: "127.0.0.1",
-            })
-        } catch (error) {
-            expect(error).toBeInstanceOf(ModelRuntimeError)
-            if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.InvalidArgPassword)
-            }
-        }
-    })
-    test("invalid password", async () => {
-        expect.assertions(2)
-        try {
-            await signup({
-                name: "beluga",
-                // @ts-ignore
-                password: 2,
-                ip_address: "127.0.0.1",
-            })
-        } catch (error) {
-            expect(error).toBeInstanceOf(ModelRuntimeError)
-            if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.InvalidArgPassword)
-            }
-        }
-    })
-    test("invalid password", async () => {
-        expect.assertions(2)
-        try {
-            await signup({
-                name: "beluga",
-                // @ts-ignore
-                password: {},
-                ip_address: "127.0.0.1",
-            })
-        } catch (error) {
-            expect(error).toBeInstanceOf(ModelRuntimeError)
-            if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.InvalidArgPassword)
             }
         }
     })

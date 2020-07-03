@@ -7,7 +7,7 @@ import config from "../../config/app"
 import { get } from "./get"
 
 export const ErrorCodes = {
-    InvalidIpAddress: "invalid_arg_ip_address",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
     ApiRequestFailed: "api_request_failed",
 } as const
 
@@ -79,7 +79,7 @@ export const ok = async ({
     apply_rule = DefaultRule,
 }: Argument): Promise<boolean> => {
     if (vs.ip_address().ok(ip_address) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
     const result = await fetch_result(ip_address)
     return apply_rule(result)
