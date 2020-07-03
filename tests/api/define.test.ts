@@ -20,7 +20,7 @@ describe("api", () => {
         ],
         authentication_required: false,
         accepted_authentication_methods: [],
-        accepted_scopes: [],
+        accepted_scopes: {},
         description: [],
     }
     const argument_specs = define_arguments(
@@ -67,6 +67,7 @@ describe("api", () => {
 
         expect.assertions(2)
         try {
+            // @ts-ignore
             await method({})
         } catch (error) {
             expect(error).toBeInstanceOf(WebApiRuntimeError)
@@ -87,6 +88,7 @@ describe("api", () => {
         expect.assertions(2)
         try {
             await method({
+                // @ts-ignore
                 required_arg: 2,
             })
         } catch (error) {
@@ -107,6 +109,7 @@ describe("api", () => {
 
         expect.assertions(2)
         try {
+            // @ts-ignore
             await method({
                 optional_arg: "",
             })
@@ -126,6 +129,7 @@ describe("api", () => {
             async (args, errors) => {}
         )
         expect.assertions(0)
+        // @ts-ignore
         await method({
             required_arg: "",
         })
@@ -142,6 +146,7 @@ describe("api", () => {
         try {
             await method({
                 required_arg: "",
+                // @ts-ignore
                 optional_arg: 1,
             })
         } catch (error) {

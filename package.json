@@ -33,9 +33,11 @@
         "prettier": "^2.0.5"
     },
     "scripts": {
-        "test": "jest"
+        "test": "jest --clearCache && jest"
     },
     "jest": {
+        "testEnvironment": "node",
+        "verbose": true,
         "moduleFileExtensions": [
             "ts",
             "js"

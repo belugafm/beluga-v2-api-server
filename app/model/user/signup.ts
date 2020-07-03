@@ -16,10 +16,10 @@ import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
 
 export const ErrorCodes = {
-    InvalidName: "invalid_arg_name",
-    InvalidPassword: "invalid_arg_password",
-    InvalidIpAddress: "invalid_arg_ip_address",
-    InvalidFingerprint: "invalid_arg_fingerprint",
+    InvalidArgName: "invalid_arg_name",
+    InvalidArgPassword: "invalid_arg_password",
+    InvalidArgIpAddress: "invalid_arg_ip_address",
+    InvalidArgFingerprint: "invalid_arg_fingerprint",
     TooManyRequests: "too_many_requests",
     NameTaken: "name_taken",
 }
@@ -55,20 +55,20 @@ export const signup = async ({
     fingerprint,
 }: Argument): Promise<UserSchema> => {
     if (vs.user.name().ok(name) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidName)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
     }
     if (vs.password().ok(password) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidPassword)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgPassword)
     }
     if (vs.ip_address().ok(ip_address) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidIpAddress)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
     if (fingerprint) {
         if (
             vs.string({ min_length: 64, max_length: 64 }).ok(fingerprint) !==
             true
         ) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidFingerprint)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgFingerprint)
         }
     }
 

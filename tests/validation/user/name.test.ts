@@ -1,9 +1,9 @@
-import { user_name } from "../../app/validation"
-import { ValueSchemaValidationError } from "../../app/validation/error"
+import { user } from "../../../app/validation"
+import { ValueSchemaValidationError } from "../../../app/validation/error"
 
 describe("user_name", () => {
     test("user_name", () => {
-        const schema = user_name()
+        const schema = user.name()
         expect(() => {
             schema.check("")
         }).toThrow(ValueSchemaValidationError)

@@ -10,6 +10,7 @@ export function name() {
     const options: Options = {
         min_length: config.user.name.min_length,
         max_length: config.user.name.max_length,
+        regexp: config.user.name.regexp,
     }
     return new Schema<string>(options, [
         check_is_string,

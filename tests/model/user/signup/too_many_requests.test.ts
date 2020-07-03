@@ -1,5 +1,5 @@
 import { connect } from "../../../mongodb"
-import { MongoMemoryServer } from "mongodb-memory-server"
+import { MongoMemoryReplSet } from "mongodb-memory-server"
 import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
@@ -21,11 +21,10 @@ async function sleep(sec: number) {
 }
 
 describe("signup", () => {
-    let mongodb: MongoMemoryServer | null = null
+    let mongodb: any = null
     beforeEach(async () => {
         mongodb = await connect()
     })
-
     afterEach(async () => {
         if (mongodb) {
             await mongodb.stop()
