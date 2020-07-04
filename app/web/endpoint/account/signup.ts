@@ -18,7 +18,7 @@ export default (server: TurboServer) => {
                 fingerprint: req.body.fingerprint,
             })
             await invalidate_last_login_session(req.cookies)
-            const result = await signin({
+            const [user, session] = await signin({
                 name: req.body.name,
                 password: req.body.password,
                 ip_address: params["ip_address"],
@@ -26,10 +26,9 @@ export default (server: TurboServer) => {
                     config.user_registration
                         .reclassify_inactive_as_dormant_after,
             })
-            if (result == null) {
+            if (session == null) {
                 throw new WebApiRuntimeError(new InternalErrorSpec())
             }
-            const [user, session] = result
             res.setCookie("user_id", session.user_id.toString(), {
                 expires: session.expire_date,
                 domain: config.server.domain,
