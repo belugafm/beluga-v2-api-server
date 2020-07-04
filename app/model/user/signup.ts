@@ -121,7 +121,7 @@ export const signup = async ({
         })
 
         const fraud_score = await request_fraud_score_if_needed(ip_address)
-        const fraud_score_id = fraud_score ? fraud_score._id : null
+        const fraud_score_id = fraud_score ? fraud_score._id : undefined
         const registration_info = await add_registration_info({
             user_id: user._id,
             ip_address,

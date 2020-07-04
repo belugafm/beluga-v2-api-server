@@ -9,6 +9,7 @@ import bcrypt from "bcrypt"
 
 export const ErrorCodes = {
     InvalidArgUserId: "invalid_arg_id",
+    InvalidArgFraudScoreId: "invalid_arg_fraud_score_id",
     InvalidArgIpAddress: "invalid_arg_ip_address",
     InvalidArgPasswordHash: "invalid_arg_password_hash",
     InvalidArgLifetime: "invalid_arg_lifetime",
@@ -35,7 +36,7 @@ export const generate = async ({
     }
     if (fraud_score_id) {
         if (fraud_score_id instanceof mongoose.Types.ObjectId === false) {
-            throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
+            throw new ModelRuntimeError(ErrorCodes.InvalidArgFraudScoreId)
         }
     }
     if (typeof lifetime !== "number") {
@@ -47,14 +48,15 @@ export const generate = async ({
         date: Date.now(),
         user_id: user_id.toString(),
     }
-    const session_id = await bcrypt.hash(JSON.stringify(source), 1)
+    const session_token = await bcrypt.hash(JSON.stringify(source), 1)
 
     return await UserLoginSession.create({
         user_id: user_id,
         created_at: new Date(),
         expire_date: new Date(Date.now() + lifetime * 1000),
         ip_address: ip_address,
-        session_id: session_id,
+        session_token: session_token,
         fraud_score_id: fraud_score_id,
+        is_expired: false,
     })
 }

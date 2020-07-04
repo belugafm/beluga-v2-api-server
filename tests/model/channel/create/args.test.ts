@@ -2,7 +2,6 @@ import { connect } from "../../../mongodb"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
 import { create, ErrorCodes } from "../../../../app/model/channel/create"
 import { ModelRuntimeError } from "../../../../app/model/error"
-import config from "../../../../app/config/app"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../app/web/api/define"
 

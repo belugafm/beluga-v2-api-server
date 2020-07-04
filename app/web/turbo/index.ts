@@ -11,9 +11,8 @@ import config from "../../config/app"
 import * as fraud_prevention from "../../model/fraud_score/ok"
 import { MethodFacts } from "../api/define"
 import { ContentTypesLiteralUnion } from "../api/facts/content_type"
-import authenticate_user_with_cookie from "../api/methods/auth/cookie/authenticate"
-import mongoose from "mongoose"
-import { UserSchema } from "app/schema/user"
+import { UserSchema } from "../../schema/user"
+import { authenticate_user } from "../auth"
 
 export { Request, Response }
 
@@ -134,46 +133,6 @@ const base_url = "/api/v1/"
 
 type Options = {
     fraud_prevention_rule?: fraud_prevention.FraudPreventionRule
-}
-
-async function authenticate_user(
-    facts: MethodFacts,
-    query: any,
-    cookies: any
-): Promise<UserSchema | null> {
-    query = query || {}
-    cookies = cookies || {}
-
-    const {
-        access_token,
-        access_token_scret,
-        oauth_consumer_key,
-        oauth_consumer_secret,
-        oauth_bearer_token,
-    } = query
-
-    if (facts.accepted_authentication_methods.includes("OAuth")) {
-        if (oauth_bearer_token && oauth_consumer_key && oauth_consumer_secret) {
-            // OAuth認証
-        }
-    }
-    if (facts.accepted_authentication_methods.includes("AccessToken")) {
-        if (access_token && access_token_scret) {
-            // アクセストークンによる認証
-        }
-    }
-    if (facts.accepted_authentication_methods.includes("Cookie")) {
-        const user_id_str = cookies["user_id"]
-        const session_id = cookies["session_id"]
-        if (user_id_str && session_id) {
-            // Cookieを使ったログインセッション
-            return await authenticate_user_with_cookie({
-                user_id: mongoose.Types.ObjectId(user_id_str),
-                session_id: session_id,
-            })
-        }
-    }
-    return null
 }
 
 export class TurboServer {

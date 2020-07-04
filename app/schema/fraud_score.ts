@@ -4,6 +4,7 @@ import { IpqsResult } from "app/lib/ipqs"
 const schema_version = 1
 
 export interface FraudScoreSchema extends Document {
+    _id: mongoose.Types.ObjectId
     ip_address: string
     result: IpqsResult
     created_at: Date

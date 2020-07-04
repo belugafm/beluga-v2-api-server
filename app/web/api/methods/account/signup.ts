@@ -14,6 +14,7 @@ import {
     ErrorCodes as ModelErrorCodes,
 } from "../../../../model/user/signup"
 import { ModelRuntimeError } from "../../../../model/error"
+import { UserSchema } from "app/schema/user"
 
 export const argument_specs = define_arguments(
     [
@@ -134,7 +135,7 @@ export default define_method(
     facts,
     argument_specs,
     expected_error_specs,
-    async (args, errors) => {
+    async (args, errors): Promise<UserSchema | null> => {
         if (args.password !== args.confirmed_password) {
             raise(errors.invalid_arg_confirmed_password)
         }

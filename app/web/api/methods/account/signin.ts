@@ -123,6 +123,6 @@ export default define_method(
                 raise(errors.unexpected_error, error)
             }
         }
-        return null
+        return [null, null]
     }
 )
