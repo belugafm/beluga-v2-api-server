@@ -11,7 +11,7 @@ export const RateLimitConfiguration = {
         limit_per_minite: 1,
         label: "Web API Tier 1",
         description: [
-            "動画アップロードなどのサーバーに高い負荷がかかる処理や、チャンネル・コミュニティの連続作成を制限するために使用されます",
+            "動画アップロードなどのサーバーに高い負荷がかかる処理などを制限するために使用されます",
         ],
     },
     [RateLimits.WebTier2]: {

@@ -6,7 +6,8 @@ import { ContentTypesLiteralUnion } from "./facts/content_type"
 import { AuthenticationMethodsLiteralUnion } from "./facts/authentication_method"
 import { Schema } from "../../validation/schema"
 import { ValueSchemaValidationError } from "../../validation/error"
-import { WebApiRuntimeError, InternalErrorSpec } from "./error"
+import { WebApiRuntimeError, InternalErrorSpec, InvalidAuth } from "./error"
+import { UserSchema } from "app/schema/user"
 
 // Web APIの仕様を定義
 export interface MethodFacts {
@@ -121,22 +122,30 @@ export function define_method<
                 ArgumentSpecs[ArgumentName]["schema"]["type"]
             >
         },
-        errors: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>
+        errors: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
+        auth_user?: UserSchema | null
     ) => Promise<CallbackReturnType>
 ): (
     args: {
         [ArgumentName in keyof ArgumentSpecs]: ReturnType<
             ArgumentSpecs[ArgumentName]["schema"]["type"]
         >
-    }
+    },
+    auth_user?: UserSchema | null
 ) => Promise<CallbackReturnType> {
     return (
         args: {
             [ArgumentName in keyof ArgumentSpecs]: ReturnType<
                 ArgumentSpecs[ArgumentName]["schema"]["type"]
             >
-        }
+        },
+        auth_user?: UserSchema | null
     ) => {
+        if (facts.authentication_required) {
+            if (auth_user == null) {
+                throw new WebApiRuntimeError(new InvalidAuth())
+            }
+        }
         // 各argumentに関連付けられた、値チェック失敗時のエラーを送出できるようにする
         const errors_associated_with_args: {
             [argument_name: string]: ExpectedError<string, ArgumentSpecs>
@@ -193,6 +202,6 @@ export function define_method<
                 }
             }
         }
-        return callback(args, expected_error_specs)
+        return callback(args, expected_error_specs, auth_user)
     }
 }

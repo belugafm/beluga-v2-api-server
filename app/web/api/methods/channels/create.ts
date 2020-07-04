@@ -9,7 +9,12 @@ import {
     ExampleObjectId,
 } from "../../define"
 import * as vs from "../../../../validation"
-import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../error"
+import {
+    InternalErrorSpec,
+    UnexpectedErrorSpec,
+    raise,
+    InvalidAuth,
+} from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
 import {
     create as create_channel,
@@ -17,7 +22,7 @@ import {
 } from "../../../../model/channel/create"
 
 export const argument_specs = define_arguments(
-    ["name", "description", "is_public", "community_id", "creator_id"] as const,
+    ["name", "description", "is_public", "community_id"] as const,
     {
         name: {
             description: ["チャンネル名"],
@@ -46,13 +51,7 @@ export const argument_specs = define_arguments(
             ],
             examples: [ExampleObjectId, "null"],
             required: false,
-            schema: vs.optional_object_id(),
-        },
-        creator_id: {
-            description: ["作成者のユーザーID"],
-            examples: [ExampleObjectId],
-            required: false,
-            schema: vs.object_id(),
+            schema: vs.nullable_object_id(),
         },
     }
 )
@@ -63,9 +62,8 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_description",
         "invalid_arg_is_public",
         "invalid_arg_community_id",
-        "invalid_arg_creator_id",
         "community_not_found",
-        "creator_not_found",
+        "invalid_auth",
         "internal_error",
         "unexpected_error",
     ] as const,
@@ -91,21 +89,12 @@ export const expected_error_specs = define_expected_errors(
             code: "invalid_arg_community_id",
             argument: "community_id",
         },
-        invalid_arg_creator_id: {
-            description: ["作成者のユーザーIDが不正です"],
-            code: "invalid_arg_creator_id",
-            argument: "creator_id",
-        },
         community_not_found: {
             description: ["コミュニティが見つかりません"],
             hint: ["`community_id`を見直してください"],
             code: "community_not_found",
         },
-        creator_not_found: {
-            description: ["ユーザーが見つかりません"],
-            hint: ["`creator_id`を見直してください"],
-            code: "creator_not_found",
-        },
+        invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
         unexpected_error: new UnexpectedErrorSpec(),
     }
@@ -115,8 +104,8 @@ export const facts: MethodFacts = {
     url: MethodIdentifiers.CreateChannel,
     http_method: HttpMethods.POST,
     rate_limiting: {
-        User: "WebTier1",
-        Bot: "WebTier1",
+        User: "WebTier2",
+        Bot: "WebTier2",
         Admin: "InternalSystem",
     },
     accepted_content_types: [ContentTypes.ApplicationJson],
@@ -134,12 +123,18 @@ export default define_method(
     facts,
     argument_specs,
     expected_error_specs,
-    async (args, errors) => {
+    async (args, errors, auth_user) => {
+        if (auth_user == null) {
+            return raise(errors.invalid_auth)
+        }
+        // TODO: コミュニティに参加しているかどうかのチェック
+        if (args.community_id) {
+        }
         try {
             return await create_channel({
                 name: args.name,
                 description: args.description,
-                creator_id: args.creator_id,
+                creator_id: auth_user._id,
                 is_public: args.is_public,
                 community_id: args.community_id,
             })

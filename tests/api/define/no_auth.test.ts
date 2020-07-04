@@ -3,11 +3,11 @@ import {
     define_expected_errors,
     define_method,
     MethodFacts,
-} from "../../app/web/api/define"
-import * as vs from "../../app/validation"
-import { HttpMethods } from "../../app/web/api/facts/http_method"
-import { ContentTypes } from "../../app/web/api/facts/content_type"
-import { WebApiRuntimeError } from "../../app/web/api/error"
+} from "../../../app/web/api/define"
+import * as vs from "../../../app/validation"
+import { HttpMethods } from "../../../app/web/api/facts/http_method"
+import { ContentTypes } from "../../../app/web/api/facts/content_type"
+import { WebApiRuntimeError } from "../../../app/web/api/error"
 
 describe("api", () => {
     const facts: MethodFacts = {

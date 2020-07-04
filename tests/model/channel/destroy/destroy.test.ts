@@ -36,7 +36,7 @@ describe("channel/destroy", () => {
     })
     test("reach limit", async () => {
         const repeats = 3
-        expect.assertions(4 * repeats)
+        expect.assertions(2 * repeats)
         for (let index = 0; index < repeats; index++) {
             const creator_id = mongoose.Types.ObjectId(ExampleObjectId)
             const channel = await create({
@@ -56,20 +56,8 @@ describe("channel/destroy", () => {
                     expect(error.code).toMatch(CreateErrorCodes.LimitReached)
                 }
             }
-            try {
-                await destroy({
-                    channel_id: channel._id,
-                    creator_id: channel._id,
-                })
-            } catch (error) {
-                expect(error).toBeInstanceOf(ModelRuntimeError)
-                if (error instanceof ModelRuntimeError) {
-                    expect(error.code).toMatch(DestroyErrorCodes.NoPermission)
-                }
-            }
             await destroy({
                 channel_id: channel._id,
-                creator_id: creator_id,
             })
             const new_channel = await create({
                 name: "チャンネル",
@@ -78,7 +66,6 @@ describe("channel/destroy", () => {
             })
             await destroy({
                 channel_id: new_channel._id,
-                creator_id: creator_id,
             })
         }
     })

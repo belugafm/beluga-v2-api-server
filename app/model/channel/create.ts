@@ -62,7 +62,7 @@ export const create = async ({
         stats: {},
         created_at: new Date(),
         creator_id: creator_id,
-        community_id: community_id,
+        community_id: community_id ? community_id : null,
         is_public: is_public,
     })
 }

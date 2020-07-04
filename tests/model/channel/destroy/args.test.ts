@@ -19,28 +19,11 @@ describe("channel/destroy", () => {
         expect.assertions(2)
         try {
             // @ts-ignore
-            await destroy({
-                creator_id: mongoose.Types.ObjectId(ExampleObjectId),
-            })
+            await destroy({})
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
                 expect(error.code).toMatch(ErrorCodes.InvalidArgChannelId)
-            }
-        }
-        return
-    })
-    test("invalid creator_id", async () => {
-        expect.assertions(2)
-        try {
-            // @ts-ignore
-            await destroy({
-                channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-            })
-        } catch (error) {
-            expect(error).toBeInstanceOf(ModelRuntimeError)
-            if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.InvalidArgCreatorId)
             }
         }
         return

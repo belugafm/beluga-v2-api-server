@@ -49,7 +49,7 @@ declare module "find-my-way" {
     type Handler = (
         req: Request,
         res: Response,
-        params: { ip_address: string; logged_in_user: UserSchema | null },
+        params: { ip_address: string; auth_user: UserSchema | null },
         store?: any
     ) => object | string
     type HTTPMethod = "GET" | "POST"
@@ -259,7 +259,7 @@ export class TurboServer {
 
                 if (facts.authentication_required) {
                     // ユーザー認証をここで行う
-                    params["logged_in_user"] = await authenticate_user(
+                    params["auth_user"] = await authenticate_user(
                         facts,
                         req.body,
                         req.cookies
