@@ -32,7 +32,7 @@ export const create = async ({
         throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
     }
     if (vs.object_id().ok(creator_id) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgCreatorId)
     }
     if (community_id) {
         if (vs.object_id().ok(community_id) !== true) {

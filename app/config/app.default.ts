@@ -56,6 +56,10 @@ const config: {
     }
     status: {
         no_editing_after: number
+        text: {
+            min_length: number
+            max_length: number
+        }
     }
 } = {
     server: {
@@ -128,6 +132,10 @@ const config: {
     status: {
         // 投稿を編集可能な期間（秒）
         no_editing_after: 60 * 5,
+        text: {
+            min_length: 0,
+            max_length: 3000,
+        },
     },
 }
 

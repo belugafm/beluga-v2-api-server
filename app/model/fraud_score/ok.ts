@@ -81,6 +81,16 @@ export const ok = async ({
     if (vs.ip_address().ok(ip_address) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgIpAddress)
     }
-    const result = await fetch_result(ip_address)
-    return apply_rule(result)
+    try {
+        const result = await fetch_result(ip_address)
+        return apply_rule(result)
+    } catch (error) {
+        if (error instanceof ModelRuntimeError) {
+            // IPQSのリクエスト上限に達したら全部通す
+            if (error.code === ErrorCodes.ApiRequestFailed) {
+                return true
+            }
+        }
+        throw error
+    }
 }

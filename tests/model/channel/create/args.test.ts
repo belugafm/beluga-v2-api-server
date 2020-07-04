@@ -36,7 +36,6 @@ describe("channel/create", () => {
                 expect(error.code).toMatch(ErrorCodes.InvalidArgName)
             }
         }
-        return
     })
     test("invalid name", async () => {
         expect.assertions(2)
