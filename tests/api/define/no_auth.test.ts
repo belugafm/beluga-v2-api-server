@@ -45,12 +45,12 @@ describe("api", () => {
         argument_specs,
         {
             optional_arg_error: {
-                description: ["ユーザー名が基準を満たしていません"],
+                description: [""],
                 argument: "optional_arg",
                 code: "optional_arg_error",
             },
             required_arg_error: {
-                description: ["パスワードが基準を満たしていません"],
+                description: [""],
                 argument: "required_arg",
                 code: "required_arg_error",
             },
@@ -129,7 +129,6 @@ describe("api", () => {
             async (args, errors) => {}
         )
         expect.assertions(0)
-        // @ts-ignore
         await method({
             required_arg: "",
         })

@@ -9,7 +9,7 @@ export interface UserLoginSessionSchema extends Document {
     ip_address: string
     created_at: Date
     expire_date: Date
-    is_invalidated?: boolean
+    is_expired?: boolean
     _schema_version?: number
 
     expired: () => boolean
@@ -38,6 +38,9 @@ const schema = new Schema({
 schema.index({ user_id: 1, session_id: 1 }, { unique: true })
 
 schema.methods.expired = function (this: UserLoginSessionSchema): boolean {
+    if (this.is_expired === true) {
+        return true
+    }
     const current = new Date()
     if (current.getTime() > this.expire_date.getTime()) {
         return true

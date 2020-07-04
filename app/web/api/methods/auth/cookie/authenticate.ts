@@ -83,9 +83,6 @@ export default define_method(
             if (session == null) {
                 return null
             }
-            if (session.is_invalidated === true) {
-                return null
-            }
             if (session.expired() === true) {
                 return null
             }

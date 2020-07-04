@@ -136,15 +136,15 @@ export function define_method<
                 ArgumentSpecs[ArgumentName]["schema"]["type"]
             >
         },
-    ErrorSpecs,
+    ErrorCodes,
     CallbackReturnType
 >(
     facts: MethodFacts,
     method_argument_specs: ArgumentSpecs,
-    expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
+    expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorCodes>,
     callback: (
         args: Args,
-        errors: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
+        errors: ExpectedErrorSpecs<ArgumentSpecs, ErrorCodes>,
         auth_user?: UserSchema | null
     ) => Promise<CallbackReturnType>
 ): (args: Args, auth_user?: UserSchema | null) => Promise<CallbackReturnType> {

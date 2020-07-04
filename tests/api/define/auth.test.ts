@@ -7,7 +7,7 @@ import {
 import * as vs from "../../../app/validation"
 import { HttpMethods } from "../../../app/web/api/facts/http_method"
 import { ContentTypes } from "../../../app/web/api/facts/content_type"
-import { WebApiRuntimeError } from "../../../app/web/api/error"
+import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
 
 describe("api", () => {
     const facts: MethodFacts = {
@@ -45,12 +45,12 @@ describe("api", () => {
         argument_specs,
         {
             optional_arg_error: {
-                description: ["ユーザー名が基準を満たしていません"],
+                description: [""],
                 argument: "optional_arg",
                 code: "optional_arg_error",
             },
             required_arg_error: {
-                description: ["パスワードが基準を満たしていません"],
+                description: [""],
                 argument: "required_arg",
                 code: "required_arg_error",
             },
@@ -64,7 +64,6 @@ describe("api", () => {
             expected_error_specs,
             async (args, errors) => {}
         )
-
         expect.assertions(2)
         try {
             await method({
@@ -73,7 +72,7 @@ describe("api", () => {
         } catch (error) {
             expect(error).toBeInstanceOf(WebApiRuntimeError)
             if (error instanceof WebApiRuntimeError) {
-                expect(error.code).toMatch("required_arg_error")
+                expect(error.code).toMatch(new InvalidAuth().code)
             }
         }
     })
