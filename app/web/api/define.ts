@@ -110,6 +110,32 @@ export function define_method<
     ArgumentSpecs extends {
         [ArgumentName in ArgumentNames]: Argument
     },
+    RequiredArgNames extends Exclude<
+        {
+            [ArgumentName in keyof ArgumentSpecs]: ArgumentSpecs[ArgumentName]["required"] extends true
+                ? ArgumentName
+                : never
+        }[keyof ArgumentSpecs],
+        undefined
+    >,
+    OptionalArgNames extends Exclude<
+        {
+            [ArgumentName in keyof ArgumentSpecs]: ArgumentSpecs[ArgumentName]["required"] extends false
+                ? ArgumentName
+                : never
+        }[keyof ArgumentSpecs],
+        undefined
+    >,
+    Args extends {
+        [ArgumentName in RequiredArgNames]: ReturnType<
+            ArgumentSpecs[ArgumentName]["schema"]["type"]
+        >
+    } &
+        {
+            [ArgumentName in OptionalArgNames]?: ReturnType<
+                ArgumentSpecs[ArgumentName]["schema"]["type"]
+            >
+        },
     ErrorSpecs,
     CallbackReturnType
 >(
@@ -117,30 +143,12 @@ export function define_method<
     method_argument_specs: ArgumentSpecs,
     expected_error_specs: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
     callback: (
-        args: {
-            [ArgumentName in keyof ArgumentSpecs]: ReturnType<
-                ArgumentSpecs[ArgumentName]["schema"]["type"]
-            >
-        },
+        args: Args,
         errors: ExpectedErrorSpecs<ArgumentSpecs, ErrorSpecs>,
         auth_user?: UserSchema | null
     ) => Promise<CallbackReturnType>
-): (
-    args: {
-        [ArgumentName in keyof ArgumentSpecs]: ReturnType<
-            ArgumentSpecs[ArgumentName]["schema"]["type"]
-        >
-    },
-    auth_user?: UserSchema | null
-) => Promise<CallbackReturnType> {
-    return (
-        args: {
-            [ArgumentName in keyof ArgumentSpecs]: ReturnType<
-                ArgumentSpecs[ArgumentName]["schema"]["type"]
-            >
-        },
-        auth_user?: UserSchema | null
-    ) => {
+): (args: Args, auth_user?: UserSchema | null) => Promise<CallbackReturnType> {
+    return (args: Args, auth_user?: UserSchema | null) => {
         if (facts.authentication_required) {
             if (auth_user == null) {
                 throw new WebApiRuntimeError(new InvalidAuth())
@@ -171,6 +179,7 @@ export function define_method<
                     })
                 }
             }
+            // @ts-ignore
             const value = args[argument_name]
             if (required || value) {
                 try {
