@@ -1,5 +1,5 @@
 import { TurboServer } from "../../turbo"
-import destroy, { facts } from "../../api/methods/channels/destroy"
+import destroy, { facts } from "../../api/methods/channel/destroy"
 import mongoose from "mongoose"
 
 export default (server: TurboServer) => {

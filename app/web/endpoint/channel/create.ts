@@ -1,5 +1,5 @@
 import { TurboServer } from "../../turbo"
-import create, { facts } from "../../api/methods/channels/create"
+import create, { facts } from "../../api/methods/channel/create"
 import mongoose from "mongoose"
 import {
     WebApiRuntimeError,
