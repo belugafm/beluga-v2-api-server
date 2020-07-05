@@ -18,13 +18,13 @@ import {
 } from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
 import {
-    get as get_channel,
+    get as get_status,
     ErrorCodes as ModelErrorCodes,
-} from "../../../../model/channel/get"
+} from "../../../../model/status/get"
 
-export const argument_specs = define_arguments(["channel_id"] as const, {
-    channel_id: {
-        description: ["チャンネルID"],
+export const argument_specs = define_arguments(["status_id"] as const, {
+    status_id: {
+        description: ["投稿ID"],
         examples: [ExampleObjectId],
         required: true,
         schema: vs.object_id(),
@@ -33,17 +33,17 @@ export const argument_specs = define_arguments(["channel_id"] as const, {
 
 export const expected_error_specs = define_expected_errors(
     [
-        "invalid_arg_channel_id",
+        "invalid_arg_status_id",
         "invalid_auth",
         "internal_error",
         "unexpected_error",
     ] as const,
     argument_specs,
     {
-        invalid_arg_channel_id: {
-            description: ["チャンネルIDが不正です"],
-            code: "invalid_arg_channel_id",
-            argument: "channel_id",
+        invalid_arg_status_id: {
+            description: ["投稿IDが不正です"],
+            code: "invalid_arg_status_id",
+            argument: "status_id",
         },
         invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
@@ -52,7 +52,7 @@ export const expected_error_specs = define_expected_errors(
 )
 
 export const facts: MethodFacts = {
-    url: MethodIdentifiers.ShowChannel,
+    url: MethodIdentifiers.ShowStatus,
     http_method: HttpMethods.POST,
     rate_limiting: {
         User: "WebTier3",
@@ -63,11 +63,11 @@ export const facts: MethodFacts = {
     authentication_required: true,
     accepted_authentication_methods: ["AccessToken", "OAuth", "Cookie"],
     accepted_scopes: {
-        User: "channel:read",
-        Bot: "channel:read",
-        Admin: "channel:read",
+        User: "status:read",
+        Bot: "status:read",
+        Admin: "status:read",
     },
-    description: ["チャンネルの情報を取得します"],
+    description: ["投稿の情報を取得します"],
 }
 
 export default define_method(
@@ -79,14 +79,14 @@ export default define_method(
             if (auth_user == null) {
                 throw new WebApiRuntimeError(errors.invalid_auth)
             }
-            return await get_channel({
-                channel_id: args.channel_id,
+            return await get_status({
+                status_id: args.status_id,
             })
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
-            } else if (error.code === ModelErrorCodes.InvalidArgChannelId) {
-                raise(errors.invalid_arg_channel_id, error)
+            } else if (error.code === ModelErrorCodes.InvalidArgStatusId) {
+                raise(errors.invalid_arg_status_id, error)
             } else if (error instanceof ModelRuntimeError) {
                 raise(errors.internal_error, error)
             } else {
