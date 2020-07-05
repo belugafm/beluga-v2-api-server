@@ -74,7 +74,7 @@ export const expected_error_specs = define_expected_errors(
 )
 
 export const facts: MethodFacts = {
-    url: MethodIdentifiers.DestroyChannel,
+    url: MethodIdentifiers.UpdateStatus,
     http_method: HttpMethods.POST,
     rate_limiting: {
         User: "WebTier3",
@@ -115,12 +115,14 @@ export default define_method(
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
-            } else if (error.code === ModelErrorCodes.InvalidArgText) {
-                raise(errors.invalid_arg_text, error)
-            } else if (error.code === ModelErrorCodes.InvalidArgChannelId) {
-                raise(errors.invalid_arg_channel_id, error)
             } else if (error instanceof ModelRuntimeError) {
-                raise(errors.internal_error, error)
+                if (error.code === ModelErrorCodes.InvalidArgText) {
+                    raise(errors.invalid_arg_text, error)
+                } else if (error.code === ModelErrorCodes.InvalidArgChannelId) {
+                    raise(errors.invalid_arg_channel_id, error)
+                } else {
+                    raise(errors.internal_error, error)
+                }
             } else {
                 raise(errors.unexpected_error, error)
             }

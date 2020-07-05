@@ -23,6 +23,9 @@ function start_server() {
     server.register(require("./web/endpoint/account/signup"))
     server.register(require("./web/endpoint/account/signin"))
     server.register(require("./web/endpoint/channel/create"))
+    server.register(require("./web/endpoint/channel/destroy"))
+    server.register(require("./web/endpoint/status/update"))
+    server.register(require("./web/endpoint/timeline/channel"))
     server.register(require("./web/endpoint/auth/cookie/authenticate"))
     server.listen(8080)
 }

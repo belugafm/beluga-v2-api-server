@@ -154,44 +154,61 @@ export class TurboServer {
             return this.router.lookup(req, res)
         })
     }
-    get(url: string, handler: Router.Handler, content_type?: string) {
-        this.router.get(
-            base_url + url,
-            async (req, res, params, store) => {
-                const { content_type } = store
-                check_content_type(content_type)
-                res.setHeader("Content-Type", content_type)
-                try {
-                    const query = qs.parse(req.url.replace(/^.+\?/, ""), {
-                        decoder: decodeURIComponent,
-                    })
-                    req.query = query
-                    const data = await handler(req, res, params)
-                    res.write(
-                        Buffer.from(
-                            to_string_based_on_content_type(data, content_type)
-                        )
+    get(facts: MethodFacts, handler: Router.Handler, options: Options = {}) {
+        if (facts.http_method !== "GET") {
+            throw new Error(
+                "POSTリクエストが要求されているendpointをGETに登録することはできません"
+            )
+        }
+        this.router.get(base_url + facts.url, async (req, res, params) => {
+            res.setHeader("Content-Type", ContentType.JSON)
+            try {
+                const query = qs.parse(req.url.replace(/^.+\?/, ""), {
+                    decoder: decodeURIComponent,
+                })
+                req.query = query
+
+                if (facts.authentication_required) {
+                    // ユーザー認証をここで行う
+                    params["auth_user"] = await authenticate_user(
+                        facts,
+                        req.body,
+                        req.cookies
                     )
-                } catch (error) {
-                    console.error(error)
+                }
+
+                const data = await handler(req, res, params)
+                res.write(Buffer.from(JSON.stringify(data)))
+            } catch (error) {
+                if (error instanceof WebApiRuntimeError) {
                     res.write(
                         Buffer.from(
                             JSON.stringify({
                                 ok: false,
-                                error: error.toString(),
-                                details: {
-                                    stack: error.stack.split("\n"),
-                                },
+                                error_code: error.code,
+                                description: error.description,
+                                argument: error.argument,
+                                hint: error.hint,
+                                additional_message: error.additional_message,
+                                stack: null,
+                            })
+                        )
+                    )
+                } else {
+                    res.write(
+                        Buffer.from(
+                            JSON.stringify({
+                                ok: false,
+                                error_code: "unexpected_error",
+                                description: [error.toString()],
+                                stack: error.stack.split("\n"),
                             })
                         )
                     )
                 }
-                res.end()
-            },
-            {
-                content_type: content_type ? content_type : ContentType.JSON,
             }
-        )
+            res.end()
+        })
     }
     post(facts: MethodFacts, handler: Router.Handler, options: Options = {}) {
         if (facts.http_method !== "POST") {
@@ -200,7 +217,7 @@ export class TurboServer {
             )
         }
         this.router.post(base_url + facts.url, async (req, res, params) => {
-            res.setHeader("Content-Type", "application/json") // サーバーの応答はjson
+            res.setHeader("Content-Type", ContentType.JSON)
             res.setStatusCode(200)
             try {
                 const body = await read_body(req) // これは必ず一番最初に呼ぶ
@@ -277,7 +294,6 @@ export class TurboServer {
                         )
                     )
                 }
-                console.error(error)
             }
             res.end()
         })

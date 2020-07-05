@@ -62,7 +62,7 @@ export const expected_error_specs = define_expected_errors(
 
 export const facts: MethodFacts = {
     url: MethodIdentifiers.ShowUser,
-    http_method: HttpMethods.POST,
+    http_method: HttpMethods.GET,
     rate_limiting: {
         User: "WebTier3",
         Bot: "WebTier4",

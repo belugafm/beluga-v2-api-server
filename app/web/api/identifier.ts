@@ -9,4 +9,5 @@ export const MethodIdentifiers = {
     DestroyStatus: "statuses/destroy",
     ShowStatus: "statuses/show",
     ShowUser: "users/show",
+    ChannelTimeline: "timeline/channel",
 }

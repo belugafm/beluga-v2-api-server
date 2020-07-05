@@ -43,6 +43,10 @@ const schema = new Schema({
     },
 })
 
+schema.index({ created_at: -1 })
+schema.index({ channel_id: -1, created_at: -1 })
+schema.index({ community_id: -1, created_at: -1 })
+
 schema.methods.transform = async function (
     this: StatusSchema
 ): Promise<StatusObject | null> {

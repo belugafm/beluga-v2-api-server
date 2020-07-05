@@ -104,10 +104,12 @@ export default define_method(
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
-            } else if (error.code === ModelErrorCodes.InvalidArgStatusId) {
-                raise(errors.invalid_arg_status_id, error)
             } else if (error instanceof ModelRuntimeError) {
-                raise(errors.internal_error, error)
+                if (error.code === ModelErrorCodes.InvalidArgStatusId) {
+                    raise(errors.invalid_arg_status_id, error)
+                } else {
+                    raise(errors.internal_error, error)
+                }
             } else {
                 raise(errors.unexpected_error, error)
             }

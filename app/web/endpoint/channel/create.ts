@@ -1,11 +1,7 @@
 import { TurboServer } from "../../turbo"
 import create, { facts } from "../../api/methods/channel/create"
 import mongoose from "mongoose"
-import {
-    WebApiRuntimeError,
-    InternalErrorSpec,
-    InvalidAuth,
-} from "../../api/error"
+import { WebApiRuntimeError, InternalErrorSpec } from "../../api/error"
 
 export default (server: TurboServer) => {
     server.post(facts, async (req, res, params) => {

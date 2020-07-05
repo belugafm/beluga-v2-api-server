@@ -16,16 +16,13 @@ import {
     InvalidAuth,
     WebApiRuntimeError,
 } from "../../error"
+import { channel as get_channel_statuses } from "../../../../model/timeline/channel"
 import { ModelRuntimeError } from "../../../../model/error"
-import {
-    destroy as destroy_channel,
-    ErrorCodes as ModelErrorCodes,
-} from "../../../../model/channel/destroy"
 import { get as get_channel } from "../../../../model/channel/get"
 
 export const argument_specs = define_arguments(["channel_id"] as const, {
     channel_id: {
-        description: ["削除するチャンネルのID"],
+        description: ["チャンネルID"],
         examples: [ExampleObjectId],
         required: true,
         schema: vs.object_id(),
@@ -37,7 +34,6 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_channel_id",
         "channel_not_found",
         "invalid_auth",
-        "no_permission",
         "internal_error",
         "unexpected_error",
     ] as const,
@@ -46,17 +42,10 @@ export const expected_error_specs = define_expected_errors(
         invalid_arg_channel_id: {
             description: ["チャンネルIDが不正です"],
             code: "invalid_arg_channel_id",
-            argument: "channel_id",
         },
         channel_not_found: {
             description: ["チャンネルが見つかりません"],
-            hint: ["`community_id`を見直してください"],
             code: "channel_not_found",
-        },
-        no_permission: {
-            description: ["権限がありません"],
-            hint: ["削除できるのは自分のチャンネルだけです"],
-            code: "no_permission",
         },
         invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
@@ -65,22 +54,22 @@ export const expected_error_specs = define_expected_errors(
 )
 
 export const facts: MethodFacts = {
-    url: MethodIdentifiers.DestroyChannel,
-    http_method: HttpMethods.POST,
+    url: MethodIdentifiers.ChannelTimeline,
+    http_method: HttpMethods.GET,
     rate_limiting: {
-        User: "WebTier2",
-        Bot: "WebTier2",
+        User: "WebTier3",
+        Bot: "WebTier4",
         Admin: "InternalSystem",
     },
     accepted_content_types: [ContentTypes.ApplicationJson],
     authentication_required: true,
     accepted_authentication_methods: ["AccessToken", "OAuth", "Cookie"],
     accepted_scopes: {
-        User: "channel:write",
-        Bot: "channel:write",
-        Admin: "channel:write",
+        User: "timeline:read",
+        Bot: "timeline:read",
+        Admin: "timeline:read",
     },
-    description: ["チャンネルを新規作成します"],
+    description: ["チャンネルの投稿を取得します"],
 }
 
 export default define_method(
@@ -98,27 +87,18 @@ export default define_method(
             if (channel == null) {
                 throw new WebApiRuntimeError(errors.channel_not_found)
             }
-            if (channel.creator_id.equals(auth_user._id) !== true) {
-                throw new WebApiRuntimeError(errors.no_permission)
-            }
-            await destroy_channel({
+            return await get_channel_statuses({
                 channel_id: args.channel_id,
             })
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
             } else if (error instanceof ModelRuntimeError) {
-                if (error.code === ModelErrorCodes.InvalidArgChannelId) {
-                    raise(errors.invalid_arg_channel_id, error)
-                } else if (error.code === ModelErrorCodes.ChannelNotFound) {
-                    raise(errors.channel_not_found, error)
-                } else {
-                    raise(errors.internal_error, error)
-                }
+                raise(errors.internal_error, error)
             } else {
                 raise(errors.unexpected_error, error)
             }
         }
-        return
+        return []
     }
 )

@@ -27,6 +27,7 @@ export interface MethodFacts {
     }
 
     // Web APIをリクエストするときのContent-Type
+    // GETの場合は無視される
     accepted_content_types: ContentTypesLiteralUnion[]
 
     // Web APIのリクエストの際に認証が必要かどうか

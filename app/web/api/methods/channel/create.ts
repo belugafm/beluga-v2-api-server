@@ -151,16 +151,22 @@ export default define_method(
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
-            } else if (error.code === ModelErrorCodes.InvalidArgName) {
-                raise(errors.invalid_arg_name, error)
-            } else if (error.code === ModelErrorCodes.InvalidArgDescription) {
-                raise(errors.invalid_arg_description, error)
-            } else if (error.code === ModelErrorCodes.InvalidArgCommunityId) {
-                raise(errors.invalid_arg_community_id, error)
-            } else if (error.code === ModelErrorCodes.LimitReached) {
-                raise(errors.limit_reached, error)
             } else if (error instanceof ModelRuntimeError) {
-                raise(errors.internal_error, error)
+                if (error.code === ModelErrorCodes.InvalidArgName) {
+                    raise(errors.invalid_arg_name, error)
+                } else if (
+                    error.code === ModelErrorCodes.InvalidArgDescription
+                ) {
+                    raise(errors.invalid_arg_description, error)
+                } else if (
+                    error.code === ModelErrorCodes.InvalidArgCommunityId
+                ) {
+                    raise(errors.invalid_arg_community_id, error)
+                } else if (error.code === ModelErrorCodes.LimitReached) {
+                    raise(errors.limit_reached, error)
+                } else {
+                    raise(errors.internal_error, error)
+                }
             } else {
                 raise(errors.unexpected_error, error)
             }
