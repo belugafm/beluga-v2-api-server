@@ -18,14 +18,14 @@ import {
 } from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
 import {
-    destroy as destroy_channel,
+    destroy as destroy_status,
     ErrorCodes as ModelErrorCodes,
-} from "../../../../model/channel/destroy"
-import { get as get_channel } from "../../../../model/channel/get"
+} from "../../../../model/status/destroy"
+import { get as get_status } from "../../../../model/status/get"
 
-export const argument_specs = define_arguments(["channel_id"] as const, {
-    channel_id: {
-        description: ["削除するチャンネルのID"],
+export const argument_specs = define_arguments(["status_id"] as const, {
+    status_id: {
+        description: ["削除する投稿のID"],
         examples: [ExampleObjectId],
         required: true,
         schema: vs.object_id(),
@@ -34,8 +34,8 @@ export const argument_specs = define_arguments(["channel_id"] as const, {
 
 export const expected_error_specs = define_expected_errors(
     [
-        "invalid_arg_channel_id",
-        "channel_not_found",
+        "invalid_arg_status_id",
+        "status_not_found",
         "invalid_auth",
         "no_permission",
         "internal_error",
@@ -43,19 +43,18 @@ export const expected_error_specs = define_expected_errors(
     ] as const,
     argument_specs,
     {
-        invalid_arg_channel_id: {
-            description: ["チャンネルIDが不正です"],
-            code: "invalid_arg_channel_id",
-            argument: "channel_id",
+        invalid_arg_status_id: {
+            description: ["投稿IDが不正です"],
+            code: "invalid_arg_status_id",
+            argument: "status_id",
         },
-        channel_not_found: {
-            description: ["チャンネルが見つかりません"],
-            hint: ["`community_id`を見直してください"],
-            code: "channel_not_found",
+        status_not_found: {
+            description: ["投稿が見つかりません"],
+            hint: ["`status_id`を見直してください"],
+            code: "status_not_found",
         },
         no_permission: {
             description: ["権限がありません"],
-            hint: ["削除できるのは自分のチャンネルだけです"],
             code: "no_permission",
         },
         invalid_auth: new InvalidAuth(),
@@ -65,22 +64,22 @@ export const expected_error_specs = define_expected_errors(
 )
 
 export const facts: MethodFacts = {
-    url: MethodIdentifiers.DestroyChannel,
+    url: MethodIdentifiers.DestroyStatus,
     http_method: HttpMethods.POST,
     rate_limiting: {
-        User: "WebTier2",
-        Bot: "WebTier2",
+        User: "WebTier3",
+        Bot: "WebTier4",
         Admin: "InternalSystem",
     },
     accepted_content_types: [ContentTypes.ApplicationJson],
     authentication_required: true,
     accepted_authentication_methods: ["AccessToken", "OAuth", "Cookie"],
     accepted_scopes: {
-        User: "channel:write",
-        Bot: "channel:write",
-        Admin: "channel:write",
+        User: "status:write",
+        Bot: "status:write",
+        Admin: "status:write",
     },
-    description: ["チャンネルを新規作成します"],
+    description: ["チャンネルに投稿します"],
 }
 
 export default define_method(
@@ -92,31 +91,27 @@ export default define_method(
             if (auth_user == null) {
                 throw new WebApiRuntimeError(errors.invalid_auth)
             }
-            const channel = await get_channel({
-                channel_id: args.channel_id,
-            })
-            if (channel == null) {
-                throw new WebApiRuntimeError(errors.channel_not_found)
+            const status = await get_status({ status_id: args.status_id })
+            if (status == null) {
+                throw new WebApiRuntimeError(errors.status_not_found)
             }
-            if (channel.creator_id.equals(auth_user._id) !== true) {
+            if (status.user_id.equals(auth_user._id) !== true) {
                 throw new WebApiRuntimeError(errors.no_permission)
             }
-            await destroy_channel({
-                channel_id: args.channel_id,
+            return await destroy_status({
+                status_id: status._id,
             })
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
-            } else if (error.code === ModelErrorCodes.InvalidArgChannelId) {
-                raise(errors.invalid_arg_channel_id, error)
-            } else if (error.code === ModelErrorCodes.ChannelNotFound) {
-                raise(errors.channel_not_found, error)
+            } else if (error.code === ModelErrorCodes.InvalidArgStatusId) {
+                raise(errors.invalid_arg_status_id, error)
             } else if (error instanceof ModelRuntimeError) {
                 raise(errors.internal_error, error)
             } else {
                 raise(errors.unexpected_error, error)
             }
         }
-        return
+        return null
     }
 )

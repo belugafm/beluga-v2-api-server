@@ -4,6 +4,7 @@ export const MethodIdentifiers = {
     CreateAccount: "account/signup",
     CreateChannel: "channels/create",
     DestroyChannel: "channels/destroy",
+    ShowChannel: "channels/show",
     UpdateStatus: "statuses/update",
     DestroyStatus: "statuses/destroy",
     ShowStatus: "statuses/show",

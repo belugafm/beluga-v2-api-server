@@ -9,7 +9,7 @@ import { HttpMethods } from "../../../app/web/api/facts/http_method"
 import { ContentTypes } from "../../../app/web/api/facts/content_type"
 import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
 
-describe("api", () => {
+describe("define", () => {
     const facts: MethodFacts = {
         url: "",
         http_method: HttpMethods.POST,

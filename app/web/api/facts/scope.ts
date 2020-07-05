@@ -7,6 +7,8 @@ export const Scopes = {
     WriteChannel: "channel:write",
     ReadTimeline: "timeline:read",
     WriteTimeline: "timeline:write",
+    ReadStatus: "status:read",
+    WriteStatus: "status:write",
 } as const
 
 export type ScopesLiteralUnion = typeof Scopes[keyof typeof Scopes]

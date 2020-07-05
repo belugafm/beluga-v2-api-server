@@ -14,6 +14,7 @@ import {
     UnexpectedErrorSpec,
     raise,
     InvalidAuth,
+    WebApiRuntimeError,
 } from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
 import {
@@ -124,13 +125,13 @@ export default define_method(
     argument_specs,
     expected_error_specs,
     async (args, errors, auth_user) => {
-        if (auth_user == null) {
-            return raise(errors.invalid_auth)
-        }
-        // TODO: コミュニティに参加しているかどうかのチェック
-        if (args.community_id) {
-        }
         try {
+            if (auth_user == null) {
+                throw new WebApiRuntimeError(errors.invalid_auth)
+            }
+            // TODO: コミュニティに参加しているかどうかのチェック
+            if (args.community_id) {
+            }
             return await create_channel({
                 name: args.name,
                 description: args.description,
@@ -139,7 +140,9 @@ export default define_method(
                 community_id: args.community_id,
             })
         } catch (error) {
-            if (error.code === ModelErrorCodes.InvalidArgName) {
+            if (error instanceof WebApiRuntimeError) {
+                throw error
+            } else if (error.code === ModelErrorCodes.InvalidArgName) {
                 raise(errors.invalid_arg_name, error)
             } else if (error.code === ModelErrorCodes.InvalidArgDescription) {
                 raise(errors.invalid_arg_description, error)

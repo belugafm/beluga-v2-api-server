@@ -9,7 +9,7 @@ import { HttpMethods } from "../../../app/web/api/facts/http_method"
 import { ContentTypes } from "../../../app/web/api/facts/content_type"
 import { WebApiRuntimeError } from "../../../app/web/api/error"
 
-describe("api", () => {
+describe("define", () => {
     const facts: MethodFacts = {
         url: "",
         http_method: HttpMethods.POST,
@@ -57,7 +57,7 @@ describe("api", () => {
         }
     )
 
-    test("define", async () => {
+    test("invalid args", async () => {
         const method = define_method(
             facts,
             argument_specs,
@@ -77,7 +77,7 @@ describe("api", () => {
         }
     })
 
-    test("define", async () => {
+    test("invalid required_arg", async () => {
         const method = define_method(
             facts,
             argument_specs,
@@ -99,7 +99,7 @@ describe("api", () => {
         }
     })
 
-    test("define", async () => {
+    test("invalid required_arg", async () => {
         const method = define_method(
             facts,
             argument_specs,
@@ -121,7 +121,7 @@ describe("api", () => {
         }
     })
 
-    test("define", async () => {
+    test("valid args", async () => {
         const method = define_method(
             facts,
             argument_specs,
@@ -134,7 +134,7 @@ describe("api", () => {
         })
     })
 
-    test("define", async () => {
+    test("invalid optional_arg", async () => {
         const method = define_method(
             facts,
             argument_specs,

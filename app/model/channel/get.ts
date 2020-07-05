@@ -4,7 +4,7 @@ import { ModelRuntimeError } from "../error"
 import * as mongo from "../../lib/mongoose"
 
 export const ErrorCodes = {
-    InvalidArgChannelid: "invalid_arg_channel_id",
+    InvalidArgChannelId: "invalid_arg_channel_id",
 } as const
 
 type Argument = {
@@ -15,7 +15,7 @@ export const get = async ({
     channel_id,
 }: Argument): Promise<ChannelSchema | null> => {
     if (vs.object_id().ok(channel_id) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidArgChannelid)
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgChannelId)
     }
     return await mongo.findOne(Channel, { _id: channel_id })
 }
