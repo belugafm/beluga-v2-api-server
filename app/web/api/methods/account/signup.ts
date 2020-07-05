@@ -14,7 +14,8 @@ import {
     ErrorCodes as ModelErrorCodes,
 } from "../../../../model/user/signup"
 import { ModelRuntimeError } from "../../../../model/error"
-import { UserSchema } from "app/schema/user"
+import { UserSchema } from "../../../../schema/user"
+import config from "../../../../config/app"
 
 export const argument_specs = define_arguments(
     [
@@ -77,6 +78,9 @@ export const expected_error_specs = define_expected_errors(
     {
         invalid_arg_name: {
             description: ["ユーザー名が基準を満たしていません"],
+            hint: [
+                `ユーザー名は${config.user.name.min_length}〜${config.user.name.max_length}文字の半角英数字に設定してください`,
+            ],
             argument: "name",
             code: "invalid_arg_name",
         },
