@@ -44,7 +44,7 @@ const schema = new Schema({
 })
 
 schema.methods.transform = async function (
-    this: UserSchema
+    this: StatusSchema
 ): Promise<StatusObject | null> {
     return await transform(this)
 }
