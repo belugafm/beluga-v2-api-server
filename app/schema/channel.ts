@@ -58,6 +58,7 @@ schema.methods.transform = function (this: ChannelSchema): any {
         stats: this.stats,
         created_at: this.created_at,
         is_public: this.is_public,
+        community_id: this.community_id,
     }
 }
 

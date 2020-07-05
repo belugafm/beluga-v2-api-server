@@ -21,6 +21,7 @@ import {
     create as create_channel,
     ErrorCodes as ModelErrorCodes,
 } from "../../../../model/channel/create"
+import config from "../../../../config/app"
 
 export const argument_specs = define_arguments(
     ["name", "description", "is_public", "community_id"] as const,
@@ -65,6 +66,7 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_community_id",
         "community_not_found",
         "invalid_auth",
+        "limit_reached",
         "internal_error",
         "unexpected_error",
     ] as const,
@@ -94,6 +96,13 @@ export const expected_error_specs = define_expected_errors(
             description: ["コミュニティが見つかりません"],
             hint: ["`community_id`を見直してください"],
             code: "community_not_found",
+        },
+        limit_reached: {
+            description: ["作成可能なチャンネル数の上限に達しました"],
+            hint: [
+                `1日に作成できるチャンネルは${config.channel.create_limit_per_day}個までです`,
+            ],
+            code: "limit_reached",
         },
         invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
@@ -148,6 +157,8 @@ export default define_method(
                 raise(errors.invalid_arg_description, error)
             } else if (error.code === ModelErrorCodes.InvalidArgCommunityId) {
                 raise(errors.invalid_arg_community_id, error)
+            } else if (error.code === ModelErrorCodes.LimitReached) {
+                raise(errors.limit_reached, error)
             } else if (error instanceof ModelRuntimeError) {
                 raise(errors.internal_error, error)
             } else {
