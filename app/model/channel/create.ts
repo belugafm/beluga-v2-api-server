@@ -59,7 +59,9 @@ export const create = async ({
     return await Channel.create({
         name: name,
         description: description || null,
-        stats: {},
+        stats: {
+            statuses_count: 0,
+        },
         created_at: new Date(),
         creator_id: creator_id,
         community_id: community_id ? community_id : null,

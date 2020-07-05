@@ -104,12 +104,21 @@ export const signup = async ({
 
         const user = await User.create({
             name: name,
-            avatar_url: "",
-            profile: {},
-            stats: {},
+            display_name: null,
+            profile: {
+                avatar_image_url: "",
+                description: null,
+                location: null,
+                theme_color: null,
+                background_image_url: null,
+            },
+            stats: {
+                statuses_count: 0,
+            },
             created_at: new Date(),
             is_active: false,
             is_dormant: false,
+            last_activity_date: null,
         })
         const password_hash = await bcrypt.hash(
             password,

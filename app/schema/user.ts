@@ -1,33 +1,35 @@
 import mongoose, { Schema, Document } from "mongoose"
 import config from "../config/app"
+import { transform } from "../object/types/user"
+import { UserObject } from "../object/schema"
 
 const schema_version = 1
 
 export interface UserSchema extends Document {
     _id: mongoose.Types.ObjectId
     name: string
-    display_name?: string
-    avatar_url: string
+    display_name: string | null
     profile: {
-        location?: string
-        description?: string
-        theme_color?: string
-        background_image_url?: string
+        avatar_image_url: string
+        location: string | null
+        description: string | null
+        theme_color: string | null
+        background_image_url: string | null
     }
     stats: {
-        statuses_count?: number
+        statuses_count: number
     }
     created_at: Date
     is_active: boolean // 登録後サイトを利用したかどうか
     is_dormant: boolean // サイトを長期間利用しなかったかどうか
-    last_activity_date?: Date
+    last_activity_date: Date | null
     _terms_of_service_agreement_date?: Date
     _terms_of_service_agreement_version?: string
     _schema_version?: number
 
     // methods
     needsReclassifyAsDormant: () => boolean
-    transform: () => any
+    transform: () => Promise<UserObject | null>
 }
 
 const NullString = {
@@ -41,9 +43,9 @@ function define_schema(): any {
             type: String,
             unique: true,
         },
-        avatar_url: String,
         display_name: NullString,
         profile: {
+            avatar_image_url: String,
             location: NullString,
             description: NullString,
             theme_color: NullString,
@@ -114,17 +116,10 @@ user_schema.methods.needsReclassifyAsDormant = function (
     }
 }
 
-user_schema.methods.transform = function (this: UserSchema): any {
-    return {
-        id: this._id,
-        name: this.name,
-        display_name: this.display_name,
-        avatar_url: this.avatar_url,
-        profile: this.profile,
-        stats: this.stats,
-        created_at: this.created_at,
-        last_activity_date: this.last_activity_date,
-    }
+user_schema.methods.transform = async function (
+    this: UserSchema
+): Promise<UserObject | null> {
+    return await transform(this)
 }
 
 export const User = mongoose.model<UserSchema>("user", user_schema)

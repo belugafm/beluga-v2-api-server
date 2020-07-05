@@ -20,7 +20,7 @@ export const _unsafe_reclassify_as_dormant = async (user: UserSchema) => {
     await DormantUser.create({
         _id: user._id,
         name: user.name,
-        avatar_url: user.avatar_url,
+        display_name: user.display_name,
         profile: user.profile,
         stats: user.stats,
         created_at: user.created_at,

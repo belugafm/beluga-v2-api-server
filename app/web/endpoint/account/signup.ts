@@ -29,13 +29,13 @@ export default (server: TurboServer) => {
             if (session == null) {
                 throw new WebApiRuntimeError(new InternalErrorSpec())
             }
-            res.setCookie("user_id", session.user_id.toString(), {
+            res.setCookie("user_id", session.user_id.toHexString(), {
                 expires: session.expire_date,
                 domain: config.server.domain,
                 path: "/",
                 httpOnly: true,
             })
-            res.setCookie("session_id", session._id.toString(), {
+            res.setCookie("session_id", session._id.toHexString(), {
                 expires: session.expire_date,
                 domain: config.server.domain,
                 path: "/",

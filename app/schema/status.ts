@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose"
+import { transform } from "../object/types/status"
+import { StatusObject } from "../object/schema"
 
 const schema_version = 1
 
@@ -13,6 +15,8 @@ export interface StatusSchema extends Document {
     is_edited: boolean
     is_deleted: boolean
     _schema_version?: number
+
+    transform: () => Promise<StatusObject | null>
 }
 
 const schema = new Schema({
@@ -37,6 +41,19 @@ const schema = new Schema({
         type: Number,
         default: schema_version,
     },
+})
+
+schema.methods.transform = async function (
+    this: UserSchema
+): Promise<StatusObject | null> {
+    return await transform(this)
+}
+
+schema.post("remove", (doc, next) => {
+    next()
+})
+schema.post("udpate", (doc, next) => {
+    next()
 })
 
 export const Status = mongoose.model<StatusSchema>("status", schema)

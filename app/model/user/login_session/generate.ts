@@ -46,7 +46,7 @@ export const generate = async ({
     const source = {
         ip_address: ip_address,
         date: Date.now(),
-        user_id: user_id.toString(),
+        user_id: user_id.toHexString(),
     }
     const session_token = await bcrypt.hash(JSON.stringify(source), 1)
 

@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose"
+import { transform } from "../object/types/channel"
+import { ChannelObject } from "../object/schema"
 
 const schema_version = 1
 
@@ -7,7 +9,7 @@ export interface ChannelSchema extends Document {
     name: string
     description: string | null
     stats: {
-        statuses_count?: number
+        statuses_count: number
     }
     created_at: Date
     creator_id: mongoose.Types.ObjectId
@@ -16,7 +18,7 @@ export interface ChannelSchema extends Document {
     _schema_version?: number
 
     // methods
-    transform: () => any
+    transform: () => Promise<ChannelObject | null>
 }
 
 const schema = new Schema({
@@ -50,16 +52,10 @@ const schema = new Schema({
     },
 })
 
-schema.methods.transform = function (this: ChannelSchema): any {
-    return {
-        id: this._id,
-        name: this.name,
-        description: this.description,
-        stats: this.stats,
-        created_at: this.created_at,
-        is_public: this.is_public,
-        community_id: this.community_id,
-    }
+schema.methods.transform = async function (
+    this: ChannelSchema
+): Promise<ChannelObject | null> {
+    return await transform(this)
 }
 
 export const Channel = mongoose.model<ChannelSchema>("channel", schema)
