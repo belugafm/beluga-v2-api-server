@@ -2,6 +2,12 @@ import { TurboServer, Request, Response } from "./web/turbo"
 import { MongoClient } from "mongodb"
 import { MongoMemoryServer, MongoMemoryReplSet } from "mongodb-memory-server"
 import mongoose from "mongoose"
+import { User } from "./schema/user"
+import { UserLoginCredential } from "./schema/user_login_credentials"
+import { UserRegistration } from "./schema/user_registration"
+import { FraudScore } from "./schema/fraud_score"
+import { Channel } from "./schema/channel"
+import { Status } from "./schema/status"
 
 function start_server() {
     const server = new TurboServer({
@@ -20,6 +26,15 @@ function start_server() {
             res.end()
         },
     })
+
+    // トランザクション中はcollectionの作成ができないので先に作っておく
+    await User.createCollection()
+    await UserLoginCredential.createCollection()
+    await UserRegistration.createCollection()
+    await FraudScore.createCollection()
+    await Channel.createCollection()
+    await Status.createCollection()
+
     server.register(require("./web/endpoint/account/signup"))
     server.register(require("./web/endpoint/account/signin"))
     server.register(require("./web/endpoint/channel/create"))

@@ -12,6 +12,9 @@ import {
     destroy,
     ErrorCodes as DestroyErrorCodes,
 } from "../../../../app/model/channel/destroy"
+import { in_memory_cache } from "../../../../app/lib/cache"
+
+in_memory_cache.disable()
 
 config.channel.create_limit_per_day = 1
 jest.setTimeout(30000)

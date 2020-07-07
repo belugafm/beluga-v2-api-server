@@ -3,7 +3,7 @@ import {
     UserRegistrationSchema,
 } from "../../../schema/user_registration"
 import { ModelRuntimeError } from "../../error"
-import mongoose from "mongoose"
+import mongoose, { ClientSession } from "mongoose"
 
 export const ErrorCodes = {
     InvalidArgUserId: "invalid_arg_id",
@@ -12,12 +12,14 @@ export const ErrorCodes = {
     InvalidArgFingerprint: "invalid_arg_fingerprint",
 }
 import * as vs from "../../../validation"
+import { createWithSession } from "../../../lib/mongoose"
 
 type Argument = {
     user_id: UserRegistrationSchema["user_id"]
     ip_address: UserRegistrationSchema["ip_address"]
     fraud_score_id: UserRegistrationSchema["fraud_score_id"]
     fingerprint: UserRegistrationSchema["fingerprint"]
+    transaction_session?: ClientSession
 }
 
 export const add = async ({
@@ -25,6 +27,7 @@ export const add = async ({
     ip_address,
     fraud_score_id,
     fingerprint,
+    transaction_session,
 }: Argument): Promise<UserRegistrationSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
@@ -43,11 +46,15 @@ export const add = async ({
         }
     }
     const date = new Date()
-    return await UserRegistration.create({
-        user_id,
-        ip_address,
-        fraud_score_id,
-        fingerprint,
-        date,
-    })
+    return await createWithSession(
+        UserRegistration,
+        {
+            user_id,
+            ip_address,
+            fraud_score_id,
+            fingerprint,
+            date,
+        },
+        transaction_session
+    )
 }

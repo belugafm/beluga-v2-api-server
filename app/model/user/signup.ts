@@ -3,17 +3,18 @@ import * as vs from "../../validation"
 import { ModelRuntimeError } from "../error"
 import bcrypt from "bcrypt"
 import config from "../../config/app"
-import mongoose from "mongoose"
+import mongoose, { ClientSession } from "mongoose"
 import { add as add_login_credential } from "./login_credential/add"
 import { add as add_registration_info } from "./registration/add"
 import { get as get_registration_info } from "./registration/get"
 import { get as get_fraud_score } from "../fraud_score/get"
 import { add as add_fraud_score } from "../fraud_score/add"
 import { get as get_user } from "../user/get"
-import { agree_to as agree_to_terms_of_service } from "../terms_of_service/agree_to"
-import { FraudScoreSchema } from "app/schema/fraud_score"
+import { _unsafe_agree_to as _unsafe_agree_to_terms_of_service } from "../terms_of_service/agree_to"
+import { FraudScoreSchema } from "../../schema/fraud_score"
 import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
 import * as ipqs from "../../lib/ipqs"
+import { createWithSession } from "../../lib/mongoose"
 
 export const ErrorCodes = {
     InvalidArgName: "invalid_arg_name",
@@ -25,7 +26,8 @@ export const ErrorCodes = {
 }
 
 const request_fraud_score_if_needed = async (
-    ip_address: string
+    ip_address: string,
+    transaction_session: ClientSession
 ): Promise<FraudScoreSchema | null> => {
     if (config.fraud_prevention.enabled !== true) {
         return null
@@ -38,7 +40,7 @@ const request_fraud_score_if_needed = async (
     if (result.success !== true) {
         return null
     }
-    return add_fraud_score({ ip_address, result })
+    return await add_fraud_score({ ip_address, result, transaction_session })
 }
 
 type Argument = {
@@ -91,59 +93,74 @@ export const signup = async ({
         }
 
         // すでに同じ名前のユーザーがいるかどうかを調べる
-        const existing_user = await get_user({ name })
+        const existing_user = await get_user({
+            name,
+            transaction_session: session,
+        })
         if (existing_user) {
             // 既存ユーザーがinactiveな場合swapする
             if (existing_user.needsReclassifyAsDormant() === true) {
-                // existing_userは削除されるので注意
+                // existing_userは削除される
                 await _unsafe_reclassify_as_dormant(existing_user)
             } else {
                 throw new ModelRuntimeError(ErrorCodes.NameTaken)
             }
         }
 
-        const user = await User.create({
-            name: name,
-            display_name: null,
-            profile: {
-                avatar_image_url: "",
-                description: null,
-                location: null,
-                theme_color: null,
-                background_image_url: null,
+        const user = await createWithSession(
+            User,
+            {
+                name: name,
+                display_name: null,
+                profile: {
+                    avatar_image_url: "",
+                    description: null,
+                    location: null,
+                    theme_color: null,
+                    background_image_url: null,
+                },
+                stats: {
+                    statuses_count: 0,
+                },
+                created_at: new Date(),
+                is_active: false,
+                is_dormant: false,
+                last_activity_date: null,
+                _terms_of_service_agreement_date: new Date(),
+                _terms_of_service_agreement_version:
+                    config.terms_of_service.version,
             },
-            stats: {
-                statuses_count: 0,
-            },
-            created_at: new Date(),
-            is_active: false,
-            is_dormant: false,
-            last_activity_date: null,
-        })
+            session
+        )
+
         const password_hash = await bcrypt.hash(
             password,
             config.user_login_credential.password.salt_rounds
         )
         const credential = await add_login_credential({
             user_id: user._id,
-            password_hash,
+            password_hash: password_hash,
+            transaction_session: session,
         })
 
-        const fraud_score = await request_fraud_score_if_needed(ip_address)
+        const fraud_score = await request_fraud_score_if_needed(
+            ip_address,
+            session
+        )
         const fraud_score_id = fraud_score ? fraud_score._id : undefined
         const registration_info = await add_registration_info({
             user_id: user._id,
-            ip_address,
-            fraud_score_id,
-            fingerprint,
+            ip_address: ip_address,
+            fraud_score_id: fraud_score_id,
+            fingerprint: fingerprint,
+            transaction_session: session,
         })
 
-        await agree_to_terms_of_service({
-            user_id: user._id,
-            date: new Date(),
-            version: config.terms_of_service.version,
-            session: session,
-        })
+        // await _unsafe_agree_to_terms_of_service(
+        //     user,
+        //     new Date(),
+        //     config.terms_of_service.version
+        // )
 
         await session.commitTransaction()
         session.endSession()

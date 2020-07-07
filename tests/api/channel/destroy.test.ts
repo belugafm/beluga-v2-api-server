@@ -7,6 +7,9 @@ import destroy_channel from "../../../app/web/api/methods/channel/destroy"
 import get_channel from "../../../app/web/api/methods/channel/show"
 import { Channel, ChannelSchema } from "../../../app/schema/channel"
 import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
+import { in_memory_cache } from "../../../app/lib/cache"
+
+in_memory_cache.disable()
 
 describe("channel", () => {
     let mongodb: MongoMemoryReplSet | null = null

@@ -61,6 +61,10 @@ const config: {
             max_length: number
         }
     }
+    in_memory_cache: {
+        cache_limit: number
+        default_expire_seconds: number
+    }
 } = {
     server: {
         domain: "localhost.beluga.fm",
@@ -136,6 +140,10 @@ const config: {
             min_length: 0,
             max_length: 3000,
         },
+    },
+    in_memory_cache: {
+        cache_limit: 1000,
+        default_expire_seconds: 600,
     },
 }
 

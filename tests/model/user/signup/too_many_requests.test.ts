@@ -2,14 +2,20 @@ import { connect } from "../../../mongodb"
 import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
-import { DormantUser, User } from "../../../../app/schema/user"
 import * as mongo from "../../../../app/lib/mongoose"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { in_memory_cache } from "../../../../app/lib/cache"
+import { DormantUser, User } from "../../../../app/schema/user"
 
-config.user_registration.limit = 3
+in_memory_cache.disable()
+
+config.user_registration.limit = 5
 config.user_registration.reclassify_inactive_as_dormant_after = 10
 jest.setTimeout(
-    config.user_registration.reclassify_inactive_as_dormant_after * 1000 * 3
+    (config.user_registration.reclassify_inactive_as_dormant_after +
+        config.user_registration.limit) *
+        1000 *
+        5
 )
 
 async function sleep(sec: number) {
@@ -32,36 +38,39 @@ describe("user/signup", () => {
     })
     test("too many request", async () => {
         expect.assertions(12)
-        await signup({
-            name: "beluga",
-            password: "password",
-            ip_address: "127.0.0.1",
-        })
+        new Date(),
+            await signup({
+                name: "beluga",
+                password: "password",
+                ip_address: "127.0.0.1",
+            })
         for (
             let num_dormant_users = 1;
             num_dormant_users <= 2;
             num_dormant_users++
         ) {
-            await sleep(config.user_registration.limit - 1)
+            await sleep(config.user_registration.limit - 2)
             try {
-                await signup({
-                    name: "Beluga",
-                    password: "password",
-                    ip_address: "127.0.0.1",
-                })
+                new Date(),
+                    await signup({
+                        name: "Beluga",
+                        password: "password",
+                        ip_address: "127.0.0.1",
+                    })
             } catch (error) {
                 expect(error).toBeInstanceOf(ModelRuntimeError)
                 if (error instanceof ModelRuntimeError) {
                     expect(error.code).toMatch(ErrorCodes.TooManyRequests)
                 }
             }
-            await sleep(2)
+            await sleep(config.user_registration.limit)
             try {
-                await signup({
-                    name: "Beluga",
-                    password: "password",
-                    ip_address: "127.0.0.1",
-                })
+                new Date(),
+                    await signup({
+                        name: "Beluga",
+                        password: "password",
+                        ip_address: "127.0.0.1",
+                    })
             } catch (error) {
                 expect(error).toBeInstanceOf(ModelRuntimeError)
                 if (error instanceof ModelRuntimeError) {
@@ -69,14 +78,14 @@ describe("user/signup", () => {
                 }
             }
             await sleep(
-                config.user_registration.reclassify_inactive_as_dormant_after -
-                    config.user_registration.limit
+                config.user_registration.reclassify_inactive_as_dormant_after
             )
-            await signup({
-                name: "Beluga",
-                password: "password",
-                ip_address: "127.0.0.1",
-            })
+            new Date(),
+                await signup({
+                    name: "Beluga",
+                    password: "password",
+                    ip_address: "127.0.0.1",
+                })
 
             const users = await mongo.find(User, {})
             expect(users).toHaveLength(1)

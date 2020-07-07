@@ -8,6 +8,9 @@ import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../app/web/api/define"
 import config from "../../../../app/config/app"
 import { Status } from "../../../../app/schema/status"
+import { in_memory_cache } from "../../../../app/lib/cache"
+
+in_memory_cache.disable()
 
 config.status.text.max_length = 10
 config.status.text.min_length = 5

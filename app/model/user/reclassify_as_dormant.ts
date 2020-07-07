@@ -17,18 +17,22 @@ type Argument = {
 }
 
 export const _unsafe_reclassify_as_dormant = async (user: UserSchema) => {
-    await DormantUser.create({
-        _id: user._id,
-        name: user.name,
-        display_name: user.display_name,
-        profile: user.profile,
-        stats: user.stats,
-        created_at: user.created_at,
-        is_active: user.is_active,
-        is_dormant: true,
-        last_activity_date: user.last_activity_date,
-    })
-    user.remove()
+    await mongo.createWithSession(
+        DormantUser,
+        {
+            _id: user._id,
+            name: user.name,
+            display_name: user.display_name,
+            profile: user.profile,
+            stats: user.stats,
+            created_at: user.created_at,
+            is_active: user.is_active,
+            is_dormant: true,
+            last_activity_date: user.last_activity_date,
+        },
+        user.$session()
+    )
+    await user.remove()
 }
 
 export const reclassify_as_dormant = async ({

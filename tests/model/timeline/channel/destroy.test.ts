@@ -6,6 +6,9 @@ import { destroy } from "../../../../app/model/status/destroy"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../app/web/api/define"
 import { Status } from "../../../../app/schema/status"
+import { in_memory_cache } from "../../../../app/lib/cache"
+
+in_memory_cache.disable()
 
 jest.setTimeout(30000)
 

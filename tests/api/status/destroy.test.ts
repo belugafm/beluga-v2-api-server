@@ -9,6 +9,9 @@ import show_status from "../../../app/web/api/methods/status/show"
 import { Channel, ChannelSchema } from "../../../app/schema/channel"
 import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
 import { Status, StatusSchema } from "../../../app/schema/status"
+import { in_memory_cache } from "../../../app/lib/cache"
+
+in_memory_cache.disable()
 
 describe("status", () => {
     let mongodb: MongoMemoryReplSet | null = null
