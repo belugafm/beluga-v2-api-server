@@ -1,5 +1,4 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { env } from "../../../mongodb"
 import { update } from "../../../../app/model/status/update"
 import { channel as get_channel_statuses } from "../../../../app/model/timeline/channel"
 import { destroy } from "../../../../app/model/status/destroy"
@@ -13,14 +12,11 @@ in_memory_cache.disable()
 jest.setTimeout(30000)
 
 describe("timeline/channel", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("destroy", async () => {
         const channel_id = mongoose.Types.ObjectId(ExampleObjectId)

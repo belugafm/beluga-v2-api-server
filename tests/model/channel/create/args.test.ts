@@ -1,5 +1,4 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { env } from "../../../mongodb"
 import { create, ErrorCodes } from "../../../../app/model/channel/create"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import mongoose from "mongoose"
@@ -8,14 +7,11 @@ import { ExampleObjectId } from "../../../../app/web/api/define"
 jest.setTimeout(30000)
 
 describe("channel/create", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("max length", async () => {
         expect.assertions(0)

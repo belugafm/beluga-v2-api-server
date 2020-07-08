@@ -1,5 +1,4 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { env } from "../../../mongodb"
 import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
@@ -8,14 +7,11 @@ config.user_registration.limit = 0
 jest.setTimeout(30000)
 
 describe("user/signup", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("invalid name", async () => {
         expect.assertions(2)

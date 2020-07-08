@@ -23,39 +23,41 @@ export async function findOne<T extends Document>(
         disable_in_memory_cache: false,
         transaction_session: null,
     }
-    const cached_result = in_memory_cache.get(
-        cls.modelName,
-        JSON.stringify(condition)
-    )
-    const {
-        additional_query_func,
-        disable_in_memory_cache,
-        transaction_session,
-    } = options
-    const $ = additional_query_func ? additional_query_func : (x: any) => x
-    if (cached_result && disable_in_memory_cache !== true) {
-        return cached_result
-    } else {
-        return new Promise((resolve, reject) => {
-            $(
-                cls
-                    .findOne(condition, (error, doc) => {
-                        if (error) {
-                            return reject(error)
-                        }
-                        if (doc && disable_in_memory_cache !== true) {
-                            in_memory_cache.set(
-                                cls.modelName,
-                                JSON.stringify(condition),
-                                doc
-                            )
-                        }
-                        return resolve(doc)
-                    })
-                    .session(transaction_session ? transaction_session : null)
-            )
-        })
+    const { _id } = condition
+    const cache_enabled =
+        options.disable_in_memory_cache !== true &&
+        _id instanceof mongoose.Types.ObjectId &&
+        Object.keys(condition).length == 1
+    if (cache_enabled) {
+        const cached_document = in_memory_cache.get(
+            cls.modelName,
+            (_id as mongoose.Types.ObjectId).toHexString()
+        )
+        if (cached_document) {
+            return cached_document
+        }
     }
+    const { additional_query_func, transaction_session } = options
+    const $ = additional_query_func ? additional_query_func : (x: any) => x
+    return new Promise((resolve, reject) => {
+        $(
+            cls
+                .findOne(condition, (error, doc) => {
+                    if (error) {
+                        return reject(error)
+                    }
+                    if (doc && cache_enabled) {
+                        in_memory_cache.set(
+                            cls.modelName,
+                            (_id as mongoose.Types.ObjectId).toHexString(),
+                            doc
+                        )
+                    }
+                    return resolve(doc)
+                })
+                .session(transaction_session ? transaction_session : null)
+        )
+    })
 }
 
 export async function find<T extends Document>(

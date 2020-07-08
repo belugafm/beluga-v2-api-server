@@ -33,7 +33,7 @@
         "prettier": "^2.0.5"
     },
     "scripts": {
-        "test": "jest --clearCache && jest"
+        "test": "jest --clearCache && jest --runInBand"
     },
     "jest": {
         "testEnvironment": "node",

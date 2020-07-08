@@ -1,7 +1,6 @@
-import { connect } from "../../mongodb"
+import { env } from "../../mongodb"
 import signup from "../../../app/web/api/methods/account/signup"
 import { User, UserSchema } from "../../../app/schema/user"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
 import create_channel from "../../../app/web/api/methods/channel/create"
 import udpate_status from "../../../app/web/api/methods/status/update"
 import destroy_status from "../../../app/web/api/methods/status/destroy"
@@ -14,14 +13,11 @@ import { in_memory_cache } from "../../../app/lib/cache"
 in_memory_cache.disable()
 
 describe("status", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("destroy", async () => {
         expect.assertions(7)

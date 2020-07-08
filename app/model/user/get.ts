@@ -37,7 +37,7 @@ export const get = async ({
 
                 // case-insensitive
                 additional_query_func: (query) => {
-                    query.collation({
+                    return query.collation({
                         locale: "en_US",
                         strength: 2,
                     })

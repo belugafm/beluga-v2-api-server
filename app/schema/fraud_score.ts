@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose"
 import { IpqsResult } from "../lib/ipqs"
-import { in_memory_cache } from "../lib/cache"
 
 const schema_version = 1
 
@@ -24,7 +23,3 @@ export const FraudScore = mongoose.model<FraudScoreSchema>(
         },
     })
 )
-
-FraudScore.watch().on("change", (event) => {
-    in_memory_cache.handleChangeEvent(FraudScore.modelName, event)
-})

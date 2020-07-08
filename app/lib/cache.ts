@@ -1,6 +1,13 @@
 import config from "../config/app"
-import mongoose, { Document } from "mongoose"
-import { ChangeEvent } from "mongodb"
+import { ChangeEvent, ChangeStream } from "mongodb"
+import mongoose from "mongoose"
+import { Channel } from "../schema/channel"
+import { FraudScore } from "../schema/fraud_score"
+import { Status } from "../schema/status"
+import { User } from "../schema/user"
+import { UserLoginCredential } from "../schema/user_login_credentials"
+import { UserLoginSession } from "../schema/user_login_session"
+import { UserRegistration } from "../schema/user_registration"
 
 class CachedObject {
     expire_date: Date
@@ -23,6 +30,7 @@ class InMemoryDocumentCache {
     default_expire_seconds: number
     enabled: boolean
     data: { [namespace: string]: { [key: string]: CachedObject } }
+    change_streams: ChangeStream<any>[] = []
     constructor(cache_limit: number, default_expire_seconds: number) {
         this.cache_limit = cache_limit
         this.default_expire_seconds = default_expire_seconds
@@ -89,9 +97,56 @@ class InMemoryDocumentCache {
             event.operationType == "delete" ||
             event.operationType == "update"
         ) {
-            const key = JSON.stringify(event.documentKey)
-            this.delete(namespace, key)
+            const { _id } = event.documentKey
+            if (_id) {
+                this.delete(
+                    namespace,
+                    (_id as mongoose.Types.ObjectId).toHexString()
+                )
+            }
         }
+    }
+    on() {
+        this.change_streams.push(
+            Channel.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+        this.change_streams.push(
+            FraudScore.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+        this.change_streams.push(
+            Status.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+        this.change_streams.push(
+            User.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+        this.change_streams.push(
+            UserLoginSession.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+        this.change_streams.push(
+            UserLoginCredential.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+        this.change_streams.push(
+            UserRegistration.watch().on("change", (event) => {
+                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+            })
+        )
+    }
+    async off() {
+        this.change_streams.forEach(async (stream) => {
+            await stream.close()
+        })
     }
 }
 

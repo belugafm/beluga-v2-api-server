@@ -1,5 +1,4 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { env } from "../../../mongodb"
 import {
     create,
     ErrorCodes as CreateErrorCodes,
@@ -8,10 +7,7 @@ import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../app/web/api/define"
-import {
-    destroy,
-    ErrorCodes as DestroyErrorCodes,
-} from "../../../../app/model/channel/destroy"
+import { destroy } from "../../../../app/model/channel/destroy"
 import { in_memory_cache } from "../../../../app/lib/cache"
 
 in_memory_cache.disable()
@@ -19,23 +15,12 @@ in_memory_cache.disable()
 config.channel.create_limit_per_day = 1
 jest.setTimeout(30000)
 
-async function sleep(sec: number) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve()
-        }, sec * 1000)
-    })
-}
-
 describe("channel/destroy", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("reach limit", async () => {
         const repeats = 3

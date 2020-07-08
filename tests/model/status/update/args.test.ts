@@ -1,5 +1,4 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { env } from "../../../mongodb"
 import { update, ErrorCodes } from "../../../../app/model/status/update"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import mongoose from "mongoose"
@@ -12,14 +11,11 @@ config.status.text.min_length = 5
 jest.setTimeout(30000)
 
 describe("status/update", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("ok", async () => {
         expect.assertions(1)

@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose"
-import { in_memory_cache } from "../lib/cache"
 
 const schema_version = 1
 
@@ -55,7 +54,3 @@ export const UserLoginSession = mongoose.model<UserLoginSessionSchema>(
     "user_login_session",
     schema
 )
-
-UserLoginSession.watch().on("change", (event) => {
-    in_memory_cache.handleChangeEvent(UserLoginSession.modelName, event)
-})

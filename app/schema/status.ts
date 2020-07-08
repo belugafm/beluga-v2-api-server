@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose"
 import { transform } from "../object/types/status"
 import { StatusObject } from "../object/schema"
-import { in_memory_cache } from "../lib/cache"
 
 const schema_version = 1
 
@@ -56,7 +55,3 @@ schema.methods.transform = async function (
 }
 
 export const Status = mongoose.model<StatusSchema>("status", schema)
-
-Status.watch().on("change", (event) => {
-    in_memory_cache.handleChangeEvent(Status.modelName, event)
-})

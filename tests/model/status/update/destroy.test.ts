@@ -1,9 +1,7 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
-import { update, ErrorCodes } from "../../../../app/model/status/update"
+import { env } from "../../../mongodb"
+import { update } from "../../../../app/model/status/update"
 import { get } from "../../../../app/model/status/get"
 import { destroy } from "../../../../app/model/status/destroy"
-import { ModelRuntimeError } from "../../../../app/model/error"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../app/web/api/define"
 import config from "../../../../app/config/app"
@@ -17,14 +15,11 @@ config.status.text.min_length = 5
 jest.setTimeout(30000)
 
 describe("status/destroy", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("ok", async () => {
         const status = await update({

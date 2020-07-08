@@ -1,5 +1,4 @@
-import { connect } from "../../../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
+import { env } from "../../../mongodb"
 import { create, ErrorCodes } from "../../../../app/model/channel/create"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
@@ -9,23 +8,12 @@ import { ExampleObjectId } from "../../../../app/web/api/define"
 config.channel.create_limit_per_day = 1
 jest.setTimeout(30000)
 
-async function sleep(sec: number) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve()
-        }, sec * 1000)
-    })
-}
-
 describe("channel/create", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("reach limit", async () => {
         expect.assertions(2)

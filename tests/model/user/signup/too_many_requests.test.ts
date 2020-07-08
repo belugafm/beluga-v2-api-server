@@ -1,9 +1,8 @@
-import { connect } from "../../../mongodb"
+import { env } from "../../../mongodb"
 import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
 import * as mongo from "../../../../app/lib/mongoose"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
 import { in_memory_cache } from "../../../../app/lib/cache"
 import { DormantUser, User } from "../../../../app/schema/user"
 
@@ -27,14 +26,11 @@ async function sleep(sec: number) {
 }
 
 describe("user/signup", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeEach(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterEach(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("too many request", async () => {
         expect.assertions(12)

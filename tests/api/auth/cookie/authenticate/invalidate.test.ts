@@ -1,8 +1,7 @@
-import { connect } from "../../../../mongodb"
+import { env } from "../../../../mongodb"
 import signup from "../../../../../app/web/api/methods/account/signup"
 import signin from "../../../../../app/web/api/methods/account/signin"
 import { User, UserSchema } from "../../../../../app/schema/user"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
 import {
     UserLoginSession,
     UserLoginSessionSchema,
@@ -14,14 +13,11 @@ import { in_memory_cache } from "../../../../../app/lib/cache"
 in_memory_cache.disable()
 
 describe("auth/cookie/authenticate", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("invalidate", async () => {
         const user = (await signup({

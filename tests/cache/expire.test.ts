@@ -1,8 +1,6 @@
-import { connect } from "../mongodb"
-import { MongoMemoryReplSet } from "mongodb-memory-server"
-import { update, ErrorCodes } from "../../app/model/status/update"
+import { env } from "../mongodb"
+import { update } from "../../app/model/status/update"
 import { get } from "../../app/model/status/get"
-import { destroy } from "../../app/model/status/destroy"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../app/web/api/define"
 import config from "../../app/config/app"
@@ -21,14 +19,11 @@ async function sleep(sec: number) {
 }
 
 describe("in_memory_cache", () => {
-    let mongodb: MongoMemoryReplSet | null = null
     beforeAll(async () => {
-        mongodb = await connect()
+        await env.connect()
     })
     afterAll(async () => {
-        if (mongodb) {
-            await mongodb.stop()
-        }
+        await env.disconnect()
     })
     test("expire", async () => {
         const status = await update({
@@ -43,9 +38,7 @@ describe("in_memory_cache", () => {
         {
             const cached_status = in_memory_cache.get(
                 Status.modelName,
-                JSON.stringify({
-                    _id: status._id,
-                })
+                status._id.toHexString()
             )
             expect(cached_status).toBeInstanceOf(Status)
             expect(cached_status?._cached).toBeTruthy()
@@ -54,9 +47,7 @@ describe("in_memory_cache", () => {
         {
             const cached_status = in_memory_cache.get(
                 Status.modelName,
-                JSON.stringify({
-                    _id: status._id,
-                })
+                status._id.toHexString()
             )
             expect(cached_status).toBeNull()
         }
