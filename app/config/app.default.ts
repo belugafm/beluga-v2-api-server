@@ -1,6 +1,7 @@
 const config: {
     server: {
         domain: string
+        port: number
     }
     fraud_prevention: {
         enabled: boolean
@@ -68,6 +69,7 @@ const config: {
 } = {
     server: {
         domain: "localhost.beluga.fm",
+        port: 8080,
     },
     // IP Quality ScoreのサービスによるIPアドレスの不信度スコアを利用して
     // ユーザーのBeluga利用を制限する

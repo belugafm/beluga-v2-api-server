@@ -35,6 +35,7 @@ export const expected_error_specs = define_expected_errors(
     [
         "invalid_arg_channel_id",
         "invalid_auth",
+        "channel_not_found",
         "internal_error",
         "unexpected_error",
     ] as const,
@@ -44,6 +45,10 @@ export const expected_error_specs = define_expected_errors(
             description: ["チャンネルIDが不正です"],
             code: "invalid_arg_channel_id",
             argument: "channel_id",
+        },
+        channel_not_found: {
+            description: ["チャンネルが見つかりません"],
+            code: "channel_not_found",
         },
         invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
@@ -79,9 +84,13 @@ export default define_method(
             if (auth_user == null) {
                 throw new WebApiRuntimeError(errors.invalid_auth)
             }
-            return await get_channel({
+            const channel = await get_channel({
                 channel_id: args.channel_id,
             })
+            if (channel == null) {
+                throw new WebApiRuntimeError(errors.channel_not_found)
+            }
+            return channel
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error

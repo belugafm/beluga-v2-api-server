@@ -144,9 +144,9 @@ class InMemoryDocumentCache {
         )
     }
     async off() {
-        this.change_streams.forEach(async (stream) => {
-            await stream.close()
-        })
+        return await Promise.all(
+            this.change_streams.map((stream) => stream.close())
+        )
     }
 }
 

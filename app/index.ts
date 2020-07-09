@@ -8,8 +8,10 @@ import { UserRegistration } from "./schema/user_registration"
 import { FraudScore } from "./schema/fraud_score"
 import { Channel } from "./schema/channel"
 import { Status } from "./schema/status"
+import { in_memory_cache } from "./lib/cache"
+import config from "./config/app"
 
-function start_server() {
+async function start_server() {
     const server = new TurboServer({
         maxParamLength: 128,
         defaultRoute: (req: Request, res: Response) => {
@@ -28,21 +30,39 @@ function start_server() {
     })
 
     // トランザクション中はcollectionの作成ができないので先に作っておく
-    await User.createCollection()
-    await UserLoginCredential.createCollection()
-    await UserRegistration.createCollection()
-    await FraudScore.createCollection()
-    await Channel.createCollection()
-    await Status.createCollection()
+    try {
+        await User.createCollection()
+    } catch (error) {}
+    try {
+        await UserLoginCredential.createCollection()
+    } catch (error) {}
+    try {
+        await UserRegistration.createCollection()
+    } catch (error) {}
+    try {
+        await FraudScore.createCollection()
+    } catch (error) {}
+    try {
+        await Channel.createCollection()
+    } catch (error) {}
+    try {
+        await Status.createCollection()
+    } catch (error) {}
 
+    // change streamの登録
+    in_memory_cache.on()
+
+    // routerにendpointを登録
     server.register(require("./web/endpoint/account/signup"))
     server.register(require("./web/endpoint/account/signin"))
     server.register(require("./web/endpoint/channel/create"))
     server.register(require("./web/endpoint/channel/destroy"))
+    server.register(require("./web/endpoint/channel/show"))
     server.register(require("./web/endpoint/status/update"))
     server.register(require("./web/endpoint/timeline/channel"))
     server.register(require("./web/endpoint/auth/cookie/authenticate"))
-    server.listen(8080)
+
+    server.listen(config.server.port)
 }
 
 if (true) {
@@ -60,7 +80,7 @@ if (true) {
                 console.error(e)
             })
             mongoose.connection.once("open", async () => {
-                start_server()
+                await start_server()
                 console.log(uri)
             })
         })

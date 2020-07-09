@@ -19,7 +19,7 @@ export const transform = async (
         name: model.name,
         description: model.description,
         stats: model.stats,
-        created_at: model.created_at,
+        created_at: model.created_at.getTime(),
         creator_id: model.creator_id.toHexString(),
         creator: await transform_user(
             await mongo.findOne(User, { _id: model.creator_id })

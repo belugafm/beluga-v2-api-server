@@ -17,10 +17,12 @@ export const transform = async (
         name: model.name,
         display_name: model.display_name,
         profile: model.profile,
-        created_at: model.created_at,
+        created_at: model.created_at.getTime(),
         stats: model.stats,
         is_active: model.is_active,
         is_dormant: model.is_dormant,
-        last_activity_date: model.last_activity_date,
+        last_activity_time: model.last_activity_date
+            ? model.last_activity_date.getTime()
+            : null,
     }
 }
