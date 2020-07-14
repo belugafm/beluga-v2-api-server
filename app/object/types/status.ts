@@ -9,6 +9,9 @@ import { Channel } from "../../schema/channel"
 import { StatusLikes } from "../../schema/status_likes"
 
 function sum(array: Array<number>) {
+    if (array.length == 0) {
+        return 0
+    }
     return array.reduce(
         (accumulator, currentValue) => accumulator + currentValue
     )

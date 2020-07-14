@@ -3,6 +3,7 @@ import { ModelRuntimeError } from "../../error"
 import * as mongo from "../../../lib/mongoose"
 import { StatusLikesSchema, StatusLikes } from "../../../schema/status_likes"
 import { ClientSession } from "mongoose"
+import { DefaultOptions, GetOptions } from "../../../model/options"
 
 export const ErrorCodes = {
     InvalidArgStatusId: "invalid_arg_status_id",
@@ -15,11 +16,10 @@ type Argument = {
     transaction_session?: ClientSession
 }
 
-export const get = async ({
-    status_id,
-    user_id,
-    transaction_session,
-}: Argument): Promise<StatusLikesSchema | StatusLikesSchema[] | null> => {
+export const get = async (
+    { status_id, user_id }: Argument,
+    options: GetOptions = DefaultOptions
+): Promise<StatusLikesSchema | StatusLikesSchema[] | null> => {
     if (vs.object_id().ok(status_id) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgStatusId)
     }
@@ -31,14 +31,14 @@ export const get = async ({
             StatusLikes,
             { status_id, user_id },
             {
-                transaction_session: transaction_session,
-                disable_in_memory_cache: transaction_session ? true : false,
+                transaction_session: options.transaction_session,
+                disable_in_memory_cache: options.disable_in_memory_cache,
             }
         )
     } else {
         return await mongo.find(StatusLikes, { status_id }, (query) => {
             return query.session(
-                transaction_session ? transaction_session : null
+                options.transaction_session ? options.transaction_session : null
             )
         })
     }

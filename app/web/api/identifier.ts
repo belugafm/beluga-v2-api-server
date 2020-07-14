@@ -8,6 +8,7 @@ export const MethodIdentifiers = {
     UpdateStatus: "statuses/update",
     DestroyStatus: "statuses/destroy",
     ShowStatus: "statuses/show",
+    CreateLike: "likes/create",
     ShowUser: "users/show",
     ChannelTimeline: "timeline/channel",
 }
