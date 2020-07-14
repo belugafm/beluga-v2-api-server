@@ -1,9 +1,9 @@
-import { env } from "../../mongodb"
-import signup from "../../../app/web/api/methods/account/signup"
-import { User, UserSchema } from "../../../app/schema/user"
+import { env, create_user } from "../../mongodb"
 import create_channel from "../../../app/web/api/methods/channel/create"
 import destroy_channel from "../../../app/web/api/methods/channel/destroy"
-import get_channel from "../../../app/web/api/methods/channel/show"
+import get_channel, {
+    expected_error_specs,
+} from "../../../app/web/api/methods/channel/show"
 import { Channel, ChannelSchema } from "../../../app/schema/channel"
 import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
 import { in_memory_cache } from "../../../app/lib/cache"
@@ -19,15 +19,7 @@ describe("channel", () => {
     })
     test("destroy", async () => {
         expect.assertions(5)
-        const user = (await signup({
-            name: "beluga",
-            password: "password",
-            confirmed_password: "password",
-            ip_address: "127.0.0.1",
-            fingerprint:
-                "0000000000000000000000000000000000000000000000000000000000000000",
-        })) as UserSchema
-        expect(user).toBeInstanceOf(User)
+        const user = await create_user()
         try {
             await create_channel({
                 name: "channel",
@@ -62,13 +54,21 @@ describe("channel", () => {
             user
         )
         {
-            const _channel = await get_channel(
-                {
-                    channel_id: channel._id,
-                },
-                user
-            )
-            expect(_channel).toBeNull()
+            try {
+                const _channel = await get_channel(
+                    {
+                        channel_id: channel._id,
+                    },
+                    user
+                )
+            } catch (error) {
+                expect(error).toBeInstanceOf(WebApiRuntimeError)
+                if (error instanceof WebApiRuntimeError) {
+                    expect(error.code).toMatch(
+                        expected_error_specs.channel_not_found.code
+                    )
+                }
+            }
         }
     })
 })

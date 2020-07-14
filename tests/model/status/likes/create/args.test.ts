@@ -1,4 +1,4 @@
-import { env, create_user } from "../../../../mongodb"
+import { env, create_user, create_channel } from "../../../../mongodb"
 import {
     create,
     ErrorCodes,
@@ -12,25 +12,27 @@ import { StatusLikes } from "../../../../../app/schema/status_likes"
 
 jest.setTimeout(30000)
 
-const channel_id = mongoose.Types.ObjectId(ExampleObjectId)
-const community_id = mongoose.Types.ObjectId(ExampleObjectId)
-
 describe("status/likes/create", () => {
+    // @ts-ignore
+    let user: UserSchema = null
+    // @ts-ignore
+    let channel: ChannelSchema = null
+
     beforeAll(async () => {
         await env.connect()
+        user = await create_user()
+        channel = await create_channel("channel", user._id)
     })
     afterAll(async () => {
         await env.disconnect()
     })
     test("ok", async () => {
         expect.assertions(2)
-        const user = await create_user("name")
+        const user = await create_user()
         const status = await update_status({
             text: "Hell Word",
             user_id: user._id,
-            channel_id,
-            community_id,
-            is_public: true,
+            channel_id: channel._id,
         })
         expect(status).toBeInstanceOf(Status)
         const likes = await create({
@@ -41,14 +43,12 @@ describe("status/likes/create", () => {
     })
     test("user_id", async () => {
         expect.assertions(2)
-        const user = await create_user("name")
+        const user = await create_user()
         try {
             const status = await update_status({
                 text: "Hell Word",
                 user_id: user._id,
-                channel_id,
-                community_id,
-                is_public: true,
+                channel_id: channel._id,
             })
             // @ts-ignore
             const likes = await create({
@@ -63,14 +63,12 @@ describe("status/likes/create", () => {
     })
     test("user_id", async () => {
         expect.assertions(2)
-        const user = await create_user("name")
+        const user = await create_user()
         try {
             const status = await update_status({
                 text: "Hell Word",
                 user_id: user._id,
-                channel_id,
-                community_id,
-                is_public: true,
+                channel_id: channel._id,
             })
             // @ts-ignore
             const likes = await create({
@@ -86,14 +84,12 @@ describe("status/likes/create", () => {
     })
     test("status_id", async () => {
         expect.assertions(2)
-        const user = await create_user("name")
+        const user = await create_user()
         try {
             const status = await update_status({
                 text: "Hell Word",
                 user_id: user._id,
-                channel_id,
-                community_id,
-                is_public: true,
+                channel_id: channel._id,
             })
             // @ts-ignore
             const likes = await create({

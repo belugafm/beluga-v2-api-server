@@ -1,4 +1,4 @@
-import { env } from "../mongodb"
+import { env, create_user, create_channel } from "../mongodb"
 import { update } from "../../app/model/status/update"
 import { get } from "../../app/model/status/get"
 import mongoose from "mongoose"
@@ -19,8 +19,15 @@ async function sleep(sec: number) {
 }
 
 describe("in_memory_cache", () => {
+    // @ts-ignore
+    let user: UserSchema = null
+    // @ts-ignore
+    let channel: ChannelSchema = null
+
     beforeAll(async () => {
         await env.connect()
+        user = await create_user()
+        channel = await create_channel("channel", user._id)
     })
     afterAll(async () => {
         await env.disconnect()
@@ -32,10 +39,8 @@ describe("in_memory_cache", () => {
             statuses.push(
                 await update({
                     text: "Hell Word",
-                    user_id: mongoose.Types.ObjectId(ExampleObjectId),
-                    channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-                    community_id: mongoose.Types.ObjectId(ExampleObjectId),
-                    is_public: true,
+                    user_id: user._id,
+                    channel_id: channel._id,
                 })
             )
         }

@@ -1,18 +1,25 @@
-import { env } from "../../../mongodb"
+import { env, create_user, create_channel } from "../../../mongodb"
 import { update, ErrorCodes } from "../../../../app/model/status/update"
 import { ModelRuntimeError } from "../../../../app/model/error"
-import mongoose from "mongoose"
-import { ExampleObjectId } from "../../../../app/web/api/define"
 import config from "../../../../app/config/app"
 import { Status } from "../../../../app/schema/status"
+import { UserSchema } from "app/schema/user"
+import { ChannelSchema } from "app/schema/channel"
 
 config.status.text.max_length = 10
 config.status.text.min_length = 5
 jest.setTimeout(30000)
 
 describe("status/update", () => {
+    // @ts-ignore
+    let user: UserSchema = null
+    // @ts-ignore
+    let channel: ChannelSchema = null
+
     beforeAll(async () => {
         await env.connect()
+        user = await create_user()
+        channel = await create_channel("channel", user._id)
     })
     afterAll(async () => {
         await env.disconnect()
@@ -21,10 +28,8 @@ describe("status/update", () => {
         expect.assertions(1)
         const status = await update({
             text: "aaaaab",
-            user_id: mongoose.Types.ObjectId(ExampleObjectId),
-            channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-            community_id: mongoose.Types.ObjectId(ExampleObjectId),
-            is_public: true,
+            user_id: user._id,
+            channel_id: channel._id,
         })
         expect(status).toBeInstanceOf(Status)
     })
@@ -33,10 +38,8 @@ describe("status/update", () => {
         try {
             await update({
                 text: "aa",
-                user_id: mongoose.Types.ObjectId(ExampleObjectId),
-                channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-                community_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                user_id: user._id,
+                channel_id: channel._id,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -50,10 +53,8 @@ describe("status/update", () => {
         try {
             await update({
                 text: "aaaaabbbbbccccc",
-                user_id: mongoose.Types.ObjectId(ExampleObjectId),
-                channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-                community_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                user_id: user._id,
+                channel_id: channel._id,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -67,10 +68,8 @@ describe("status/update", () => {
         try {
             // @ts-ignore
             await update({
-                user_id: mongoose.Types.ObjectId(ExampleObjectId),
-                channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-                community_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                user_id: user._id,
+                channel_id: channel._id,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -85,9 +84,7 @@ describe("status/update", () => {
             // @ts-ignore
             await update({
                 text: "aaaaab",
-                channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-                community_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                channel_id: channel._id,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -102,9 +99,7 @@ describe("status/update", () => {
             // @ts-ignore
             await update({
                 text: "aaaaab",
-                user_id: mongoose.Types.ObjectId(ExampleObjectId),
-                community_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                user_id: user._id,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -113,31 +108,12 @@ describe("status/update", () => {
             }
         }
     })
-    test("invalid is_public", async () => {
-        expect.assertions(2)
-        try {
-            // @ts-ignore
-            await update({
-                text: "aaaaab",
-                user_id: mongoose.Types.ObjectId(ExampleObjectId),
-                channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-                community_id: mongoose.Types.ObjectId(ExampleObjectId),
-            })
-        } catch (error) {
-            expect(error).toBeInstanceOf(ModelRuntimeError)
-            if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.InvalidArgIsPublic)
-            }
-        }
-    })
     test("null community_id", async () => {
         expect.assertions(0)
         await update({
             text: "aaaaab",
-            user_id: mongoose.Types.ObjectId(ExampleObjectId),
-            channel_id: mongoose.Types.ObjectId(ExampleObjectId),
-            community_id: null,
-            is_public: true,
+            user_id: user._id,
+            channel_id: channel._id,
         })
     })
 })

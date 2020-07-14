@@ -1,36 +1,34 @@
-import { env } from "../../../../mongodb"
+import { env, create_user, create_channel } from "../../../../mongodb"
 import {
     create,
     ErrorCodes,
 } from "../../../../../app/model/status/likes/create"
 import { update as update_status } from "../../../../../app/model/status/update"
 import { ModelRuntimeError } from "../../../../../app/model/error"
-import mongoose from "mongoose"
-import { ExampleObjectId } from "../../../../../app/web/api/define"
-import { Status } from "../../../../../app/schema/status"
 import config from "../../../../../app/config/app"
 
 jest.setTimeout(30000)
 
-const channel_id = mongoose.Types.ObjectId(ExampleObjectId)
-const community_id = mongoose.Types.ObjectId(ExampleObjectId)
-
 describe("status/likes/create", () => {
+    // @ts-ignore
+    let user: UserSchema = null
+    // @ts-ignore
+    let channel: ChannelSchema = null
+
     beforeAll(async () => {
         await env.connect()
+        user = await create_user()
+        channel = await create_channel("channel", user._id)
     })
     afterAll(async () => {
         await env.disconnect()
     })
     test("limit", async () => {
         expect.assertions(2)
-        const user = await create_user("name")
         const status = await update_status({
             text: "Hell Word",
             user_id: user._id,
-            channel_id,
-            community_id,
-            is_public: true,
+            channel_id: channel._id,
         })
         for (let index = 0; index < config.status.like.max_count; index++) {
             await create({

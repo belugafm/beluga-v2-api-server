@@ -101,16 +101,10 @@ export default define_method(
             if (auth_user == null) {
                 throw new WebApiRuntimeError(errors.invalid_auth)
             }
-            const channel = await get_channel({ channel_id: args.channel_id })
-            if (channel == null) {
-                throw new WebApiRuntimeError(errors.channel_not_found)
-            }
             return await update_status({
                 text: args.text,
                 user_id: auth_user._id,
-                channel_id: channel._id,
-                community_id: channel.community_id,
-                is_public: channel.is_public,
+                channel_id: args.channel_id,
             })
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
@@ -120,6 +114,8 @@ export default define_method(
                     raise(errors.invalid_arg_text, error)
                 } else if (error.code === ModelErrorCodes.InvalidArgChannelId) {
                     raise(errors.invalid_arg_channel_id, error)
+                } else if (error.code === ModelErrorCodes.ChannelNotFound) {
+                    raise(errors.channel_not_found, error)
                 } else {
                     raise(errors.internal_error, error)
                 }

@@ -9,7 +9,10 @@ import { Status } from "../app/schema/status"
 import { in_memory_cache } from "../app/lib/cache"
 import config from "../app/config/app"
 
-export async function create_user(name: string) {
+export async function create_user(name?: string) {
+    if (name == null) {
+        name = Math.random().toString(32).substring(2)
+    }
     return await User.create({
         name: name,
         display_name: null,
@@ -29,6 +32,24 @@ export async function create_user(name: string) {
         last_activity_date: null,
         _terms_of_service_agreement_date: new Date(),
         _terms_of_service_agreement_version: config.terms_of_service.version,
+    })
+}
+
+export async function create_channel(
+    name: string,
+    creator_id: mongoose.Types.ObjectId,
+    community_id?: mongoose.Types.ObjectId
+) {
+    return await Channel.create({
+        name: name,
+        description: null,
+        stats: {
+            statuses_count: 0,
+        },
+        created_at: new Date(),
+        creator_id: creator_id,
+        community_id: community_id ? community_id : null,
+        is_public: true,
     })
 }
 
