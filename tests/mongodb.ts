@@ -7,6 +7,30 @@ import { FraudScore } from "../app/schema/fraud_score"
 import { Channel } from "../app/schema/channel"
 import { Status } from "../app/schema/status"
 import { in_memory_cache } from "../app/lib/cache"
+import config from "../app/config/app"
+
+export async function create_user(name: string) {
+    return await User.create({
+        name: name,
+        display_name: null,
+        profile: {
+            avatar_image_url: "",
+            description: null,
+            location: null,
+            theme_color: null,
+            background_image_url: null,
+        },
+        stats: {
+            statuses_count: 0,
+        },
+        created_at: new Date(),
+        is_active: false,
+        is_dormant: false,
+        last_activity_date: null,
+        _terms_of_service_agreement_date: new Date(),
+        _terms_of_service_agreement_version: config.terms_of_service.version,
+    })
+}
 
 export async function sleep(sec: number) {
     return new Promise((resolve) => {

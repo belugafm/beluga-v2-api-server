@@ -61,6 +61,9 @@ const config: {
             min_length: number
             max_length: number
         }
+        like: {
+            max_count: number
+        }
     }
     in_memory_cache: {
         cache_limit: number
@@ -141,6 +144,9 @@ const config: {
         text: {
             min_length: 0,
             max_length: 3000,
+        },
+        like: {
+            max_count: 10,
         },
     },
     in_memory_cache: {

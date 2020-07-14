@@ -11,6 +11,7 @@ export interface StatusSchema extends Document {
     community_id: mongoose.Types.ObjectId | null
     text: string
     created_at: Date
+    likes: number
     is_public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
     is_edited: boolean
     is_deleted: boolean
@@ -29,6 +30,10 @@ const schema = new Schema({
     is_public: {
         type: Boolean,
         default: true,
+    },
+    likes: {
+        type: Number,
+        default: 0,
     },
     is_edited: {
         type: Boolean,

@@ -59,4 +59,12 @@ export type StatusObject = {
     is_public: boolean
     is_edited: boolean
     is_deleted: boolean
+    likes: {
+        count: number
+        users: UserObject[]
+    }
+    favorites: {
+        count: number
+        users: UserObject[]
+    }
 }

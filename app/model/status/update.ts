@@ -51,5 +51,6 @@ export const update = async ({
         is_deleted: false,
         is_edited: false,
         created_at: new Date(),
+        likes: 0,
     })
 }
