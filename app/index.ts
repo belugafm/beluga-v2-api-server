@@ -59,6 +59,7 @@ async function start_server() {
     server.register(require("./web/endpoint/channel/destroy"))
     server.register(require("./web/endpoint/channel/show"))
     server.register(require("./web/endpoint/status/update"))
+    server.register(require("./web/endpoint/likes/create"))
     server.register(require("./web/endpoint/timeline/channel"))
     server.register(require("./web/endpoint/auth/cookie/authenticate"))
 

@@ -4,6 +4,7 @@ import { ModelRuntimeError } from "../error"
 import * as mongo from "../../lib/mongoose"
 import mongoose, { ClientSession } from "mongoose"
 import { _unsafe_reclassify_as_dormant } from "./reclassify_as_dormant"
+import { GetOptions, DefaultOptions } from "../options"
 
 export const ErrorCodes = {
     InvalidArgName: "invalid_arg_name",
@@ -17,11 +18,10 @@ type Argument = {
     transaction_session?: ClientSession
 }
 
-export const get = async ({
-    name,
-    user_id,
-    transaction_session,
-}: Argument): Promise<UserSchema | null> => {
+export const get = async (
+    { name, user_id }: Argument,
+    options: GetOptions = DefaultOptions
+): Promise<UserSchema | null> => {
     if (name) {
         if (vs.user.name().ok(name) !== true) {
             throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
@@ -30,7 +30,7 @@ export const get = async ({
             User,
             { name },
             {
-                transaction_session: transaction_session,
+                transaction_session: options.transaction_session,
 
                 // nameの場合in-memory cacheの自動消去が機能しないのでmongodbから直接結果を返す
                 disable_in_memory_cache: true,
@@ -52,8 +52,7 @@ export const get = async ({
             User,
             { _id: user_id },
             {
-                transaction_session: transaction_session,
-                disable_in_memory_cache: transaction_session ? true : false,
+                transaction_session: options.transaction_session,
             }
         )
     } else {

@@ -35,10 +35,12 @@ export const create = async ({
     session.startTransaction()
 
     try {
-        const status = await get_status({
-            status_id,
-            transaction_session: session,
-        })
+        const status = await get_status(
+            {
+                status_id,
+            },
+            { transaction_session: session }
+        )
         if (status == null) {
             throw new ModelRuntimeError(ErrorCodes.StatusNotFound)
         }

@@ -9,6 +9,9 @@ import { Channel } from "../../schema/channel"
 import { StatusLikes } from "../../schema/status_likes"
 
 function sum(array: Array<number>) {
+    if (array.length == 0) {
+        return 0
+    }
     return array.reduce(
         (accumulator, currentValue) => accumulator + currentValue
     )
@@ -28,15 +31,6 @@ export const transform = async (
         throw new ObjectTransformationError()
     }
     const all_likes = await mongo.find(StatusLikes, { status_id: model._id })
-    const unko = (
-        await Promise.all(
-            all_likes.map(async (likes) => {
-                return await transform_user(
-                    await mongo.findOne(User, { _id: likes.user_id })
-                )
-            })
-        )
-    ).filter((user) => user != null)
     return {
         id: model._id.toHexString(),
         text: model.text,

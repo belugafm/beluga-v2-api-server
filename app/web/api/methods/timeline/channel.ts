@@ -40,7 +40,7 @@ export const expected_error_specs = define_expected_errors(
     argument_specs,
     {
         invalid_arg_channel_id: {
-            description: ["チャンネルIDが不正です"],
+            description: ["`channel_id`が不正です"],
             code: "invalid_arg_channel_id",
         },
         channel_not_found: {

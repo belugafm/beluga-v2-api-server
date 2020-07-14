@@ -93,10 +93,14 @@ export const signup = async ({
         }
 
         // すでに同じ名前のユーザーがいるかどうかを調べる
-        const existing_user = await get_user({
-            name,
-            transaction_session: session,
-        })
+        const existing_user = await get_user(
+            {
+                name,
+            },
+            {
+                transaction_session: session,
+            }
+        )
         if (existing_user) {
             // 既存ユーザーがinactiveな場合swapする
             if (existing_user.needsReclassifyAsDormant() === true) {

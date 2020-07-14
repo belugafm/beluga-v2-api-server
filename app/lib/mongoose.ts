@@ -23,11 +23,13 @@ export async function findOne<T extends Document>(
         disable_in_memory_cache: false,
         transaction_session: null,
     }
+    const { additional_query_func, transaction_session } = options
     const { _id } = condition
     const cache_enabled =
         options.disable_in_memory_cache !== true &&
         _id instanceof mongoose.Types.ObjectId &&
-        Object.keys(condition).length == 1
+        Object.keys(condition).length == 1 &&
+        transaction_session == null
     if (cache_enabled) {
         const cached_document = in_memory_cache.get(
             cls.modelName,
@@ -37,7 +39,6 @@ export async function findOne<T extends Document>(
             return cached_document
         }
     }
-    const { additional_query_func, transaction_session } = options
     const $ = additional_query_func ? additional_query_func : (x: any) => x
     return new Promise((resolve, reject) => {
         $(

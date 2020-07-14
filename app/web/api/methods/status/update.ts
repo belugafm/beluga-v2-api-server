@@ -21,7 +21,6 @@ import {
     update as update_status,
     ErrorCodes as ModelErrorCodes,
 } from "../../../../model/status/update"
-import { get as get_channel } from "../../../../model/channel/get"
 
 export const argument_specs = define_arguments(
     ["text", "channel_id"] as const,
@@ -58,7 +57,7 @@ export const expected_error_specs = define_expected_errors(
             argument: "text",
         },
         invalid_arg_channel_id: {
-            description: ["チャンネルIDが不正です"],
+            description: ["`channel_id`が不正です"],
             code: "invalid_arg_channel_id",
             argument: "channel_id",
         },
