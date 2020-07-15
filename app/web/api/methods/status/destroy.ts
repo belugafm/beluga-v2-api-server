@@ -68,7 +68,7 @@ export const facts: MethodFacts = {
     http_method: HttpMethods.POST,
     rate_limiting: {
         User: "WebTier3",
-        Bot: "WebTier4",
+        Bot: "WebTier3",
         Admin: "InternalSystem",
     },
     accepted_content_types: [ContentTypes.ApplicationJson],
@@ -79,7 +79,7 @@ export const facts: MethodFacts = {
         Bot: "status:write",
         Admin: "status:write",
     },
-    description: ["チャンネルに投稿します"],
+    description: ["投稿を削除しま"],
 }
 
 export default define_method(
@@ -91,7 +91,10 @@ export default define_method(
             if (auth_user == null) {
                 throw new WebApiRuntimeError(errors.invalid_auth)
             }
-            const status = await get_status({ status_id: args.status_id })
+            const status = await get_status(
+                { status_id: args.status_id },
+                { disable_in_memory_cache: true }
+            )
             if (status == null) {
                 throw new WebApiRuntimeError(errors.status_not_found)
             }
