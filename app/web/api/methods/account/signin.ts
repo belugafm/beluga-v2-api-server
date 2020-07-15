@@ -14,7 +14,6 @@ import {
     ErrorCodes as ModelErrorCodes,
 } from "../../../../model/user/signin"
 import { ModelRuntimeError } from "../../../../model/error"
-import { update_last_activity_date } from "../../../../model/user/update_last_activity_date"
 import { UserSchema } from "app/schema/user"
 import { UserLoginSessionSchema } from "app/schema/user_login_session"
 
@@ -106,17 +105,12 @@ export default define_method(
         errors
     ): Promise<[UserSchema | null, UserLoginSessionSchema | null]> => {
         try {
-            const [user, login_session] = await signin({
+            return await signin({
                 name: args.name,
                 password: args.password,
                 ip_address: args.ip_address,
                 session_lifetime: args.session_lifetime,
             })
-            await update_last_activity_date({
-                user_id: user._id,
-                date: new Date(),
-            })
-            return [user, login_session]
         } catch (error) {
             if (error instanceof ModelRuntimeError) {
                 if (error.code === ModelErrorCodes.InvalidArgName) {

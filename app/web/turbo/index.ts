@@ -13,6 +13,7 @@ import { MethodFacts } from "../api/define"
 import { ContentTypesLiteralUnion } from "../api/facts/content_type"
 import { UserSchema } from "../../schema/user"
 import { authenticate_user } from "../auth"
+import { update_last_activity_date } from "../../model/user/update_last_activity_date"
 
 export { Request, Response }
 
@@ -91,42 +92,15 @@ export const ContentType = {
     JSON: "application/json",
 }
 
-function to_string_based_on_content_type(
-    data: string | object,
-    type: string | undefined
-) {
-    if (type === ContentType.JSON) {
-        if (typeof data !== "object") {
-            throw new Error("handlerはオブジェクトを返す必要があります")
-        }
-        return JSON.stringify(data)
+async function activate_user(user: UserSchema) {
+    if (user.is_dormant === true) {
+        return
     }
-    if (type === ContentType.HTML) {
-        if (typeof data !== "string") {
-            throw new Error("handlerは文字列を返す必要があります")
-        }
-        return data
+    if (user.is_active === true) {
+        return
     }
-    if (typeof data !== "object") {
-        throw new Error("handlerはオブジェクトを返す必要があります")
-    }
-    return JSON.stringify(data)
-}
-
-function check_content_type(content_type?: string) {
-    if (content_type) {
-        const available_types = Object.values(ContentType)
-        if (available_types.includes(content_type) === false) {
-            let types_str = ""
-            available_types.forEach((type) => {
-                types_str += `'${type}',`
-            })
-            types_str = types_str.slice(0, types_str.length - 1)
-            throw new Error(
-                `content_typeは${types_str}のいずれかを指定してください`
-            )
-        }
-    }
+    user.is_active = true
+    await user.save()
 }
 
 const base_url = "/api/v1/"
@@ -235,11 +209,20 @@ export class TurboServer {
 
                 if (facts.authentication_required) {
                     // ユーザー認証をここで行う
-                    params["auth_user"] = await authenticate_user(
+                    const auth_user = await authenticate_user(
                         facts,
                         req.body,
                         req.cookies
                     )
+                    if (auth_user) {
+                        // activeなユーザーにする
+                        await activate_user(auth_user)
+                        await update_last_activity_date({
+                            user_id: auth_user._id,
+                            date: new Date(),
+                        })
+                    }
+                    params["auth_user"] = auth_user
                 }
 
                 // IPアドレス等を使ってアクセス制限をする場合はここで行う

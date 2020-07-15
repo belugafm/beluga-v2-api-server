@@ -1,7 +1,6 @@
 import { UserSchema, User } from "../../schema/user"
 import { UserObject } from "../schema"
 import { ObjectTransformationError } from "../error"
-import * as mongo from "../../lib/mongoose"
 
 export const transform = async (
     model: UserSchema | null

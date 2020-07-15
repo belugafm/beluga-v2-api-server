@@ -24,7 +24,7 @@ export default (server: TurboServer) => {
                 ip_address: params["ip_address"],
                 session_lifetime:
                     config.user_registration
-                        .reclassify_inactive_as_dormant_after,
+                        .reclassify_inactive_as_dormant_after / 2,
             })
             if (session == null) {
                 throw new WebApiRuntimeError(new InternalErrorSpec())

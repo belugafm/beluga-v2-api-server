@@ -47,7 +47,7 @@ export const DefaultRule: FraudPreventionRule = (result) => {
 }
 
 export const StrictRule: FraudPreventionRule = (result) => {
-    const { fraud_score, ISP, proxy, vpn, tor } = result
+    const { fraud_score, ISP, proxy, vpn, tor, country_code } = result
     if (config.fraud_prevention.isp_allow_list.includes(ISP)) {
         return true
     }
@@ -55,6 +55,9 @@ export const StrictRule: FraudPreventionRule = (result) => {
         return false
     }
     if (fraud_score >= 85) {
+        return false
+    }
+    if (country_code !== "JP") {
         return false
     }
     if (tor === true) {
