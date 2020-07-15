@@ -114,32 +114,41 @@ class InMemoryDocumentCache {
         )
         this.change_streams.push(
             FraudScore.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+                in_memory_cache.handleChangeEvent(FraudScore.modelName, event)
             })
         )
         this.change_streams.push(
             Status.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+                in_memory_cache.handleChangeEvent(Status.modelName, event)
             })
         )
         this.change_streams.push(
             User.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+                in_memory_cache.handleChangeEvent(User.modelName, event)
             })
         )
         this.change_streams.push(
             UserLoginSession.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+                in_memory_cache.handleChangeEvent(
+                    UserLoginSession.modelName,
+                    event
+                )
             })
         )
         this.change_streams.push(
             UserLoginCredential.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+                in_memory_cache.handleChangeEvent(
+                    UserLoginCredential.modelName,
+                    event
+                )
             })
         )
         this.change_streams.push(
             UserRegistration.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
+                in_memory_cache.handleChangeEvent(
+                    UserRegistration.modelName,
+                    event
+                )
             })
         )
     }
