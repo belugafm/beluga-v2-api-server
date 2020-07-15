@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose"
 import { transform } from "../object/types/status"
-import { StatusObject } from "../object/schema"
+import { StatusObject, UserObject } from "../object/schema"
+import { UserSchema } from "./user"
 
 const schema_version = 1
 
@@ -11,14 +12,15 @@ export interface StatusSchema extends Document {
     community_id: mongoose.Types.ObjectId | null
     text: string
     created_at: Date
-    likes: number
+    like_count: number
+    favorite_count: number
     is_public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
     is_edited: boolean
     is_deleted: boolean
     _schema_version?: number
 
     _cached?: boolean
-    transform: () => Promise<StatusObject | null>
+    transform: (auth_user: UserSchema | null) => Promise<StatusObject | null>
 }
 
 const schema = new Schema({
@@ -31,7 +33,11 @@ const schema = new Schema({
         type: Boolean,
         default: true,
     },
-    likes: {
+    like_count: {
+        type: Number,
+        default: 0,
+    },
+    favorite_count: {
         type: Number,
         default: 0,
     },
@@ -54,9 +60,10 @@ schema.index({ channel_id: -1, created_at: -1 })
 schema.index({ community_id: -1, created_at: -1 })
 
 schema.methods.transform = async function (
-    this: StatusSchema
+    this: StatusSchema,
+    auth_user: UserSchema | null
 ): Promise<StatusObject | null> {
-    return await transform(this)
+    return await transform(this, auth_user)
 }
 
 export const Status = mongoose.model<StatusSchema>("status", schema)

@@ -1,4 +1,4 @@
-import { env, sleep, create_user, create_channel } from "../../../../mongodb"
+import { env, create_user, create_channel } from "../../../../mongodb"
 import { create } from "../../../../../app/model/status/likes/create"
 import { get } from "../../../../../app/model/status/likes/get"
 import { update as update_status } from "../../../../../app/model/status/update"
@@ -46,13 +46,14 @@ describe("status/likes/get", () => {
                 status_id: status_1._id,
                 user_id: user_1._id,
             })
-            await sleep(2)
-
-            const status = (await get_status({
-                status_id: status_1._id,
-            })) as StatusSchema
+            const status = (await get_status(
+                {
+                    status_id: status_1._id,
+                },
+                { disable_in_memory_cache: true }
+            )) as StatusSchema
             expect(status).toBeInstanceOf(Status)
-            expect(status.likes).toEqual(n)
+            expect(status.like_count).toEqual(n)
 
             const likes = (await get({
                 status_id: status_1._id,
@@ -67,18 +68,23 @@ describe("status/likes/get", () => {
                 status_id: status_2._id,
                 user_id: user_2._id,
             })
-            await sleep(2)
 
-            const status = (await get_status({
-                status_id: status_2._id,
-            })) as StatusSchema
+            const status = (await get_status(
+                {
+                    status_id: status_2._id,
+                },
+                { disable_in_memory_cache: true }
+            )) as StatusSchema
             expect(status).toBeInstanceOf(Status)
-            expect(status.likes).toEqual(n)
+            expect(status.like_count).toEqual(n)
 
-            const likes = (await get({
-                status_id: status_2._id,
-                user_id: user_2._id,
-            })) as StatusLikesSchema
+            const likes = (await get(
+                {
+                    status_id: status_2._id,
+                    user_id: user_2._id,
+                },
+                { disable_in_memory_cache: true }
+            )) as StatusLikesSchema
             expect(likes).toBeInstanceOf(StatusLikes)
             expect(likes.count).toEqual(n)
         }

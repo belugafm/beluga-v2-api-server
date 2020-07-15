@@ -1,7 +1,10 @@
 import * as vs from "../../../validation"
 import { ModelRuntimeError } from "../../error"
 import * as mongo from "../../../lib/mongoose"
-import { StatusLikesSchema, StatusLikes } from "../../../schema/status_likes"
+import {
+    StatusFavoritesSchema,
+    StatusFavorites,
+} from "../../../schema/status_favorites"
 import { ClientSession } from "mongoose"
 import { DefaultOptions, GetOptions } from "../../options"
 
@@ -11,15 +14,15 @@ export const ErrorCodes = {
 } as const
 
 type Argument = {
-    status_id: StatusLikesSchema["status_id"]
-    user_id?: StatusLikesSchema["user_id"]
+    status_id: StatusFavoritesSchema["status_id"]
+    user_id?: StatusFavoritesSchema["user_id"]
     transaction_session?: ClientSession
 }
 
 export const get = async (
     { status_id, user_id }: Argument,
     options: GetOptions = DefaultOptions
-): Promise<StatusLikesSchema | StatusLikesSchema[] | null> => {
+): Promise<StatusFavoritesSchema | StatusFavoritesSchema[] | null> => {
     if (vs.object_id().ok(status_id) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgStatusId)
     }
@@ -28,7 +31,7 @@ export const get = async (
             throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
         }
         return await mongo.findOne(
-            StatusLikes,
+            StatusFavorites,
             { status_id, user_id },
             {
                 transaction_session: options.transaction_session,
@@ -36,7 +39,7 @@ export const get = async (
             }
         )
     } else {
-        return await mongo.find(StatusLikes, { status_id }, (query) => {
+        return await mongo.find(StatusFavorites, { status_id }, (query) => {
             return query.session(
                 options.transaction_session ? options.transaction_session : null
             )

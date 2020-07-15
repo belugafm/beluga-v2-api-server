@@ -1,17 +1,22 @@
 import { TurboServer } from "../../turbo"
-import update, { facts } from "../../api/methods/status/update"
+import create, { facts } from "../../api/methods/favorites/create"
 import mongoose from "mongoose"
 import { WebApiRuntimeError, InternalErrorSpec } from "../../api/error"
+import { get as get_status } from "../../../model/status/get"
 
 export default (server: TurboServer) => {
     server.post(facts, async (req, res, params) => {
         const { auth_user } = params
-        const status = await update(
+        const status_id = mongoose.Types.ObjectId(req.body.status_id)
+        await create(
             {
-                channel_id: mongoose.Types.ObjectId(req.body.channel_id),
-                text: req.body.text,
+                status_id: status_id,
             },
             auth_user
+        )
+        const status = await get_status(
+            { status_id },
+            { disable_in_memory_cache: true }
         )
         if (status == null) {
             throw new WebApiRuntimeError(new InternalErrorSpec())

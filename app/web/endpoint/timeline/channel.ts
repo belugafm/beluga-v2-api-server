@@ -14,7 +14,9 @@ export default (server: TurboServer) => {
         return {
             ok: true,
             statuses: await Promise.all(
-                statuses.map(async (status) => await status.transform())
+                statuses.map(
+                    async (status) => await status.transform(auth_user)
+                )
             ),
         }
     })

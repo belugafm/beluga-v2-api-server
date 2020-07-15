@@ -1,7 +1,10 @@
 import * as vs from "../../../validation"
 import { ModelRuntimeError } from "../../error"
-import { StatusLikes, StatusLikesSchema } from "../../../schema/status_likes"
-import { get as get_likes } from "./get"
+import {
+    StatusFavorites,
+    StatusFavoritesSchema,
+} from "../../../schema/status_favorites"
+import { get as get_favorites } from "./get"
 import { get as get_status } from "../get"
 import { get as get_user } from "../../user/get"
 import config from "../../../config/app"
@@ -12,18 +15,18 @@ export const ErrorCodes = {
     InvalidArgUserId: "invalid_arg_user_id",
     StatusNotFound: "status_not_found",
     UserNotFound: "user_not_found",
-    LimitReached: "limit_reached",
+    AlreadyFavorited: "already_favorited",
 }
 
 type Argument = {
-    status_id: StatusLikesSchema["status_id"]
-    user_id: StatusLikesSchema["user_id"]
+    status_id: StatusFavoritesSchema["status_id"]
+    user_id: StatusFavoritesSchema["user_id"]
 }
 
 export const create = async ({
     status_id,
     user_id,
-}: Argument): Promise<StatusLikesSchema> => {
+}: Argument): Promise<StatusFavoritesSchema> => {
     if (vs.object_id().ok(status_id) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgStatusId)
     }
@@ -52,45 +55,31 @@ export const create = async ({
             throw new ModelRuntimeError(ErrorCodes.UserNotFound)
         }
 
-        const likes = (await get_likes(
+        const already_favorited = (await get_favorites(
             {
                 status_id,
                 user_id,
             },
-            { transaction_session: session }
-        )) as StatusLikesSchema
+            { disable_in_memory_cache: true }
+        )) as StatusFavoritesSchema
 
-        if (likes) {
-            if (likes.count >= config.status.like.max_count) {
-                throw new ModelRuntimeError(ErrorCodes.LimitReached)
-            }
-            likes.count += 1
-            await likes.save()
-
-            status.like_count += 1
-            await status.save()
-
-            await session.commitTransaction()
-            session.endSession()
-
-            return likes
-        } else {
-            status.like_count += 1
-            await status.save()
-
-            const likes = await StatusLikes.create({
-                status_id: status_id,
-                user_id: user_id,
-                channel_id: status.channel_id,
-                community_id: status.community_id ? status.community_id : null,
-                count: 1,
-            })
-
-            await session.commitTransaction()
-            session.endSession()
-
-            return likes
+        if (already_favorited) {
+            throw new ModelRuntimeError(ErrorCodes.AlreadyFavorited)
         }
+        status.favorite_count += 1
+        await status.save()
+
+        const favorite = await StatusFavorites.create({
+            status_id: status_id,
+            user_id: user_id,
+            channel_id: status.channel_id,
+            community_id: status.community_id ? status.community_id : null,
+        })
+
+        await session.commitTransaction()
+        session.endSession()
+
+        return favorite
     } catch (error) {
         await session.abortTransaction()
         session.endSession()

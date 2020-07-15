@@ -23,7 +23,7 @@ export default (server: TurboServer) => {
         }
         return {
             ok: true,
-            status: await status.transform(),
+            status: await status.transform(auth_user),
         }
     })
 }

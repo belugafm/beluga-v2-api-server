@@ -50,6 +50,7 @@ export const update = async ({
         is_deleted: false,
         is_edited: false,
         created_at: new Date(),
-        likes: 0,
+        like_count: 0,
+        favorite_count: 0,
     })
 }
