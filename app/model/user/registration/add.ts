@@ -19,16 +19,14 @@ type Argument = {
     ip_address: UserRegistrationSchema["ip_address"]
     fraud_score_id: UserRegistrationSchema["fraud_score_id"]
     fingerprint: UserRegistrationSchema["fingerprint"]
-    transaction_session?: ClientSession
 }
 
-export const add = async ({
-    user_id,
-    ip_address,
-    fraud_score_id,
-    fingerprint,
-    transaction_session,
-}: Argument): Promise<UserRegistrationSchema> => {
+export const add = async (
+    { user_id, ip_address, fraud_score_id, fingerprint }: Argument,
+    options: {
+        transaction_session: ClientSession | null
+    } = { transaction_session: null }
+): Promise<UserRegistrationSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
@@ -46,15 +44,25 @@ export const add = async ({
         }
     }
     const date = new Date()
-    return await createWithSession(
-        UserRegistration,
-        {
+    if (options.transaction_session) {
+        return await createWithSession(
+            UserRegistration,
+            {
+                user_id,
+                ip_address,
+                fraud_score_id,
+                fingerprint,
+                date,
+            },
+            options.transaction_session
+        )
+    } else {
+        return await UserRegistration.create({
             user_id,
             ip_address,
             fraud_score_id,
             fingerprint,
             date,
-        },
-        transaction_session
-    )
+        })
+    }
 }

@@ -40,7 +40,10 @@ const request_fraud_score_if_needed = async (
     if (result.success !== true) {
         return null
     }
-    return await add_fraud_score({ ip_address, result, transaction_session })
+    return await add_fraud_score(
+        { ip_address, result },
+        { transaction_session }
+    )
 }
 
 type Argument = {
@@ -141,24 +144,32 @@ export const signup = async ({
             password,
             config.user_login_credential.password.salt_rounds
         )
-        const credential = await add_login_credential({
-            user_id: user._id,
-            password_hash: password_hash,
-            transaction_session: session,
-        })
+        const credential = await add_login_credential(
+            {
+                user_id: user._id,
+                password_hash: password_hash,
+            },
+            {
+                transaction_session: session,
+            }
+        )
 
         const fraud_score = await request_fraud_score_if_needed(
             ip_address,
             session
         )
         const fraud_score_id = fraud_score ? fraud_score._id : undefined
-        const registration_info = await add_registration_info({
-            user_id: user._id,
-            ip_address: ip_address,
-            fraud_score_id: fraud_score_id,
-            fingerprint: fingerprint,
-            transaction_session: session,
-        })
+        const registration_info = await add_registration_info(
+            {
+                user_id: user._id,
+                ip_address: ip_address,
+                fraud_score_id: fraud_score_id,
+                fingerprint: fingerprint,
+            },
+            {
+                transaction_session: session,
+            }
+        )
 
         // await _unsafe_agree_to_terms_of_service(
         //     user,

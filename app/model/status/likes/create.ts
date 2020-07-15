@@ -52,11 +52,13 @@ export const create = async ({
             throw new ModelRuntimeError(ErrorCodes.UserNotFound)
         }
 
-        const likes = (await get_likes({
-            status_id,
-            user_id,
-            transaction_session: session,
-        })) as StatusLikesSchema
+        const likes = (await get_likes(
+            {
+                status_id,
+                user_id,
+            },
+            { transaction_session: session }
+        )) as StatusLikesSchema
 
         if (likes) {
             if (likes.count >= config.status.like.max_count) {

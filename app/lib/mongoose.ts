@@ -85,7 +85,7 @@ export async function find<T extends Document>(
 export async function createWithSession<T extends Document>(
     cls: mongoose.Model<T, {}>,
     doc: CreateQuery<T>,
-    session?: ClientSession
+    session: ClientSession
 ): Promise<T> {
     return new Promise((resolve, reject) => {
         cls.create(

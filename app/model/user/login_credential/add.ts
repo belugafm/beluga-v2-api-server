@@ -14,26 +14,33 @@ export const ErrorCodes = {
 type Argument = {
     user_id: UserLoginCredentialSchema["user_id"]
     password_hash: UserLoginCredentialSchema["password_hash"]
-    transaction_session?: ClientSession
 }
 
-export const add = async ({
-    user_id,
-    password_hash,
-    transaction_session,
-}: Argument): Promise<UserLoginCredentialSchema> => {
+export const add = async (
+    { user_id, password_hash }: Argument,
+    options: {
+        transaction_session: ClientSession | null
+    } = { transaction_session: null }
+): Promise<UserLoginCredentialSchema> => {
     if (user_id instanceof mongoose.Types.ObjectId === false) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgUserId)
     }
     if (typeof password_hash !== "string") {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgPasswordHash)
     }
-    return await createWithSession(
-        UserLoginCredential,
-        {
+    if (options.transaction_session) {
+        return await createWithSession(
+            UserLoginCredential,
+            {
+                user_id,
+                password_hash,
+            },
+            options.transaction_session
+        )
+    } else {
+        return await UserLoginCredential.create({
             user_id,
             password_hash,
-        },
-        transaction_session
-    )
+        })
+    }
 }
