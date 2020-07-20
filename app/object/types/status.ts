@@ -77,9 +77,10 @@ async function likes_users(status: StatusSchema) {
     const all_likes = await (async (
         status: StatusSchema
     ): Promise<StatusLikesSchema[]> => {
+        const key = "likes"
         const [_likes, is_cached] = status_object_cache.get(
             status._id.toHexString(),
-            "likes"
+            key
         )
         if (is_cached) {
             return _likes
@@ -87,7 +88,7 @@ async function likes_users(status: StatusSchema) {
         const likes = (await get_likes({
             status_id: status._id,
         })) as StatusLikesSchema[]
-        status_object_cache.set(status._id.toHexString(), "likes", likes)
+        status_object_cache.set(status._id.toHexString(), key, likes)
         return likes
     })(status)
 
@@ -106,9 +107,10 @@ async function favorites_users(status: StatusSchema) {
     const all_favorites = await (async (
         status: StatusSchema
     ): Promise<StatusFavoritesSchema[]> => {
+        const key = "favorites"
         const [_favorites, is_cached] = status_object_cache.get(
             status._id.toHexString(),
-            "favorites"
+            key
         )
         if (is_cached) {
             return _favorites
@@ -116,11 +118,7 @@ async function favorites_users(status: StatusSchema) {
         const favorites = (await get_favorites({
             status_id: status._id,
         })) as StatusFavoritesSchema[]
-        status_object_cache.set(
-            status._id.toHexString(),
-            "favorites",
-            favorites
-        )
+        status_object_cache.set(status._id.toHexString(), key, favorites)
         return favorites
     })(status)
     return remove_null(
@@ -161,7 +159,6 @@ export const transform = async (
         is_public: model.is_public,
         is_deleted: model.is_deleted,
         is_edited: model.is_edited,
-        is_muted: false,
         is_favorited: await is_favorited(model, auth_user),
         likes: {
             count: model.like_count,

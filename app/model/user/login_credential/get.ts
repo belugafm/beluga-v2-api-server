@@ -1,7 +1,7 @@
 import {
     UserLoginCredential,
     UserLoginCredentialSchema,
-} from "../../../schema/user_login_credentials"
+} from "../../../schema/user_login_credential"
 import { ModelRuntimeError } from "../../error"
 import mongoose from "mongoose"
 import * as mongo from "../../../lib/mongoose"

@@ -1,7 +1,7 @@
 import { MongoMemoryReplSet } from "mongodb-memory-server"
 import mongoose from "mongoose"
 import { User } from "../app/schema/user"
-import { UserLoginCredential } from "../app/schema/user_login_credentials"
+import { UserLoginCredential } from "../app/schema/user_login_credential"
 import { UserRegistration } from "../app/schema/user_registration"
 import { FraudScore } from "../app/schema/fraud_score"
 import { Channel } from "../app/schema/channel"
