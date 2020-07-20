@@ -17,7 +17,6 @@ class ObjectCache extends InMemoryCache {
     on() {
         this.change_streams.push(
             Status.watch().on("change", (event) => {
-                console.log(event)
                 if (
                     event.operationType == "delete" ||
                     event.operationType == "update"
@@ -51,9 +50,10 @@ async function is_favorited(
     if (auth_user == null) {
         return false
     }
+    const key = `is_favorited_${auth_user._id.toHexString()}`
     const [_favorite, is_cached] = status_object_cache.get(
         status._id.toHexString(),
-        auth_user._id.toHexString()
+        key
     )
     if (is_cached) {
         if (_favorite === null) {
@@ -66,11 +66,7 @@ async function is_favorited(
         status_id: status._id,
         user_id: auth_user._id,
     })
-    status_object_cache.set(
-        status._id.toHexString(),
-        auth_user._id.toHexString(),
-        favorite
-    )
+    status_object_cache.set(status._id.toHexString(), key, favorite)
     if (favorite == null) {
         return false
     }
@@ -78,9 +74,23 @@ async function is_favorited(
 }
 
 async function likes_users(status: StatusSchema) {
-    const all_likes = (await get_likes({
-        status_id: status._id,
-    })) as StatusLikesSchema[]
+    const all_likes = await (async (
+        status: StatusSchema
+    ): Promise<StatusLikesSchema[]> => {
+        const [_likes, is_cached] = status_object_cache.get(
+            status._id.toHexString(),
+            "likes"
+        )
+        if (is_cached) {
+            return _likes
+        }
+        const likes = (await get_likes({
+            status_id: status._id,
+        })) as StatusLikesSchema[]
+        status_object_cache.set(status._id.toHexString(), "likes", likes)
+        return likes
+    })(status)
+
     return remove_null(
         await Promise.all(
             all_likes.map(async (likes) => {
@@ -93,9 +103,26 @@ async function likes_users(status: StatusSchema) {
 }
 
 async function favorites_users(status: StatusSchema) {
-    const all_favorites = (await get_favorites({
-        status_id: status._id,
-    })) as StatusFavoritesSchema[]
+    const all_favorites = await (async (
+        status: StatusSchema
+    ): Promise<StatusFavoritesSchema[]> => {
+        const [_favorites, is_cached] = status_object_cache.get(
+            status._id.toHexString(),
+            "favorites"
+        )
+        if (is_cached) {
+            return _favorites
+        }
+        const favorites = (await get_favorites({
+            status_id: status._id,
+        })) as StatusFavoritesSchema[]
+        status_object_cache.set(
+            status._id.toHexString(),
+            "favorites",
+            favorites
+        )
+        return favorites
+    })(status)
     return remove_null(
         await Promise.all(
             all_favorites.map(async (likes) => {

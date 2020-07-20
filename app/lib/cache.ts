@@ -4,9 +4,6 @@ export class CachedObject {
     expire_date: Date
     value: any
     constructor(value: any, expire_seconds: number) {
-        if (value) {
-            value._cached = true
-        }
         this.value = value
         this.expire_date = new Date(Date.now() + expire_seconds * 1000)
     }
