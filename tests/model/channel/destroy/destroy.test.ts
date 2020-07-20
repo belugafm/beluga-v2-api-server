@@ -8,9 +8,9 @@ import config from "../../../../app/config/app"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../app/web/api/define"
 import { destroy } from "../../../../app/model/channel/destroy"
-import { in_memory_cache } from "../../../../app/lib/cache"
+import { document_cache } from "../../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 config.channel.create_limit_per_day = 1
 jest.setTimeout(30000)

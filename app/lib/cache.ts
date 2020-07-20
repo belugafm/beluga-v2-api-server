@@ -1,21 +1,14 @@
-import config from "../config/app"
-import { ChangeEvent, ChangeStream } from "mongodb"
-import mongoose from "mongoose"
-import { Channel } from "../schema/channel"
-import { FraudScore } from "../schema/fraud_score"
-import { Status } from "../schema/status"
-import { User } from "../schema/user"
-import { UserLoginCredential } from "../schema/user_login_credentials"
-import { UserLoginSession } from "../schema/user_login_session"
-import { UserRegistration } from "../schema/user_registration"
+import { ChangeStream } from "mongodb"
 
-class CachedObject {
+export class CachedObject {
     expire_date: Date
-    data: any
-    constructor(data: any, expire_seconds: number) {
-        data._cached = true
-        this.data = data
-        this.expire_date = new Date(Date.now() + expire_seconds)
+    value: any
+    constructor(value: any, expire_seconds: number) {
+        if (value) {
+            value._cached = true
+        }
+        this.value = value
+        this.expire_date = new Date(Date.now() + expire_seconds * 1000)
     }
     is_expired() {
         if (this.expire_date.getTime() < Date.now()) {
@@ -25,7 +18,8 @@ class CachedObject {
         }
     }
 }
-class InMemoryDocumentCache {
+
+export class InMemoryCache {
     cache_limit: number
     default_expire_seconds: number
     enabled: boolean
@@ -43,26 +37,27 @@ class InMemoryDocumentCache {
     disable() {
         this.enabled = false
     }
-    get(namespace: string, key: string): any {
+    get(namespace: string, key: string): [any, boolean] {
         if (this.enabled !== true) {
-            return null
+            return [null, false]
         }
         if (namespace in this.data !== true) {
-            return null
+            return [null, false]
         }
         if (key in this.data[namespace] !== true) {
-            return null
+            return [null, false]
         }
         const cached_object = this.data[namespace][key]
         if (cached_object.is_expired() === true) {
-            return null
+            delete this.data[namespace][key]
+            return [null, false]
         }
-        return cached_object.data
+        return [cached_object.value, true]
     }
     set(
         namespace: string,
         key: string,
-        data: any,
+        value: any,
         expire_seconds?: number
     ): void {
         if (this.enabled !== true) {
@@ -76,15 +71,20 @@ class InMemoryDocumentCache {
             this.data[namespace] = {}
         }
         this.data[namespace][key] = new CachedObject(
-            data,
+            value,
             expire_seconds ? expire_seconds : this.default_expire_seconds
         )
     }
-    delete(namespace: string, key: string) {
+    delete(namespace: string, key?: string) {
         if (this.enabled !== true) {
             return
         }
         if (namespace in this.data !== true) {
+            return
+        }
+        if (key == null) {
+            delete this.data[namespace]
+            this.data[namespace] = {}
             return
         }
         if (key in this.data[namespace] !== true) {
@@ -92,74 +92,6 @@ class InMemoryDocumentCache {
         }
         delete this.data[namespace][key]
     }
-    handleChangeEvent(namespace: string, event: ChangeEvent<any>) {
-        if (
-            event.operationType == "delete" ||
-            event.operationType == "update"
-        ) {
-            const { _id } = event.documentKey
-            if (_id) {
-                this.delete(
-                    namespace,
-                    (_id as mongoose.Types.ObjectId).toHexString()
-                )
-            }
-        }
-    }
-    on() {
-        this.change_streams.push(
-            Channel.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Channel.modelName, event)
-            })
-        )
-        this.change_streams.push(
-            FraudScore.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(FraudScore.modelName, event)
-            })
-        )
-        this.change_streams.push(
-            Status.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(Status.modelName, event)
-            })
-        )
-        this.change_streams.push(
-            User.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(User.modelName, event)
-            })
-        )
-        this.change_streams.push(
-            UserLoginSession.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(
-                    UserLoginSession.modelName,
-                    event
-                )
-            })
-        )
-        this.change_streams.push(
-            UserLoginCredential.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(
-                    UserLoginCredential.modelName,
-                    event
-                )
-            })
-        )
-        this.change_streams.push(
-            UserRegistration.watch().on("change", (event) => {
-                in_memory_cache.handleChangeEvent(
-                    UserRegistration.modelName,
-                    event
-                )
-            })
-        )
-    }
-    async off() {
-        return await Promise.all(
-            this.change_streams.map((stream) => stream.close())
-        )
-    }
+    on() {}
+    async off() {}
 }
-
-export const in_memory_cache = new InMemoryDocumentCache(
-    config.in_memory_cache.cache_limit,
-    config.in_memory_cache.default_expire_seconds
-)

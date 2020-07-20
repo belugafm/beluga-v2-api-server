@@ -6,9 +6,9 @@ import get_channel, {
 } from "../../../app/web/api/methods/channel/show"
 import { Channel, ChannelSchema } from "../../../app/schema/channel"
 import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
-import { in_memory_cache } from "../../../app/lib/cache"
+import { document_cache } from "../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 describe("channel", () => {
     beforeAll(async () => {

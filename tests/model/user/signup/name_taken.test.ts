@@ -2,9 +2,9 @@ import { env } from "../../../mongodb"
 import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
-import { in_memory_cache } from "../../../../app/lib/cache"
+import { document_cache } from "../../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 config.user_registration.limit = 0
 jest.setTimeout(30000)

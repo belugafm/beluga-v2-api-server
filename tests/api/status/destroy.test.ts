@@ -8,9 +8,9 @@ import show_status from "../../../app/web/api/methods/status/show"
 import { Channel, ChannelSchema } from "../../../app/schema/channel"
 import { WebApiRuntimeError, InvalidAuth } from "../../../app/web/api/error"
 import { Status, StatusSchema } from "../../../app/schema/status"
-import { in_memory_cache } from "../../../app/lib/cache"
+import { document_cache } from "../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 describe("status", () => {
     beforeAll(async () => {

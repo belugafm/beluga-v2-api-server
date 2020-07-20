@@ -1,19 +1,44 @@
 import { StatusSchema, Status } from "../../schema/status"
 import { StatusObject, UserObject } from "../schema"
 import { ObjectTransformationError } from "../error"
-import * as mongo from "../../lib/mongoose"
-import { User, UserSchema } from "../../schema/user"
+import { UserSchema } from "../../schema/user"
 import { transform as transform_user } from "./user"
 import { transform as transform_channel } from "./channel"
-import { Channel } from "../../schema/channel"
-import { StatusLikes, StatusLikesSchema } from "../../schema/status_likes"
-import {
-    StatusFavorites,
-    StatusFavoritesSchema,
-} from "../../schema/status_favorites"
+import { StatusLikesSchema } from "../../schema/status_likes"
+import { StatusFavoritesSchema } from "../../schema/status_favorites"
 import { get as get_favorites } from "../../model/status/favorites/get"
 import { get as get_likes } from "../../model/status/likes/get"
 import { get as get_user } from "../../model/user/get"
+import { get as get_channel } from "../../model/channel/get"
+import { InMemoryCache } from "../../lib/cache"
+import config from "../../config/app"
+
+class ObjectCache extends InMemoryCache {
+    on() {
+        this.change_streams.push(
+            Status.watch().on("change", (event) => {
+                console.log(event)
+                if (
+                    event.operationType == "delete" ||
+                    event.operationType == "update"
+                ) {
+                    const { _id } = event.documentKey
+                    if (_id) {
+                        this.delete(_id as string)
+                    }
+                }
+            })
+        )
+    }
+    async off() {
+        await Promise.all(this.change_streams.map((stream) => stream.close()))
+    }
+}
+
+export const status_object_cache = new ObjectCache(
+    config.in_memory_cache.cache_limit,
+    config.in_memory_cache.default_expire_seconds
+)
 
 function remove_null(array: (UserObject | null)[]): UserObject[] {
     return array.filter((user) => user != null) as UserObject[]
@@ -26,10 +51,26 @@ async function is_favorited(
     if (auth_user == null) {
         return false
     }
+    const [_favorite, is_cached] = status_object_cache.get(
+        status._id.toHexString(),
+        auth_user._id.toHexString()
+    )
+    if (is_cached) {
+        if (_favorite === null) {
+            return false
+        } else {
+            return true
+        }
+    }
     const favorite = await get_favorites({
         status_id: status._id,
         user_id: auth_user._id,
     })
+    status_object_cache.set(
+        status._id.toHexString(),
+        auth_user._id.toHexString(),
+        favorite
+    )
     if (favorite == null) {
         return false
     }
@@ -80,12 +121,10 @@ export const transform = async (
         id: model._id.toHexString(),
         text: model.text,
         user_id: model.user_id.toHexString(),
-        user: await transform_user(
-            await mongo.findOne(User, { _id: model.user_id })
-        ),
+        user: await transform_user(await get_user({ user_id: model.user_id })),
         channel_id: model.channel_id.toHexString(),
         channel: await transform_channel(
-            await mongo.findOne(Channel, { _id: model.channel_id })
+            await get_channel({ channel_id: model.channel_id })
         ),
         community_id: model.community_id
             ? model.community_id.toHexString()

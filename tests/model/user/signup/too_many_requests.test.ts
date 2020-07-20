@@ -3,10 +3,10 @@ import { signup, ErrorCodes } from "../../../../app/model/user/signup"
 import { ModelRuntimeError } from "../../../../app/model/error"
 import config from "../../../../app/config/app"
 import * as mongo from "../../../../app/lib/mongoose"
-import { in_memory_cache } from "../../../../app/lib/cache"
+import { document_cache } from "../../../../app/document/cache"
 import { DormantUser, User } from "../../../../app/schema/user"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 config.user_registration.limit = 5
 config.user_registration.reclassify_inactive_as_dormant_after = 10

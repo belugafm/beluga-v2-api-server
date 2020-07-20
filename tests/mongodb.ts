@@ -6,7 +6,7 @@ import { UserRegistration } from "../app/schema/user_registration"
 import { FraudScore } from "../app/schema/fraud_score"
 import { Channel } from "../app/schema/channel"
 import { Status } from "../app/schema/status"
-import { in_memory_cache } from "../app/lib/cache"
+import { document_cache } from "../app/document/cache"
 import config from "../app/config/app"
 
 export async function create_user(name?: string) {
@@ -102,7 +102,7 @@ class MongoTestEnvironment {
                         sleep(3)
 
                         // change streamの登録
-                        in_memory_cache.on()
+                        document_cache.on()
 
                         resolve()
                     })
@@ -111,7 +111,7 @@ class MongoTestEnvironment {
         })
     }
     async disconnect() {
-        await in_memory_cache.off()
+        await document_cache.off()
         await mongoose.disconnect()
         if (this.replSet) {
             await this.replSet.stop()

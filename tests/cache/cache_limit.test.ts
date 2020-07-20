@@ -5,7 +5,7 @@ import mongoose from "mongoose"
 import { ExampleObjectId } from "../../app/web/api/define"
 import config from "../../app/config/app"
 import { Status } from "../../app/schema/status"
-import { in_memory_cache } from "../../app/lib/cache"
+import { document_cache } from "../../app/document/cache"
 
 config.in_memory_cache.cache_limit = 10
 jest.setTimeout(30000)
@@ -51,11 +51,11 @@ describe("in_memory_cache", () => {
             if (index < 10) {
                 expect(
                     // @ts-ignore
-                    in_memory_cache.data[Status.modelName].length == index + 1
+                    document_cache.data[Status.modelName].length == index + 1
                 )
             } else {
                 // @ts-ignore
-                expect(in_memory_cache.data[Status.modelName].length == 1)
+                expect(document_cache.data[Status.modelName].length == 1)
             }
         }
     })

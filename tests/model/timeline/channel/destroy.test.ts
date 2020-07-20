@@ -3,9 +3,9 @@ import { update } from "../../../../app/model/status/update"
 import { channel as get_channel_statuses } from "../../../../app/model/timeline/channel"
 import { destroy } from "../../../../app/model/status/destroy"
 import { Status } from "../../../../app/schema/status"
-import { in_memory_cache } from "../../../../app/lib/cache"
+import { document_cache } from "../../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 jest.setTimeout(30000)
 

@@ -8,8 +8,9 @@ import { UserRegistration } from "./schema/user_registration"
 import { FraudScore } from "./schema/fraud_score"
 import { Channel } from "./schema/channel"
 import { Status } from "./schema/status"
-import { in_memory_cache } from "./lib/cache"
 import config from "./config/app"
+import { document_cache } from "./document/cache"
+import { status_object_cache } from "./object/types/status"
 
 async function start_server() {
     const server = new TurboServer({
@@ -50,7 +51,8 @@ async function start_server() {
     } catch (error) {}
 
     // change streamの登録
-    in_memory_cache.on()
+    document_cache.on()
+    status_object_cache.on()
 
     // routerにendpointを登録
     server.register(require("./web/endpoint/account/signup"))

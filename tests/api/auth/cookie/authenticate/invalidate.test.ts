@@ -8,9 +8,9 @@ import {
 } from "../../../../../app/schema/user_login_session"
 import authenticate_login_session from "../../../../../app/web/api/methods/auth/cookie/authenticate"
 import { invalidate_last_login_session } from "../../../../../app/web/auth"
-import { in_memory_cache } from "../../../../../app/lib/cache"
+import { document_cache } from "../../../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 describe("auth/cookie/authenticate", () => {
     beforeAll(async () => {

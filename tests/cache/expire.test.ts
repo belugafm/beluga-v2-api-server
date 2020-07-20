@@ -1,13 +1,10 @@
 import { env, create_user, create_channel } from "../mongodb"
 import { update } from "../../app/model/status/update"
 import { get } from "../../app/model/status/get"
-import mongoose from "mongoose"
-import { ExampleObjectId } from "../../app/web/api/define"
-import config from "../../app/config/app"
 import { Status } from "../../app/schema/status"
-import { in_memory_cache } from "../../app/lib/cache"
+import { document_cache } from "../../app/document/cache"
 
-config.in_memory_cache.default_expire_seconds = 5
+document_cache.default_expire_seconds = 5
 jest.setTimeout(30000)
 
 async function sleep(sec: number) {
@@ -40,8 +37,9 @@ describe("in_memory_cache", () => {
         })
         expect(status).toBeInstanceOf(Status)
         await get({ status_id: status._id })
+        await sleep(4)
         {
-            const cached_status = in_memory_cache.get(
+            const [cached_status] = document_cache.get(
                 Status.modelName,
                 status._id.toHexString()
             )
@@ -50,7 +48,7 @@ describe("in_memory_cache", () => {
         }
         await sleep(10)
         {
-            const cached_status = in_memory_cache.get(
+            const [cached_status] = document_cache.get(
                 Status.modelName,
                 status._id.toHexString()
             )

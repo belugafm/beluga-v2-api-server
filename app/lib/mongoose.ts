@@ -5,7 +5,7 @@ import mongoose, {
     ClientSession,
     CreateQuery,
 } from "mongoose"
-import { in_memory_cache } from "./cache"
+import { document_cache } from "../document/cache"
 
 type FindOneOptions<T extends Document> = {
     additional_query_func?: (query: DocumentQuery<T | null, T>) => void
@@ -31,7 +31,7 @@ export async function findOne<T extends Document>(
         Object.keys(condition).length == 1 &&
         transaction_session == null
     if (cache_enabled) {
-        const cached_document = in_memory_cache.get(
+        const [cached_document] = document_cache.get(
             cls.modelName,
             (_id as mongoose.Types.ObjectId).toHexString()
         )
@@ -48,7 +48,7 @@ export async function findOne<T extends Document>(
                         return reject(error)
                     }
                     if (doc && cache_enabled) {
-                        in_memory_cache.set(
+                        document_cache.set(
                             cls.modelName,
                             (_id as mongoose.Types.ObjectId).toHexString(),
                             doc

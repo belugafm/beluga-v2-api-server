@@ -4,9 +4,9 @@ import { get } from "../../../../app/model/status/get"
 import { destroy } from "../../../../app/model/status/destroy"
 import config from "../../../../app/config/app"
 import { Status } from "../../../../app/schema/status"
-import { in_memory_cache } from "../../../../app/lib/cache"
+import { document_cache } from "../../../../app/document/cache"
 
-in_memory_cache.disable()
+document_cache.disable()
 
 config.status.text.max_length = 10
 config.status.text.min_length = 5
