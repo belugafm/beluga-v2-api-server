@@ -1,12 +1,16 @@
 import { env, create_user } from "../../../../mongodb"
-import { create, ErrorCodes } from "../../../../../app/model/user/mutes/create"
+import {
+    destroy,
+    ErrorCodes,
+} from "../../../../../app/model/user/blocks/destroy"
+import { create } from "../../../../../app/model/user/blocks/create"
 import { ModelRuntimeError } from "../../../../../app/model/error"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../../app/web/api/define"
 
 jest.setTimeout(30000)
 
-describe("mutes/create", () => {
+describe("blocks/destroy", () => {
     beforeAll(async () => {
         await env.connect()
     })
@@ -20,13 +24,17 @@ describe("mutes/create", () => {
             auth_user_id: auth_user._id,
             target_user_id: target_user._id,
         })
+        await destroy({
+            auth_user_id: auth_user._id,
+            target_user_id: target_user._id,
+        })
     })
     test("invalid_arg_auth_user_id", async () => {
         expect.assertions(2)
         const target_user = await create_user()
         try {
             // @ts-ignore
-            await create({
+            await destroy({
                 target_user_id: target_user._id,
             })
         } catch (error) {
@@ -41,7 +49,7 @@ describe("mutes/create", () => {
         const auth_user = await create_user()
         try {
             // @ts-ignore
-            await create({
+            await destroy({
                 auth_user_id: auth_user._id,
             })
         } catch (error) {
@@ -51,18 +59,18 @@ describe("mutes/create", () => {
             }
         }
     })
-    test("cannot_mute_self", async () => {
+    test("cannot_unmute_self", async () => {
         expect.assertions(2)
         const auth_user = await create_user()
         try {
-            await create({
+            await destroy({
                 auth_user_id: auth_user._id,
                 target_user_id: auth_user._id,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.CannotMuteSelf)
+                expect(error.code).toMatch(ErrorCodes.CannotUnblockSelf)
             }
         }
     })
@@ -70,7 +78,7 @@ describe("mutes/create", () => {
         expect.assertions(2)
         const target_user = await create_user()
         try {
-            await create({
+            await destroy({
                 auth_user_id: mongoose.Types.ObjectId(ExampleObjectId),
                 target_user_id: target_user._id,
             })
@@ -85,7 +93,7 @@ describe("mutes/create", () => {
         expect.assertions(2)
         const auth_user = await create_user()
         try {
-            await create({
+            await destroy({
                 auth_user_id: auth_user._id,
                 target_user_id: mongoose.Types.ObjectId(ExampleObjectId),
             })

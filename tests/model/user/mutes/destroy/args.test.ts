@@ -1,6 +1,9 @@
 import { env, create_user } from "../../../../mongodb"
-import { destroy, ErrorCodes } from "../../../../../app/model/mutes/destroy"
-import { create } from "../../../../../app/model/mutes/create"
+import {
+    destroy,
+    ErrorCodes,
+} from "../../../../../app/model/user/mutes/destroy"
+import { create } from "../../../../../app/model/user/mutes/create"
 import { ModelRuntimeError } from "../../../../../app/model/error"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../../app/web/api/define"

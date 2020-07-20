@@ -1,8 +1,8 @@
-import * as vs from "../../validation"
-import { ModelRuntimeError } from "../error"
+import * as vs from "../../../validation"
+import { ModelRuntimeError } from "../../error"
 import { get as get_mutes } from "./get"
-import { get as get_user } from "../user/get"
-import { UserMutesSchema } from "../../schema/user_mutes"
+import { get as get_user } from "../get"
+import { UserMutesSchema } from "../../../schema/user_mutes"
 
 export const ErrorCodes = {
     InvalidArgAuthUserId: "invalid_arg_auth_user_id",

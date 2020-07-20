@@ -1,12 +1,12 @@
 import { env, create_user } from "../../../../mongodb"
-import { create, ErrorCodes } from "../../../../../app/model/user/mutes/create"
+import { create, ErrorCodes } from "../../../../../app/model/user/blocks/create"
 import { ModelRuntimeError } from "../../../../../app/model/error"
 import mongoose from "mongoose"
 import { ExampleObjectId } from "../../../../../app/web/api/define"
 
 jest.setTimeout(30000)
 
-describe("mutes/create", () => {
+describe("blocks/create", () => {
     beforeAll(async () => {
         await env.connect()
     })
@@ -51,7 +51,7 @@ describe("mutes/create", () => {
             }
         }
     })
-    test("cannot_mute_self", async () => {
+    test("cannot_block_self", async () => {
         expect.assertions(2)
         const auth_user = await create_user()
         try {
@@ -62,7 +62,7 @@ describe("mutes/create", () => {
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
             if (error instanceof ModelRuntimeError) {
-                expect(error.code).toMatch(ErrorCodes.CannotMuteSelf)
+                expect(error.code).toMatch(ErrorCodes.CannotBlockSelf)
             }
         }
     })
