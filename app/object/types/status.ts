@@ -73,7 +73,7 @@ async function is_favorited(
     return true
 }
 
-async function likes_users(status: StatusSchema) {
+async function likes_users(status: StatusSchema, auth_user: UserSchema | null) {
     const all_likes = await (async (
         status: StatusSchema
     ): Promise<StatusLikesSchema[]> => {
@@ -96,14 +96,18 @@ async function likes_users(status: StatusSchema) {
         await Promise.all(
             all_likes.map(async (likes) => {
                 return await transform_user(
-                    await get_user({ user_id: likes.user_id })
+                    await get_user({ user_id: likes.user_id }),
+                    auth_user
                 )
             })
         )
     )
 }
 
-async function favorites_users(status: StatusSchema) {
+async function favorites_users(
+    status: StatusSchema,
+    auth_user: UserSchema | null
+) {
     const all_favorites = await (async (
         status: StatusSchema
     ): Promise<StatusFavoritesSchema[]> => {
@@ -125,7 +129,8 @@ async function favorites_users(status: StatusSchema) {
         await Promise.all(
             all_favorites.map(async (likes) => {
                 return await transform_user(
-                    await get_user({ user_id: likes.user_id })
+                    await get_user({ user_id: likes.user_id }),
+                    auth_user
                 )
             })
         )
@@ -146,10 +151,14 @@ export const transform = async (
         id: model._id.toHexString(),
         text: model.text,
         user_id: model.user_id.toHexString(),
-        user: await transform_user(await get_user({ user_id: model.user_id })),
+        user: await transform_user(
+            await get_user({ user_id: model.user_id }),
+            auth_user
+        ),
         channel_id: model.channel_id.toHexString(),
         channel: await transform_channel(
-            await get_channel({ channel_id: model.channel_id })
+            await get_channel({ channel_id: model.channel_id }),
+            auth_user
         ),
         community_id: model.community_id
             ? model.community_id.toHexString()
@@ -162,11 +171,11 @@ export const transform = async (
         is_favorited: await is_favorited(model, auth_user),
         likes: {
             count: model.like_count,
-            users: await likes_users(model),
+            users: await likes_users(model, auth_user),
         },
         favorites: {
             count: model.favorite_count,
-            users: await favorites_users(model),
+            users: await favorites_users(model, auth_user),
         },
     }
 }

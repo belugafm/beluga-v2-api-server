@@ -29,7 +29,7 @@ export interface UserSchema extends Document {
 
     // methods
     needsReclassifyAsDormant: () => boolean
-    transform: () => Promise<UserObject | null>
+    transform: (auth_user: UserSchema | null) => Promise<UserObject | null>
 }
 
 const NullString = {
@@ -117,9 +117,10 @@ user_schema.methods.needsReclassifyAsDormant = function (
 }
 
 user_schema.methods.transform = async function (
-    this: UserSchema
+    this: UserSchema,
+    auth_user: UserSchema | null
 ): Promise<UserObject | null> {
-    return await transform(this)
+    return await transform(this, auth_user)
 }
 
 export const User = mongoose.model<UserSchema>("user", user_schema)

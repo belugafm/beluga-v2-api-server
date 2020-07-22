@@ -23,7 +23,7 @@ export default (server: TurboServer) => {
         }
         return {
             ok: true,
-            channel: await channel.transform(),
+            channel: await channel.transform(auth_user),
         }
     })
 }

@@ -11,6 +11,10 @@ export const MethodIdentifiers = {
     CreateLike: "likes/create",
     CreateFavorite: "favorites/create",
     DestroyFavorite: "favorites/destroy",
+    CreateMute: "mutes/create",
+    DestroyMute: "mutes/destroy",
+    CreateBlock: "blocks/create",
+    DestroyBlock: "blocks/destroy",
     ShowUser: "users/show",
     ChannelTimeline: "timeline/channel",
 }

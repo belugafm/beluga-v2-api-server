@@ -14,7 +14,7 @@ export default (server: TurboServer) => {
         }
         return {
             ok: true,
-            user: await user.transform(),
+            user: await user.transform(null),
             logged_out: false,
         }
     })

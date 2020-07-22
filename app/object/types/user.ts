@@ -3,7 +3,8 @@ import { UserObject } from "../schema"
 import { ObjectTransformationError } from "../error"
 
 export const transform = async (
-    model: UserSchema | null
+    model: UserSchema | null,
+    auth_user: UserSchema | null
 ): Promise<UserObject | null> => {
     if (model === null) {
         return null
