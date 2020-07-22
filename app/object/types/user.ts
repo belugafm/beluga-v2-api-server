@@ -19,8 +19,10 @@ export const transform = async (
         profile: model.profile,
         created_at: model.created_at.getTime(),
         stats: model.stats,
-        is_active: model.is_active,
-        is_dormant: model.is_dormant,
+        active: model.active,
+        dormant: model.dormant,
+        muted: false,
+        blocked: false,
         last_activity_time: model.last_activity_date
             ? model.last_activity_date.getTime()
             : null,

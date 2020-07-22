@@ -44,7 +44,6 @@ describe("in_memory_cache", () => {
                 status._id.toHexString()
             )
             expect(cached_status).toBeInstanceOf(Status)
-            expect(cached_status?._cached).toBeTruthy()
         }
         await sleep(10)
         {

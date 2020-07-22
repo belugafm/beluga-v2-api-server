@@ -57,6 +57,6 @@ export const generate = async ({
         ip_address: ip_address,
         session_token: session_token,
         fraud_score_id: fraud_score_id,
-        is_expired: false,
+        expired: false,
     })
 }

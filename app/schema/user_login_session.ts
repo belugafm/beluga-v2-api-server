@@ -10,10 +10,10 @@ export interface UserLoginSessionSchema extends Document {
     ip_address: string
     created_at: Date
     expire_date: Date
-    is_expired: boolean
+    expired: boolean
     _schema_version?: number
 
-    expired: () => boolean
+    ok: () => boolean
 }
 
 const schema = new Schema({
@@ -26,7 +26,7 @@ const schema = new Schema({
     ip_address: String,
     created_at: Date,
     expire_date: Date,
-    is_expired: {
+    expired: {
         type: Boolean,
         default: false,
     },
@@ -38,16 +38,15 @@ const schema = new Schema({
 
 schema.index({ user_id: 1, session_token: 1 }, { unique: true })
 
-schema.methods.expired = function (this: UserLoginSessionSchema): boolean {
-    if (this.is_expired === true) {
-        return true
+schema.methods.ok = function (this: UserLoginSessionSchema): boolean {
+    if (this.expired === true) {
+        return false
     }
     const current = new Date()
     if (current.getTime() > this.expire_date.getTime()) {
-        return true
-    } else {
         return false
     }
+    return true
 }
 
 export const UserLoginSession = mongoose.model<UserLoginSessionSchema>(

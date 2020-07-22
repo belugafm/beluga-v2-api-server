@@ -27,8 +27,8 @@ export async function create_user(name?: string) {
             statuses_count: 0,
         },
         created_at: new Date(),
-        is_active: false,
-        is_dormant: false,
+        active: false,
+        dormant: false,
         last_activity_date: null,
         _terms_of_service_agreement_date: new Date(),
         _terms_of_service_agreement_version: config.terms_of_service.version,
@@ -49,7 +49,7 @@ export async function create_channel(
         created_at: new Date(),
         creator_id: creator_id,
         community_id: community_id ? community_id : null,
-        is_public: true,
+        public: true,
     })
 }
 

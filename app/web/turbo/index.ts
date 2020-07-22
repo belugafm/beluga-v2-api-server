@@ -93,13 +93,13 @@ export const ContentType = {
 }
 
 async function activate_user(user: UserSchema) {
-    if (user.is_dormant === true) {
+    if (user.dormant === true) {
         return
     }
-    if (user.is_active === true) {
+    if (user.active === true) {
         return
     }
-    user.is_active = true
+    user.active = true
     await user.save()
 }
 

@@ -26,8 +26,8 @@ export const _unsafe_reclassify_as_dormant = async (user: UserSchema) => {
             profile: user.profile,
             stats: user.stats,
             created_at: user.created_at,
-            is_active: user.is_active,
-            is_dormant: true,
+            active: user.active,
+            dormant: true,
             last_activity_date: user.last_activity_date,
         },
         user.$session()

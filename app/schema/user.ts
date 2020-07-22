@@ -20,8 +20,8 @@ export interface UserSchema extends Document {
         statuses_count: number
     }
     created_at: Date
-    is_active: boolean // 登録後サイトを利用したかどうか
-    is_dormant: boolean // サイトを長期間利用しなかったかどうか
+    active: boolean // 登録後サイトを利用したかどうか
+    dormant: boolean // サイトを長期間利用しなかったかどうか
     last_activity_date: Date | null
     _terms_of_service_agreement_date?: Date
     _terms_of_service_agreement_version?: string
@@ -58,11 +58,11 @@ function define_schema(): any {
             },
         },
         created_at: Date,
-        is_active: {
+        active: {
             type: Boolean,
             default: false,
         },
-        is_dormant: {
+        dormant: {
             type: Boolean,
             default: false,
         },
@@ -92,7 +92,7 @@ user_schema.methods.needsReclassifyAsDormant = function (
     this: UserSchema
 ): boolean {
     const current = new Date()
-    if (this.is_active && this.last_activity_date) {
+    if (this.active && this.last_activity_date) {
         const seconds =
             (current.getTime() - this.last_activity_date.getTime()) / 1000
         if (

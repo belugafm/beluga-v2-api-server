@@ -97,7 +97,7 @@ export default define_method(
             if (session == null) {
                 return [null, null]
             }
-            if (session.expired() === true) {
+            if (session.ok() !== true) {
                 return [null, null]
             }
             if (session.user_id.equals(args.user_id) !== true) {

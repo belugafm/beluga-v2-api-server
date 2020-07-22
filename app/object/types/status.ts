@@ -165,10 +165,9 @@ export const transform = async (
             : null,
         community: null,
         created_at: model.created_at.getTime(),
-        is_public: model.is_public,
-        is_deleted: model.is_deleted,
-        is_edited: model.is_edited,
-        is_favorited: await is_favorited(model, auth_user),
+        public: model.public,
+        edited: model.edited,
+        favorited: await is_favorited(model, auth_user),
         likes: {
             count: model.like_count,
             users: await likes_users(model, auth_user),

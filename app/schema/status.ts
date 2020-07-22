@@ -14,9 +14,8 @@ export interface StatusSchema extends Document {
     created_at: Date
     like_count: number
     favorite_count: number
-    is_public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
-    is_edited: boolean
-    is_deleted: boolean
+    public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
+    edited: boolean
     _schema_version?: number
 
     _cached?: boolean
@@ -42,10 +41,6 @@ const schema = new Schema({
         default: 0,
     },
     is_edited: {
-        type: Boolean,
-        default: false,
-    },
-    is_deleted: {
         type: Boolean,
         default: false,
     },

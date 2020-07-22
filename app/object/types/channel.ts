@@ -26,7 +26,7 @@ export const transform = async (
             await mongo.findOne(User, { _id: model.creator_id }),
             auth_user
         ),
-        is_public: model.is_public,
+        public: model.public,
         community_id: model.community_id
             ? model.community_id.toHexString()
             : null,

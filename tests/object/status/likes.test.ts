@@ -47,7 +47,9 @@ describe("StatusObject", () => {
             const _status = (await get_status({
                 status_id: status._id,
             })) as StatusSchema
-            const status_object = (await _status.transform()) as StatusObject
+            const status_object = (await _status.transform(
+                user
+            )) as StatusObject
             expect(status_object.likes.count).toEqual(2 * likes_count)
             expect(status_object.likes.users).toHaveLength(2)
         }

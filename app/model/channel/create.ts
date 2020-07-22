@@ -15,7 +15,7 @@ export const ErrorCodes = {
 
 type Argument = {
     name: ChannelSchema["name"]
-    is_public: ChannelSchema["is_public"]
+    is_public: ChannelSchema["public"]
     creator_id: ChannelSchema["creator_id"]
     community_id?: ChannelSchema["community_id"]
     description?: ChannelSchema["description"]
@@ -65,6 +65,6 @@ export const create = async ({
         created_at: new Date(),
         creator_id: creator_id,
         community_id: community_id ? community_id : null,
-        is_public: is_public,
+        public: is_public,
     })
 }

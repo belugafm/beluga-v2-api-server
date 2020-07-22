@@ -130,8 +130,8 @@ export const signup = async ({
                     statuses_count: 0,
                 },
                 created_at: new Date(),
-                is_active: false,
-                is_dormant: false,
+                active: false,
+                dormant: false,
                 last_activity_date: null,
                 _terms_of_service_agreement_date: new Date(),
                 _terms_of_service_agreement_version:

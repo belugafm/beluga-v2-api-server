@@ -23,8 +23,8 @@ export default (server: TurboServer) => {
             if (session == null) {
                 throw new WebApiRuntimeError(new InternalErrorSpec())
             }
-            if (user.is_active !== true) {
-                user.is_active = true
+            if (user.active !== true) {
+                user.active = true
                 await user.save()
             }
             await update_last_activity_date({

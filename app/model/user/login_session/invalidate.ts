@@ -20,6 +20,6 @@ export const invalidate = async ({ session_id }: Argument): Promise<void> => {
     if (session == null) {
         throw new ModelRuntimeError(ErrorCodes.SessionNotFound)
     }
-    session.is_expired = true
+    session.expired = true
     await session.save()
 }
