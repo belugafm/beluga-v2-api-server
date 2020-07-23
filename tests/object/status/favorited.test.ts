@@ -25,8 +25,8 @@ describe("StatusObject::favorited", () => {
         await env.disconnect()
     })
     test("cache", async () => {
-        const user_1 = await create_user("user_1")
-        const user_2 = await create_user("user_2")
+        const user_1 = await create_user()
+        const user_2 = await create_user()
 
         const status = await update_status({
             text: "Hell Word",

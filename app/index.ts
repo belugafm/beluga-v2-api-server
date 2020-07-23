@@ -11,6 +11,44 @@ import { Status } from "./schema/status"
 import config from "./config/app"
 import { document_cache } from "./document/cache"
 import { status_object_cache } from "./object/types/status"
+import { user_object_cache } from "./object/types/user"
+import { StatusFavorites } from "./schema/status_favorites"
+import { StatusLikes } from "./schema/status_likes"
+import { UserMutes } from "./schema/user_mutes"
+import { UserBlocks } from "./schema/user_blocks"
+
+async function create_collections() {
+    try {
+        await User.createCollection()
+    } catch (error) {}
+    try {
+        await UserLoginCredential.createCollection()
+    } catch (error) {}
+    try {
+        await UserRegistration.createCollection()
+    } catch (error) {}
+    try {
+        await FraudScore.createCollection()
+    } catch (error) {}
+    try {
+        await Channel.createCollection()
+    } catch (error) {}
+    try {
+        await Status.createCollection()
+    } catch (error) {}
+    try {
+        await StatusFavorites.createCollection()
+    } catch (error) {}
+    try {
+        await StatusLikes.createCollection()
+    } catch (error) {}
+    try {
+        await UserMutes.createCollection()
+    } catch (error) {}
+    try {
+        await UserBlocks.createCollection()
+    } catch (error) {}
+}
 
 async function start_server() {
     const server = new TurboServer({
@@ -31,28 +69,12 @@ async function start_server() {
     })
 
     // トランザクション中はcollectionの作成ができないので先に作っておく
-    try {
-        await User.createCollection()
-    } catch (error) {}
-    try {
-        await UserLoginCredential.createCollection()
-    } catch (error) {}
-    try {
-        await UserRegistration.createCollection()
-    } catch (error) {}
-    try {
-        await FraudScore.createCollection()
-    } catch (error) {}
-    try {
-        await Channel.createCollection()
-    } catch (error) {}
-    try {
-        await Status.createCollection()
-    } catch (error) {}
+    await create_collections()
 
     // change streamの登録
     document_cache.on()
     status_object_cache.on()
+    user_object_cache.on()
 
     // routerにendpointを登録
     server.register(require("./web/endpoint/account/signup"))
@@ -83,6 +105,10 @@ if (true) {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
                 useCreateIndex: true,
+
+                // change streamでwatchしている数よりも
+                // 大きい値に設定する必要がある
+                poolSize: 20,
             })
             mongoose.connection.on("error", (e) => {
                 console.error(e)

@@ -1,6 +1,7 @@
 import { UserSchema, User } from "../../schema/user"
 import { UserObject } from "../schema"
 import { ObjectTransformationError } from "../error"
+import { muted } from "./user/mutes"
 
 export const transform = async (
     model: UserSchema | null,
@@ -21,10 +22,16 @@ export const transform = async (
         stats: model.stats,
         active: model.active,
         dormant: model.dormant,
-        muted: false,
+        muted: await muted(model, auth_user),
         blocked: false,
         last_activity_time: model.last_activity_date
             ? model.last_activity_date.getTime()
             : null,
     }
+}
+
+export const user_object_cache = {
+    on: () => {
+        muted._cache.on()
+    },
 }
