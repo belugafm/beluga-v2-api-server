@@ -93,7 +93,7 @@ export default define_method(
             }
             const status = await get_status(
                 { status_id: args.status_id },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )
             if (status == null) {
                 throw new WebApiRuntimeError(errors.status_not_found)

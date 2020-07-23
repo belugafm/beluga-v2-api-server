@@ -33,7 +33,7 @@ export const get = async (
                 transaction_session: options.transaction_session,
 
                 // nameの場合in-memory cacheの自動消去が機能しないのでmongodbから直接結果を返す
-                disable_in_memory_cache: true,
+                disable_cache: true,
 
                 // case-insensitive
                 additional_query_func: (query) => {

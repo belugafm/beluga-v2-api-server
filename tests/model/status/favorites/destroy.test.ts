@@ -63,7 +63,7 @@ describe("status/favorites/destroy", () => {
                 {
                     status_id: status._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusSchema
             expect(_status).toBeInstanceOf(Status)
             expect(_status.favorite_count).toEqual(1)
@@ -73,7 +73,7 @@ describe("status/favorites/destroy", () => {
                     status_id: status._id,
                     user_id: user_1._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusFavoritesSchema
             expect(favorite).toBeInstanceOf(StatusFavorites)
         }
@@ -104,7 +104,7 @@ describe("status/favorites/destroy", () => {
                 {
                     status_id: status._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusSchema
             expect(_status).toBeInstanceOf(Status)
             expect(_status.favorite_count).toEqual(2)
@@ -114,7 +114,7 @@ describe("status/favorites/destroy", () => {
                     status_id: status._id,
                     user_id: user_2._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusFavoritesSchema
             expect(favorite).toBeInstanceOf(StatusFavorites)
         }
@@ -134,7 +134,7 @@ describe("status/favorites/destroy", () => {
                 {
                     status_id: status._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusSchema
             expect(_status).toBeInstanceOf(Status)
             expect(_status.favorite_count).toEqual(1)
@@ -144,7 +144,7 @@ describe("status/favorites/destroy", () => {
                     status_id: status._id,
                     user_id: user_2._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusFavoritesSchema
             expect(favorite).toBeNull()
         }
@@ -158,7 +158,7 @@ describe("status/favorites/destroy", () => {
                 {
                     status_id: status._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusSchema
             expect(_status).toBeInstanceOf(Status)
             expect(_status.favorite_count).toEqual(0)
@@ -168,7 +168,7 @@ describe("status/favorites/destroy", () => {
                     status_id: status._id,
                     user_id: user_1._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusFavoritesSchema
             expect(favorite).toBeNull()
         }

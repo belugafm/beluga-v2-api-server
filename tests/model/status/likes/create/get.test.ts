@@ -50,7 +50,7 @@ describe("status/likes/get", () => {
                 {
                     status_id: status_1._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusSchema
             expect(status).toBeInstanceOf(Status)
             expect(status.like_count).toEqual(n)
@@ -73,7 +73,7 @@ describe("status/likes/get", () => {
                 {
                     status_id: status_2._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusSchema
             expect(status).toBeInstanceOf(Status)
             expect(status.like_count).toEqual(n)
@@ -83,7 +83,7 @@ describe("status/likes/get", () => {
                     status_id: status_2._id,
                     user_id: user_2._id,
                 },
-                { disable_in_memory_cache: true }
+                { disable_cache: true }
             )) as StatusLikesSchema
             expect(likes).toBeInstanceOf(StatusLikes)
             expect(likes.count).toEqual(n)

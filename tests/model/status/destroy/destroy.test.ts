@@ -37,7 +37,7 @@ describe("status/destroy", () => {
         const _status = await get(
             { status_id: status._id },
             {
-                disable_in_memory_cache: true,
+                disable_cache: true,
             }
         )
         expect(_status).toBeNull()

@@ -14,10 +14,7 @@ export default (server: TurboServer) => {
             },
             auth_user
         )
-        const user = await get_user(
-            { user_id },
-            { disable_in_memory_cache: true }
-        )
+        const user = await get_user({ user_id }, { disable_cache: true })
         if (user == null) {
             throw new WebApiRuntimeError(new InternalErrorSpec())
         }

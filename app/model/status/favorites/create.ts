@@ -60,7 +60,7 @@ export const create = async ({
                 status_id,
                 user_id,
             },
-            { disable_in_memory_cache: true }
+            { disable_cache: true }
         )) as StatusFavoritesSchema
 
         if (already_favorited) {

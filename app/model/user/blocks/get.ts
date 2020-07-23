@@ -32,7 +32,7 @@ export const get = async (
             { user_id: auth_user_id, target_user_id: target_user_id },
             {
                 transaction_session: options.transaction_session,
-                disable_in_memory_cache: options.disable_in_memory_cache,
+                disable_cache: options.disable_cache,
             }
         )
     } else {

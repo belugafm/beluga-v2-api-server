@@ -52,7 +52,7 @@ export const destroy = async ({
             auth_user_id,
             target_user_id,
         },
-        { disable_in_memory_cache: true }
+        { disable_cache: true }
     )) as UserMutesSchema
 
     if (mute == null) {

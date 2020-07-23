@@ -9,7 +9,7 @@ import { document_cache } from "../document/cache"
 
 type FindOneOptions<T extends Document> = {
     additional_query_func?: (query: DocumentQuery<T | null, T>) => void
-    disable_in_memory_cache?: boolean
+    disable_cache?: boolean
     transaction_session?: ClientSession | null
 }
 
@@ -20,13 +20,13 @@ export async function findOne<T extends Document>(
 ): Promise<T | null> {
     options = options || {
         additional_query_func: (x) => x,
-        disable_in_memory_cache: false,
+        disable_cache: false,
         transaction_session: null,
     }
     const { additional_query_func, transaction_session } = options
     const { _id } = condition
     const cache_enabled =
-        options.disable_in_memory_cache !== true &&
+        options.disable_cache !== true &&
         _id instanceof mongoose.Types.ObjectId &&
         Object.keys(condition).length == 1 &&
         transaction_session == null

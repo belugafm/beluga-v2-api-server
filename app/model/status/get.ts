@@ -24,7 +24,7 @@ export const get = async (
         { _id: status_id },
         {
             transaction_session: options.transaction_session,
-            disable_in_memory_cache: options.disable_in_memory_cache,
+            disable_cache: options.disable_cache,
         }
     )
 }
