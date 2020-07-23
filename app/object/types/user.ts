@@ -2,6 +2,7 @@ import { UserSchema, User } from "../../schema/user"
 import { UserObject } from "../schema"
 import { ObjectTransformationError } from "../error"
 import { muted } from "./user/mutes"
+import { blocked } from "./user/blocked"
 
 export type TransformOption = {
     disable_cache: boolean
@@ -33,7 +34,7 @@ export const transform = async (
         active: model.active,
         dormant: model.dormant,
         muted: await muted(model, auth_user, options.disable_cache),
-        blocked: false,
+        blocked: await blocked(model, auth_user, options.disable_cache),
         last_activity_time: model.last_activity_date
             ? model.last_activity_date.getTime()
             : null,

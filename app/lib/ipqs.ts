@@ -30,7 +30,7 @@ export type IpqsResult = {
 }
 
 export const get_score = async (ip_address: string): Promise<IpqsResult> => {
-    if (ip_address === "127.0.0.1") {
+    if (ip_address === "127.0.0.1" || ip_address === "0.0.0.0") {
         return {
             success: true,
             message: "",

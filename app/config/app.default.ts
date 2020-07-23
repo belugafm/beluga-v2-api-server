@@ -12,6 +12,10 @@ const config: {
     terms_of_service: {
         version: string
     }
+    admin: {
+        name: string
+        password: string
+    }
     user_registration: {
         limit: number
         reclassify_inactive_as_dormant_after: number
@@ -84,6 +88,12 @@ const config: {
     },
     terms_of_service: {
         version: "dc96fc180a405bf5c2d1631ab69444e71bbbd0ac",
+    },
+    admin: {
+        name: "admin",
+
+        // 以下は必ず変更する
+        password: "password",
     },
     user_registration: {
         // 同じIPアドレスでの登録はこの秒数の間隔より短く行えないようになる

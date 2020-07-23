@@ -16,6 +16,7 @@ import { StatusFavorites } from "./schema/status_favorites"
 import { StatusLikes } from "./schema/status_likes"
 import { UserMutes } from "./schema/user_mutes"
 import { UserBlocks } from "./schema/user_blocks"
+import signup from "./web/api/methods/account/signup"
 
 async function create_collections() {
     try {
@@ -89,6 +90,8 @@ async function start_server() {
     server.register(require("./web/endpoint/favorites/destroy"))
     server.register(require("./web/endpoint/mutes/create"))
     server.register(require("./web/endpoint/mutes/destroy"))
+    server.register(require("./web/endpoint/blocks/create"))
+    server.register(require("./web/endpoint/blocks/destroy"))
     server.register(require("./web/endpoint/timeline/channel"))
     server.register(require("./web/endpoint/auth/cookie/authenticate"))
 
@@ -116,6 +119,12 @@ if (true) {
             mongoose.connection.once("open", async () => {
                 await start_server()
                 console.log(uri)
+                await signup({
+                    name: config.admin.name,
+                    password: config.admin.password,
+                    confirmed_password: config.admin.password,
+                    ip_address: "0.0.0.0",
+                })
             })
         })
     })
