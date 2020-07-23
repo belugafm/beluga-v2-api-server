@@ -81,7 +81,6 @@ export class InMemoryCache {
         }
         if (key == null) {
             delete this.data[namespace]
-            this.data[namespace] = {}
             return
         }
         if (key in this.data[namespace] !== true) {

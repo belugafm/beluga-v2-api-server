@@ -11,12 +11,32 @@ import config from "../../../config/app"
 class DocumentCache extends InMemoryCache {
     on() {
         this.change_streams.push(
-            StatusFavorites.watch([], { fullDocument: "updateLookup" }).on(
-                "change",
-                (event) => {
-                    console.log(event)
+            StatusFavorites.watch().on("change", (event) => {
+                if (event.operationType == "delete") {
+                    const { _id } = event.documentKey
+                    if (_id) {
+                        this.delete(_id as string)
+                    }
                 }
-            )
+                if (
+                    event.operationType == "insert" ||
+                    event.operationType == "update"
+                ) {
+                    const { fullDocument } = event
+                    if (fullDocument) {
+                        const { _id, user_id, status_id } = fullDocument
+                        {
+                            const namespace = user_id.toHexString()
+                            const lookup_key = status_id.toHexString()
+                            map.delete(namespace, lookup_key)
+                        }
+                        {
+                            const namespace = _id.toHexString()
+                            this.delete(namespace)
+                        }
+                    }
+                }
+            })
         )
     }
     async off() {
@@ -34,7 +54,7 @@ const map = new InMemoryCache(
     config.in_memory_cache.default_expire_seconds
 )
 
-function _get_cached_value(
+export function get_cached_value(
     status: StatusSchema,
     auth_user: UserSchema
 ): boolean | null {
@@ -65,7 +85,7 @@ async function _favorited(
     if (auth_user == null) {
         return false
     }
-    const favorited = _get_cached_value(status, auth_user)
+    const favorited = get_cached_value(status, auth_user)
     if (favorited !== null) {
         return favorited
     }
@@ -87,6 +107,7 @@ async function _favorited(
     return document_id !== null
 }
 
-_favorited.cache = cache
+_favorited._map = map
+_favorited._cache = cache
 
 export const favorited = _favorited

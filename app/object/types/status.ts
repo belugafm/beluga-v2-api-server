@@ -5,10 +5,7 @@ import { UserSchema } from "../../schema/user"
 import { transform as transform_user } from "./user"
 import { transform as transform_channel } from "./channel"
 import { StatusLikesSchema } from "../../schema/status_likes"
-import {
-    StatusFavoritesSchema,
-    StatusFavorites,
-} from "../../schema/status_favorites"
+import { StatusFavoritesSchema } from "../../schema/status_favorites"
 import { get as get_favorites } from "../../model/status/favorites/get"
 import { get as get_likes } from "../../model/status/likes/get"
 import { get as get_user } from "../../model/user/get"
@@ -31,14 +28,6 @@ class ObjectCache extends InMemoryCache {
                     }
                 }
             })
-        )
-        this.change_streams.push(
-            StatusFavorites.watch([], { fullDocument: "updateLookup" }).on(
-                "change",
-                (event) => {
-                    console.log(event)
-                }
-            )
         )
     }
     async off() {
@@ -164,6 +153,6 @@ export const transform = async (
 export const status_object_cache = {
     on: () => {
         object_cache.on()
-        favorited.cache.on()
+        favorited._cache.on()
     },
 }
