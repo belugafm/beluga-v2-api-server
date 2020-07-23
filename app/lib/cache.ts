@@ -89,5 +89,7 @@ export class InMemoryCache {
         delete this.data[namespace][key]
     }
     on() {}
-    async off() {}
+    async off() {
+        await Promise.all(this.change_streams.map((stream) => stream.close()))
+    }
 }

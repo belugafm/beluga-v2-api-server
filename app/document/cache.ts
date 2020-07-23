@@ -62,9 +62,6 @@ class DocumentCache extends InMemoryCache {
             })
         )
     }
-    async off() {
-        await Promise.all(this.change_streams.map((stream) => stream.close()))
-    }
 }
 
 export const document_cache = new DocumentCache(

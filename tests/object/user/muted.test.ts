@@ -6,16 +6,14 @@ import mongoose from "mongoose"
 
 jest.setTimeout(30000)
 
-describe("StatusObject::muted", () => {
+describe("UserObject", () => {
     beforeAll(async () => {
         await env.connect()
-        muted._cache.on()
     })
     afterAll(async () => {
-        await muted._cache.off()
         await env.disconnect()
     })
-    test("cache", async () => {
+    test("muted", async () => {
         const auth_user = await create_user()
         const target_user = await create_user()
         {

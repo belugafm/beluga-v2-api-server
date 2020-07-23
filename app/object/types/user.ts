@@ -3,10 +3,20 @@ import { UserObject } from "../schema"
 import { ObjectTransformationError } from "../error"
 import { muted } from "./user/mutes"
 
+export type TransformOption = {
+    disable_cache: boolean
+}
+
 export const transform = async (
     model: UserSchema | null,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    options?: TransformOption
 ): Promise<UserObject | null> => {
+    if (options == null) {
+        options = {
+            disable_cache: false,
+        }
+    }
     if (model === null) {
         return null
     }
@@ -22,7 +32,7 @@ export const transform = async (
         stats: model.stats,
         active: model.active,
         dormant: model.dormant,
-        muted: await muted(model, auth_user),
+        muted: await muted(model, auth_user, options.disable_cache),
         blocked: false,
         last_activity_time: model.last_activity_date
             ? model.last_activity_date.getTime()
@@ -33,5 +43,8 @@ export const transform = async (
 export const user_object_cache = {
     on: () => {
         muted._cache.on()
+    },
+    off: async () => {
+        await muted._cache.off()
     },
 }

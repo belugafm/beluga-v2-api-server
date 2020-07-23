@@ -30,9 +30,6 @@ class ObjectCache extends InMemoryCache {
             })
         )
     }
-    async off() {
-        await Promise.all(this.change_streams.map((stream) => stream.close()))
-    }
 }
 
 const object_cache = new ObjectCache(
@@ -154,5 +151,9 @@ export const status_object_cache = {
     on: () => {
         object_cache.on()
         favorited._cache.on()
+    },
+    off: async () => {
+        await object_cache.off()
+        await favorited._cache.off()
     },
 }

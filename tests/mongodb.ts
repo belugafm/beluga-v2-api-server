@@ -7,7 +7,13 @@ import { FraudScore } from "../app/schema/fraud_score"
 import { Channel } from "../app/schema/channel"
 import { Status } from "../app/schema/status"
 import { document_cache } from "../app/document/cache"
+import { status_object_cache } from "../app/object/types/status"
+import { user_object_cache } from "../app/object/types/user"
 import config from "../app/config/app"
+import { StatusLikes } from "../app/schema/status_likes"
+import { UserMutes } from "../app/schema/user_mutes"
+import { UserBlocks } from "../app/schema/user_blocks"
+import { StatusFavorites } from "../app/schema/status_favorites"
 
 export async function create_user(name?: string) {
     if (name == null) {
@@ -75,6 +81,7 @@ class MongoTestEnvironment {
                         useNewUrlParser: true,
                         useUnifiedTopology: true,
                         useCreateIndex: true,
+                        poolSize: 100,
                     })
                     mongoose.connection.once("open", async () => {
                         // トランザクション中はcollectionの作成ができないので
@@ -97,12 +104,26 @@ class MongoTestEnvironment {
                         try {
                             await Status.createCollection()
                         } catch (error) {}
+                        try {
+                            await StatusFavorites.createCollection()
+                        } catch (error) {}
+                        try {
+                            await StatusLikes.createCollection()
+                        } catch (error) {}
+                        try {
+                            await UserMutes.createCollection()
+                        } catch (error) {}
+                        try {
+                            await UserBlocks.createCollection()
+                        } catch (error) {}
 
                         // 数秒待機する
                         sleep(3)
 
                         // change streamの登録
                         document_cache.on()
+                        status_object_cache.on()
+                        user_object_cache.on()
 
                         resolve()
                     })
@@ -112,6 +133,8 @@ class MongoTestEnvironment {
     }
     async disconnect() {
         await document_cache.off()
+        await status_object_cache.off()
+        await user_object_cache.off()
         await mongoose.disconnect()
         if (this.replSet) {
             await this.replSet.stop()

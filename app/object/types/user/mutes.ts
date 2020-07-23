@@ -35,9 +35,6 @@ class DocumentCache extends InMemoryCache {
             })
         )
     }
-    async off() {
-        await Promise.all(this.change_streams.map((stream) => stream.close()))
-    }
 }
 
 const cache = new DocumentCache(
@@ -76,14 +73,17 @@ export function get_cached_value(
 
 async function _muted(
     target_user: UserSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    disable_cache: boolean = false
 ): Promise<boolean> {
     if (auth_user == null) {
         return false
     }
-    const muted = get_cached_value(target_user, auth_user)
-    if (muted !== null) {
-        return muted
+    if (disable_cache !== true) {
+        const muted = get_cached_value(target_user, auth_user)
+        if (muted !== null) {
+            return muted
+        }
     }
     const document = (await get_mutes({
         target_user_id: target_user._id,

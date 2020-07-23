@@ -10,7 +10,7 @@ import mongoose from "mongoose"
 
 jest.setTimeout(30000)
 
-describe("StatusObject::favorited", () => {
+describe("StatusObject", () => {
     // @ts-ignore
     let channel: ChannelSchema = null
 
@@ -18,13 +18,11 @@ describe("StatusObject::favorited", () => {
         await env.connect()
         const user = await create_user()
         channel = await create_channel("channel", user._id)
-        favorited._cache.on()
     })
     afterAll(async () => {
-        await favorited._cache.off()
         await env.disconnect()
     })
-    test("cache", async () => {
+    test("favorited", async () => {
         const user_1 = await create_user()
         const user_2 = await create_user()
 

@@ -23,7 +23,7 @@ describe("StatusObject", () => {
     afterAll(async () => {
         await env.disconnect()
     })
-    test("ok", async () => {
+    test("likes", async () => {
         const user_1 = await create_user("user_1")
         const user_2 = await create_user("user_2")
 

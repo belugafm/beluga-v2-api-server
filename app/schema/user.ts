@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose"
 import config from "../config/app"
-import { transform } from "../object/types/user"
+import { transform, TransformOption } from "../object/types/user"
 import { UserObject } from "../object/schema"
 
 const schema_version = 1
@@ -29,7 +29,10 @@ export interface UserSchema extends Document {
 
     // methods
     needsReclassifyAsDormant: () => boolean
-    transform: (auth_user: UserSchema | null) => Promise<UserObject | null>
+    transform: (
+        auth_user: UserSchema | null,
+        options?: TransformOption
+    ) => Promise<UserObject | null>
 }
 
 const NullString = {
@@ -118,9 +121,10 @@ user_schema.methods.needsReclassifyAsDormant = function (
 
 user_schema.methods.transform = async function (
     this: UserSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    options?: TransformOption
 ): Promise<UserObject | null> {
-    return await transform(this, auth_user)
+    return await transform(this, auth_user, options)
 }
 
 export const User = mongoose.model<UserSchema>("user", user_schema)
