@@ -5,12 +5,16 @@ import { UserSchema } from "../../schema/user"
 import { transform as transform_user } from "./user"
 import { transform as transform_channel } from "./channel"
 import { StatusLikesSchema } from "../../schema/status_likes"
-import { StatusFavoritesSchema } from "../../schema/status_favorites"
+import {
+    StatusFavoritesSchema,
+    StatusFavorites,
+} from "../../schema/status_favorites"
 import { get as get_favorites } from "../../model/status/favorites/get"
 import { get as get_likes } from "../../model/status/likes/get"
 import { get as get_user } from "../../model/user/get"
 import { get as get_channel } from "../../model/channel/get"
 import { InMemoryCache } from "../../lib/cache"
+import { favorited } from "./status/favorited"
 import config from "../../config/app"
 
 class ObjectCache extends InMemoryCache {
@@ -28,13 +32,21 @@ class ObjectCache extends InMemoryCache {
                 }
             })
         )
+        this.change_streams.push(
+            StatusFavorites.watch([], { fullDocument: "updateLookup" }).on(
+                "change",
+                (event) => {
+                    console.log(event)
+                }
+            )
+        )
     }
     async off() {
         await Promise.all(this.change_streams.map((stream) => stream.close()))
     }
 }
 
-export const status_object_cache = new ObjectCache(
+const object_cache = new ObjectCache(
     config.in_memory_cache.cache_limit,
     config.in_memory_cache.default_expire_seconds
 )
@@ -43,42 +55,12 @@ function remove_null(array: (UserObject | null)[]): UserObject[] {
     return array.filter((user) => user != null) as UserObject[]
 }
 
-async function is_favorited(
-    status: StatusSchema,
-    auth_user: UserSchema | null
-) {
-    if (auth_user == null) {
-        return false
-    }
-    const key = `is_favorited_${auth_user._id.toHexString()}`
-    const [_favorite, is_cached] = status_object_cache.get(
-        status._id.toHexString(),
-        key
-    )
-    if (is_cached) {
-        if (_favorite === null) {
-            return false
-        } else {
-            return true
-        }
-    }
-    const favorite = await get_favorites({
-        status_id: status._id,
-        user_id: auth_user._id,
-    })
-    status_object_cache.set(status._id.toHexString(), key, favorite)
-    if (favorite == null) {
-        return false
-    }
-    return true
-}
-
 async function likes_users(status: StatusSchema, auth_user: UserSchema | null) {
     const all_likes = await (async (
         status: StatusSchema
     ): Promise<StatusLikesSchema[]> => {
         const key = "likes"
-        const [_likes, is_cached] = status_object_cache.get(
+        const [_likes, is_cached] = object_cache.get(
             status._id.toHexString(),
             key
         )
@@ -88,7 +70,7 @@ async function likes_users(status: StatusSchema, auth_user: UserSchema | null) {
         const likes = (await get_likes({
             status_id: status._id,
         })) as StatusLikesSchema[]
-        status_object_cache.set(status._id.toHexString(), key, likes)
+        object_cache.set(status._id.toHexString(), key, likes)
         return likes
     })(status)
 
@@ -112,7 +94,7 @@ async function favorites_users(
         status: StatusSchema
     ): Promise<StatusFavoritesSchema[]> => {
         const key = "favorites"
-        const [_favorites, is_cached] = status_object_cache.get(
+        const [_favorites, is_cached] = object_cache.get(
             status._id.toHexString(),
             key
         )
@@ -122,7 +104,7 @@ async function favorites_users(
         const favorites = (await get_favorites({
             status_id: status._id,
         })) as StatusFavoritesSchema[]
-        status_object_cache.set(status._id.toHexString(), key, favorites)
+        object_cache.set(status._id.toHexString(), key, favorites)
         return favorites
     })(status)
     return remove_null(
@@ -167,7 +149,7 @@ export const transform = async (
         created_at: model.created_at.getTime(),
         public: model.public,
         edited: model.edited,
-        favorited: await is_favorited(model, auth_user),
+        favorited: await favorited(model, auth_user),
         likes: {
             count: model.like_count,
             users: await likes_users(model, auth_user),
@@ -177,4 +159,11 @@ export const transform = async (
             users: await favorites_users(model, auth_user),
         },
     }
+}
+
+export const status_object_cache = {
+    on: () => {
+        object_cache.on()
+        favorited.cache.on()
+    },
 }
