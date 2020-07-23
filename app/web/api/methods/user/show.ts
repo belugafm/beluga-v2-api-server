@@ -9,7 +9,6 @@ import {
 } from "../../define"
 import * as vs from "../../../../validation"
 import { InternalErrorSpec, UnexpectedErrorSpec, raise } from "../../error"
-import { signin } from "../../../../model/user/signin"
 import { ModelRuntimeError } from "../../../../model/error"
 
 export const argument_specs = define_arguments(["name", "user_id"] as const, {
@@ -85,12 +84,6 @@ export default define_method(
     expected_error_specs,
     async (args, errors) => {
         try {
-            return await signin({
-                name: args.name,
-                password: args.password,
-                ip_address: args.ip_address,
-                session_lifetime: args.session_lifetime,
-            })
         } catch (error) {
             if (error instanceof ModelRuntimeError) {
                 raise(errors.internal_error, error)
