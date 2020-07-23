@@ -4,14 +4,17 @@ import { StatusLikes, StatusLikesSchema } from "../../../schema/status_likes"
 import { get as get_likes } from "./get"
 import { get as get_status } from "../get"
 import { get as get_user } from "../../user/get"
+import { get as get_blocks } from "../../user/blocks/get"
 import config from "../../../config/app"
 import mongoose from "mongoose"
+import { UserBlocksSchema } from "../../../schema/user_blocks"
 
 export const ErrorCodes = {
     InvalidArgStatusId: "invalid_arg_status_id",
     InvalidArgUserId: "invalid_arg_user_id",
     StatusNotFound: "status_not_found",
     UserNotFound: "user_not_found",
+    CannotCreateLike: "cannot_create_like",
     LimitReached: "limit_reached",
 }
 
@@ -50,6 +53,21 @@ export const create = async ({
         })
         if (user == null) {
             throw new ModelRuntimeError(ErrorCodes.UserNotFound)
+        }
+
+        if (status.user_id.equals(user._id)) {
+            throw new ModelRuntimeError(ErrorCodes.CannotCreateLike)
+        }
+
+        const blocked = (await get_blocks(
+            {
+                auth_user_id: status.user_id,
+                target_user_id: user_id,
+            },
+            { disable_cache: true }
+        )) as UserBlocksSchema
+        if (blocked) {
+            throw new ModelRuntimeError(ErrorCodes.CannotCreateLike)
         }
 
         const likes = (await get_likes(

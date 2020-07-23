@@ -37,6 +37,7 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_status_id",
         "status_not_found",
         "limit_reached",
+        "cannot_create_like",
         "invalid_auth",
         "internal_error",
         "unexpected_error",
@@ -51,6 +52,14 @@ export const expected_error_specs = define_expected_errors(
         status_not_found: {
             description: ["投稿が見つかりません"],
             code: "status_not_found",
+        },
+        cannot_create_like: {
+            description: ["この投稿にいいねすることはできません"],
+            hint: [
+                "自分の投稿にいいねすることはできません",
+                "相手からブロックされている場合もいいねできません",
+            ],
+            code: "cannot_create_like",
         },
         limit_reached: {
             description: ["これ以上いいねすることはできません"],
@@ -105,6 +114,8 @@ export default define_method(
                     raise(errors.status_not_found, error)
                 } else if (error.code === ModelErrorCodes.InvalidArgStatusId) {
                     raise(errors.invalid_arg_status_id, error)
+                } else if (error.code === ModelErrorCodes.CannotCreateLike) {
+                    raise(errors.cannot_create_like, error)
                 } else if (error.code === ModelErrorCodes.LimitReached) {
                     raise(errors.limit_reached, error)
                 } else {

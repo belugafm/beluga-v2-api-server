@@ -37,6 +37,7 @@ export const expected_error_specs = define_expected_errors(
         "invalid_arg_status_id",
         "status_not_found",
         "already_favorited",
+        "cannot_create_favorite",
         "invalid_auth",
         "internal_error",
         "unexpected_error",
@@ -51,6 +52,11 @@ export const expected_error_specs = define_expected_errors(
         status_not_found: {
             description: ["投稿が見つかりません"],
             code: "status_not_found",
+        },
+        cannot_create_favorite: {
+            description: ["この投稿をふぁぼることはできません"],
+            hint: ["ブロックされています"],
+            code: "cannot_create_favorite",
         },
         already_favorited: {
             description: ["すでにふぁぼっています"],
@@ -104,6 +110,10 @@ export default define_method(
                     raise(errors.invalid_arg_status_id, error)
                 } else if (error.code === ModelErrorCodes.AlreadyFavorited) {
                     raise(errors.already_favorited, error)
+                } else if (
+                    error.code === ModelErrorCodes.CannotCreateFavorite
+                ) {
+                    raise(errors.cannot_create_favorite, error)
                 } else {
                     raise(errors.internal_error, error)
                 }

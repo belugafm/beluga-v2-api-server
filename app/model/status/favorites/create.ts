@@ -7,14 +7,16 @@ import {
 import { get as get_favorites } from "./get"
 import { get as get_status } from "../get"
 import { get as get_user } from "../../user/get"
-import config from "../../../config/app"
+import { get as get_blocks } from "../../user/blocks/get"
 import mongoose from "mongoose"
+import { UserBlocksSchema } from "../../../schema/user_blocks"
 
 export const ErrorCodes = {
     InvalidArgStatusId: "invalid_arg_status_id",
     InvalidArgUserId: "invalid_arg_user_id",
     StatusNotFound: "status_not_found",
     UserNotFound: "user_not_found",
+    CannotCreateFavorite: "cannot_create_favorite",
     AlreadyFavorited: "already_favorited",
 }
 
@@ -53,6 +55,17 @@ export const create = async ({
         })
         if (user == null) {
             throw new ModelRuntimeError(ErrorCodes.UserNotFound)
+        }
+
+        const blocked = (await get_blocks(
+            {
+                auth_user_id: status.user_id,
+                target_user_id: user_id,
+            },
+            { disable_cache: true }
+        )) as UserBlocksSchema
+        if (blocked) {
+            throw new ModelRuntimeError(ErrorCodes.CannotCreateFavorite)
         }
 
         const already_favorited = (await get_favorites(
