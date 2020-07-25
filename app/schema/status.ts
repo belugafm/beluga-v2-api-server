@@ -22,33 +22,38 @@ export interface StatusSchema extends Document {
     transform: (auth_user: UserSchema | null) => Promise<StatusObject | null>
 }
 
-const schema = new Schema({
-    text: String,
-    created_at: Date,
-    user_id: mongoose.Types.ObjectId,
-    channel_id: mongoose.Types.ObjectId,
-    community_id: mongoose.Types.ObjectId,
-    is_public: {
-        type: Boolean,
-        default: true,
+const schema = new Schema(
+    {
+        text: String,
+        created_at: Date,
+        user_id: mongoose.Types.ObjectId,
+        channel_id: mongoose.Types.ObjectId,
+        community_id: mongoose.Types.ObjectId,
+        is_public: {
+            type: Boolean,
+            default: true,
+        },
+        like_count: {
+            type: Number,
+            default: 0,
+        },
+        favorite_count: {
+            type: Number,
+            default: 0,
+        },
+        is_edited: {
+            type: Boolean,
+            default: false,
+        },
+        _schema_version: {
+            type: Number,
+            default: schema_version,
+        },
     },
-    like_count: {
-        type: Number,
-        default: 0,
-    },
-    favorite_count: {
-        type: Number,
-        default: 0,
-    },
-    is_edited: {
-        type: Boolean,
-        default: false,
-    },
-    _schema_version: {
-        type: Number,
-        default: schema_version,
-    },
-})
+    {
+        collection: "status",
+    }
+)
 
 schema.index({ created_at: -1 })
 schema.index({ channel_id: -1, created_at: -1 })

@@ -22,36 +22,41 @@ export interface ChannelSchema extends Document {
     transform: (auth_user: UserSchema | null) => Promise<ChannelObject | null>
 }
 
-const schema = new Schema({
-    name: String,
-    description: {
-        type: String,
-        default: null,
-    },
-    creator_id: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-    },
-    stats: {
-        statuses_count: {
+const schema = new Schema(
+    {
+        name: String,
+        description: {
+            type: String,
+            default: null,
+        },
+        creator_id: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+        },
+        stats: {
+            statuses_count: {
+                type: Number,
+                default: 0,
+            },
+        },
+        created_at: Date,
+        public: {
+            type: Boolean,
+            default: false,
+        },
+        community_id: {
+            type: mongoose.Types.ObjectId,
+            default: null,
+        },
+        _schema_version: {
             type: Number,
-            default: 0,
+            default: schema_version,
         },
     },
-    created_at: Date,
-    public: {
-        type: Boolean,
-        default: false,
-    },
-    community_id: {
-        type: mongoose.Types.ObjectId,
-        default: null,
-    },
-    _schema_version: {
-        type: Number,
-        default: schema_version,
-    },
-})
+    {
+        collection: "channel",
+    }
+)
 
 schema.methods.transform = async function (
     this: ChannelSchema,

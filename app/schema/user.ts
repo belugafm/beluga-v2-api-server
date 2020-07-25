@@ -88,7 +88,9 @@ function define_schema(): any {
     }
 }
 
-const user_schema = new Schema(define_schema())
+const user_schema = new Schema(define_schema(), {
+    collection: "user",
+})
 
 // 休眠アカウントとみなすかどうか
 user_schema.methods.needsReclassifyAsDormant = function (
@@ -136,5 +138,7 @@ dormant_user_schema_definition._id = mongoose.Types.ObjectId
 
 export const DormantUser = mongoose.model<UserSchema>(
     "dormant_user",
-    new Schema(dormant_user_schema_definition)
+    new Schema(dormant_user_schema_definition, {
+        collection: "dormant_user",
+    })
 )
