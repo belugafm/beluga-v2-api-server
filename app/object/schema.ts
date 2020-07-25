@@ -63,7 +63,10 @@ export type StatusObject = {
     favorited: boolean
     likes: {
         count: number
-        users: UserObject[]
+        counts: {
+            count: number
+            user: UserObject
+        }[]
     }
     favorites: {
         count: number

@@ -39,12 +39,12 @@ describe("status/likes/get", () => {
             channel_id: channel._id,
         })
         const likes_count = 5
-        expect.assertions(8 * likes_count + 2)
+        expect.assertions(8 * likes_count + 1)
 
         for (let n = 1; n <= likes_count; n++) {
             await create({
                 status_id: status_1._id,
-                user_id: user_1._id,
+                user_id: user_2._id,
             })
             const status = (await get_status(
                 {
@@ -57,7 +57,7 @@ describe("status/likes/get", () => {
 
             const likes = (await get({
                 status_id: status_1._id,
-                user_id: user_1._id,
+                user_id: user_2._id,
             })) as StatusLikesSchema
             expect(likes).toBeInstanceOf(StatusLikes)
             expect(likes.count).toEqual(n)
@@ -66,7 +66,7 @@ describe("status/likes/get", () => {
         for (let n = 1; n <= likes_count; n++) {
             await create({
                 status_id: status_2._id,
-                user_id: user_2._id,
+                user_id: user_1._id,
             })
 
             const status = (await get_status(
@@ -81,7 +81,7 @@ describe("status/likes/get", () => {
             const likes = (await get(
                 {
                     status_id: status_2._id,
-                    user_id: user_2._id,
+                    user_id: user_1._id,
                 },
                 { disable_cache: true }
             )) as StatusLikesSchema
@@ -93,16 +93,6 @@ describe("status/likes/get", () => {
                 status_id: status_2._id,
             })) as StatusLikesSchema
             expect(all_likes).toHaveLength(1)
-        }
-        await create({
-            status_id: status_2._id,
-            user_id: user_1._id,
-        })
-        {
-            const all_likes = (await get({
-                status_id: status_2._id,
-            })) as StatusLikesSchema
-            expect(all_likes).toHaveLength(2)
         }
     })
 })

@@ -36,10 +36,6 @@ describe("StatusObject", () => {
         for (let n = 1; n <= likes_count; n++) {
             await create({
                 status_id: status._id,
-                user_id: user_1._id,
-            })
-            await create({
-                status_id: status._id,
                 user_id: user_2._id,
             })
         }
@@ -50,8 +46,8 @@ describe("StatusObject", () => {
             const status_object = (await _status.transform(
                 user
             )) as StatusObject
-            expect(status_object.likes.count).toEqual(2 * likes_count)
-            expect(status_object.likes.users).toHaveLength(2)
+            expect(status_object.likes.count).toEqual(likes_count)
+            expect(status_object.likes.counts).toHaveLength(1)
         }
     })
 })

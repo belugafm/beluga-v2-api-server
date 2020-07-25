@@ -28,16 +28,17 @@ describe("status/likes/create", () => {
     })
     test("ok", async () => {
         expect.assertions(2)
-        const user = await create_user()
+        const user_1 = await create_user()
+        const user_2 = await create_user()
         const status = await update_status({
             text: "Hell Word",
-            user_id: user._id,
+            user_id: user_1._id,
             channel_id: channel._id,
         })
         expect(status).toBeInstanceOf(Status)
         const likes = await create({
             status_id: status._id,
-            user_id: user._id,
+            user_id: user_2._id,
         })
         expect(likes).toBeInstanceOf(StatusLikes)
     })

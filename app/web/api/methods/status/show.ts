@@ -18,7 +18,7 @@ import {
 } from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
 import {
-    get as get_status,
+    get,
     ErrorCodes as ModelErrorCodes,
 } from "../../../../model/status/get"
 
@@ -34,6 +34,7 @@ export const argument_specs = define_arguments(["status_id"] as const, {
 export const expected_error_specs = define_expected_errors(
     [
         "invalid_arg_status_id",
+        "status_not_found",
         "invalid_auth",
         "internal_error",
         "unexpected_error",
@@ -44,6 +45,10 @@ export const expected_error_specs = define_expected_errors(
             description: ["投稿IDが不正です"],
             code: "invalid_arg_status_id",
             argument: "status_id",
+        },
+        status_not_found: {
+            description: ["投稿が見つかりません"],
+            code: "status_not_found",
         },
         invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
@@ -79,9 +84,13 @@ export default define_method(
             if (auth_user == null) {
                 throw new WebApiRuntimeError(errors.invalid_auth)
             }
-            return await get_status({
+            const status = await get({
                 status_id: args.status_id,
             })
+            if (status == null) {
+                throw new WebApiRuntimeError(errors.status_not_found)
+            }
+            return status
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
                 throw error
