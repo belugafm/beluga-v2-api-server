@@ -30,13 +30,13 @@ describe("channel/destroy", () => {
             const channel = await create({
                 name: "チャンネル",
                 creator_id: creator_id,
-                is_public: true,
+                public: true,
             })
             try {
                 await create({
                     name: "チャンネル",
                     creator_id: creator_id,
-                    is_public: true,
+                    public: true,
                 })
             } catch (error) {
                 expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -50,7 +50,7 @@ describe("channel/destroy", () => {
             const new_channel = await create({
                 name: "チャンネル",
                 creator_id: creator_id,
-                is_public: true,
+                public: true,
             })
             await destroy({
                 channel_id: new_channel._id,

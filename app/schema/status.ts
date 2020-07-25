@@ -5,6 +5,21 @@ import { UserSchema } from "./user"
 
 const schema_version = 1
 
+export type ChannelEntity = {
+    channel_id: mongoose.Types.ObjectId
+    indices: [number, number]
+}
+
+export type StatusEntity = {
+    status_id: mongoose.Types.ObjectId
+    indices: [number, number]
+}
+
+export type Entities = {
+    channels: ChannelEntity[]
+    statuses: StatusEntity[]
+}
+
 export interface StatusSchema extends Document {
     _id: mongoose.Types.ObjectId
     user_id: mongoose.Types.ObjectId
@@ -16,6 +31,7 @@ export interface StatusSchema extends Document {
     favorite_count: number
     public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
     edited: boolean
+    entities: Entities
     _schema_version?: number
 
     _cached?: boolean
@@ -29,7 +45,11 @@ const schema = new Schema(
         user_id: mongoose.Types.ObjectId,
         channel_id: mongoose.Types.ObjectId,
         community_id: mongoose.Types.ObjectId,
-        is_public: {
+        entities: {
+            type: Object,
+            default: {},
+        },
+        public: {
             type: Boolean,
             default: true,
         },
@@ -41,7 +61,7 @@ const schema = new Schema(
             type: Number,
             default: 0,
         },
-        is_edited: {
+        edited: {
             type: Boolean,
             default: false,
         },

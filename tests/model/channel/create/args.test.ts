@@ -18,7 +18,7 @@ describe("channel/create", () => {
         await create({
             name: "チャンネル",
             creator_id: mongoose.Types.ObjectId(ExampleObjectId),
-            is_public: true,
+            public: true,
         })
     })
     test("invalid name", async () => {
@@ -67,7 +67,7 @@ describe("channel/create", () => {
             await create({
                 name: "",
                 creator_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                public: true,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)
@@ -82,7 +82,7 @@ describe("channel/create", () => {
             await create({
                 name: "0123456789012345678901234567890123456789",
                 creator_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                public: true,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)

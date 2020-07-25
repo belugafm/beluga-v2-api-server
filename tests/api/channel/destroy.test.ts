@@ -23,7 +23,7 @@ describe("channel", () => {
         try {
             await create_channel({
                 name: "channel",
-                is_public: true,
+                public: true,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(WebApiRuntimeError)
@@ -34,7 +34,7 @@ describe("channel", () => {
         const channel = (await create_channel(
             {
                 name: "channel",
-                is_public: true,
+                public: true,
             },
             user
         )) as ChannelSchema

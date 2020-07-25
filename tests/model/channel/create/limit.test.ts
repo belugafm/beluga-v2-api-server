@@ -20,13 +20,13 @@ describe("channel/create", () => {
         await create({
             name: "チャンネル",
             creator_id: mongoose.Types.ObjectId(ExampleObjectId),
-            is_public: true,
+            public: true,
         })
         try {
             await create({
                 name: "チャンネル",
                 creator_id: mongoose.Types.ObjectId(ExampleObjectId),
-                is_public: true,
+                public: true,
             })
         } catch (error) {
             expect(error).toBeInstanceOf(ModelRuntimeError)

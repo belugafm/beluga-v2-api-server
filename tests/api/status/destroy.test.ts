@@ -33,7 +33,7 @@ describe("status", () => {
         const channel = (await create_channel(
             {
                 name: "channel",
-                is_public: true,
+                public: true,
             },
             user
         )) as ChannelSchema

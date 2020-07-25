@@ -15,6 +15,5 @@ export function text() {
         check_is_string,
         check_min_length,
         check_max_length,
-        check_regex_pattern,
     ])
 }
