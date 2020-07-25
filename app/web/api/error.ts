@@ -34,6 +34,12 @@ export class InvalidContentTypeErrorSpec {
     code = "invalid_content_type" as const
 }
 
+export class EndpointUnavailableErrorSpec {
+    description = ["このAPIは無効化されています"]
+    hint = []
+    code = "endpoint_unavailable" as const
+}
+
 // modelから送出されたエラー
 export class InternalErrorSpec {
     description = ["問題が発生したためリクエストを完了できません"]

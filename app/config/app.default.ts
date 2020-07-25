@@ -73,6 +73,9 @@ const config: {
         cache_limit: number
         default_expire_seconds: number
     }
+    blocks: {
+        enabled: boolean
+    }
 } = {
     server: {
         domain: "localhost.beluga.fm",
@@ -162,6 +165,9 @@ const config: {
     in_memory_cache: {
         cache_limit: 1000,
         default_expire_seconds: 600,
+    },
+    blocks: {
+        enabled: false,
     },
 }
 
