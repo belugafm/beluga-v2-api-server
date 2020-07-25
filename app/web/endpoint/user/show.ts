@@ -8,8 +8,8 @@ export default (server: TurboServer) => {
         const { auth_user } = params
         const user = await show(
             {
-                user_id: mongoose.Types.ObjectId(req.body.user_id),
-                name: req.body.name,
+                user_id: mongoose.Types.ObjectId(req.query.user_id),
+                name: req.query.name,
             },
             auth_user
         )

@@ -24,7 +24,7 @@ import {
 import config from "../../../../config/app"
 
 export const argument_specs = define_arguments(
-    ["name", "description", "is_public", "community_id"] as const,
+    ["name", "description", "public", "community_id"] as const,
     {
         name: {
             description: ["チャンネル名"],
@@ -38,7 +38,7 @@ export const argument_specs = define_arguments(
             required: false,
             schema: vs.string(),
         },
-        is_public: {
+        public: {
             description: [
                 "グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか",
             ],
@@ -62,7 +62,7 @@ export const expected_error_specs = define_expected_errors(
     [
         "invalid_arg_name",
         "invalid_arg_description",
-        "invalid_arg_is_public",
+        "invalid_arg_public",
         "invalid_arg_community_id",
         "community_not_found",
         "invalid_auth",
@@ -82,10 +82,10 @@ export const expected_error_specs = define_expected_errors(
             code: "invalid_arg_description",
             argument: "description",
         },
-        invalid_arg_is_public: {
-            description: ["`is_public`の値が不正です"],
-            code: "invalid_arg_is_public",
-            argument: "is_public",
+        invalid_arg_public: {
+            description: ["`public`の値が不正です"],
+            code: "invalid_arg_public",
+            argument: "public",
         },
         invalid_arg_community_id: {
             description: ["コミュニティIDが不正です"],
@@ -145,7 +145,7 @@ export default define_method(
                 name: args.name,
                 description: args.description,
                 creator_id: auth_user._id,
-                is_public: args.is_public,
+                public: args.public,
                 community_id: args.community_id,
             })
         } catch (error) {

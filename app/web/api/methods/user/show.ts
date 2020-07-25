@@ -13,6 +13,7 @@ import {
     UnexpectedErrorSpec,
     raise,
     WebApiRuntimeError,
+    InvalidAuth,
 } from "../../error"
 import { ModelRuntimeError } from "../../../../model/error"
 import { get, ErrorCodes as ModelErrorCodes } from "../../../../model/user/get"
@@ -76,7 +77,7 @@ export const facts: MethodFacts = {
         Admin: "InternalSystem",
     },
     accepted_content_types: [ContentTypes.ApplicationJson],
-    authentication_required: false,
+    authentication_required: true,
     accepted_authentication_methods: ["AccessToken", "OAuth", "Cookie"],
     accepted_scopes: {
         User: "user:read",

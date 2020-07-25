@@ -144,13 +144,13 @@ export class TurboServer {
 
                 if (facts.authentication_required) {
                     // ユーザー認証をここで行う
-                    params["auth_user"] = await authenticate_user(
+                    const auth_user = await authenticate_user(
                         facts,
-                        req.body,
+                        req.query,
                         req.cookies
                     )
+                    params["auth_user"] = auth_user
                 }
-
                 const data = await handler(req, res, params)
                 res.write(Buffer.from(JSON.stringify(data)))
             } catch (error) {

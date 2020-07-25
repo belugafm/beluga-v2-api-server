@@ -9,25 +9,20 @@ export const ErrorCodes = {
     InvalidArgDescription: "invalid_arg_description",
     InvalidArgCreatorId: "invalid_arg_creator_id",
     InvalidArgCommunityId: "invalid_arg_community_id",
-    InvalidArgIsPublic: "invalid_arg_is_public",
+    InvalidArgPublic: "invalid_arg_public",
     LimitReached: "limit_reached",
 }
 
 type Argument = {
     name: ChannelSchema["name"]
-    is_public: ChannelSchema["public"]
+    public: ChannelSchema["public"]
     creator_id: ChannelSchema["creator_id"]
     community_id?: ChannelSchema["community_id"]
     description?: ChannelSchema["description"]
 }
 
-export const create = async ({
-    name,
-    description,
-    creator_id,
-    community_id,
-    is_public,
-}: Argument): Promise<ChannelSchema> => {
+export const create = async (args: Argument): Promise<ChannelSchema> => {
+    const { name, description, creator_id, community_id } = args
     if (vs.channel.name().ok(name) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgName)
     }
@@ -44,8 +39,8 @@ export const create = async ({
             throw new ModelRuntimeError(ErrorCodes.InvalidArgDescription)
         }
     }
-    if (vs.boolean().ok(is_public) !== true) {
-        throw new ModelRuntimeError(ErrorCodes.InvalidArgIsPublic)
+    if (vs.boolean().ok(args.public) !== true) {
+        throw new ModelRuntimeError(ErrorCodes.InvalidArgPublic)
     }
     const my_channels = await mongo.find(Channel, {
         creator_id: creator_id,
@@ -65,6 +60,6 @@ export const create = async ({
         created_at: new Date(),
         creator_id: creator_id,
         community_id: community_id ? community_id : null,
-        public: is_public,
+        public: args.public,
     })
 }

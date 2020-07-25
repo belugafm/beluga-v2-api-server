@@ -13,7 +13,7 @@ export default (server: TurboServer) => {
             {
                 name: req.body.name,
                 description: req.body.description,
-                is_public: req.body.is_public,
+                public: req.body.public,
                 community_id: community_id,
             },
             auth_user

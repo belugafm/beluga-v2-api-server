@@ -86,6 +86,7 @@ async function start_server() {
     server.register(require("./web/endpoint/status/update"))
     server.register(require("./web/endpoint/status/destroy"))
     server.register(require("./web/endpoint/status/show"))
+    server.register(require("./web/endpoint/user/show"))
     server.register(require("./web/endpoint/likes/create"))
     server.register(require("./web/endpoint/favorites/create"))
     server.register(require("./web/endpoint/favorites/destroy"))
