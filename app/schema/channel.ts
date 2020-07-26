@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose"
-import { transform } from "../object/types/channel"
+import { transform, TransformOption } from "../object/types/channel"
 import { ChannelObject } from "../object/schema"
 import { UserSchema } from "./user"
 
@@ -60,9 +60,10 @@ const schema = new Schema(
 
 schema.methods.transform = async function (
     this: ChannelSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    options: TransformOption
 ): Promise<ChannelObject | null> {
-    return await transform(this, auth_user)
+    return await transform(this, auth_user, options)
 }
 
 export const Channel = mongoose.model<ChannelSchema>("channel", schema)

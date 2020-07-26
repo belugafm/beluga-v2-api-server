@@ -84,9 +84,10 @@ schema.index({ community_id: -1, created_at: -1 })
 
 schema.methods.transform = async function (
     this: StatusSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    options: TransformOption
 ): Promise<StatusObject | null> {
-    return await transform(this, auth_user)
+    return await transform(this, auth_user, options)
 }
 
 export const Status = mongoose.model<StatusSchema>("status", schema)

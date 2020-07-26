@@ -124,7 +124,7 @@ user_schema.methods.needsReclassifyAsDormant = function (
 user_schema.methods.transform = async function (
     this: UserSchema,
     auth_user: UserSchema | null,
-    options?: TransformOption
+    options: TransformOption
 ): Promise<UserObject | null> {
     return await transform(this, auth_user, options)
 }

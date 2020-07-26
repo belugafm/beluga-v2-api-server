@@ -93,7 +93,8 @@ export const transform = async (
         user_id: model.user_id.toHexString(),
         user: await transform_user(
             await get_user({ user_id: model.user_id }),
-            auth_user
+            auth_user,
+            { disable_cache: options.disable_cache }
         ),
         channel_id: model.channel_id.toHexString(),
         channel: await transform_channel(
@@ -113,11 +114,15 @@ export const transform = async (
             : { channels: [], statuses: [] },
         likes: {
             count: model.like_count,
-            counts: await likes_counts(model, auth_user),
+            counts: await likes_counts(model, auth_user, options.disable_cache),
         },
         favorites: {
             count: model.favorite_count,
-            users: await favorites_users(model, auth_user),
+            users: await favorites_users(
+                model,
+                auth_user,
+                options.disable_cache
+            ),
         },
     }
 }
