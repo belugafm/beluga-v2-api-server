@@ -56,11 +56,14 @@ export type StatusObject = {
     channel: ChannelObject | null
     community_id: string | null
     community: CommunityObject | null
+    thread_status_id: string | null
+    thread_status: StatusObject | null
     text: string
     created_at: number
     public: boolean
     edited: boolean
     favorited: boolean
+    comment_count: number
     entities: {
         channels: {
             channel_id: string

@@ -111,6 +111,11 @@ export const transform = async (
             ? model.community_id.toHexString()
             : null,
         community: null,
+        thread_status_id: model.thread_status_id
+            ? model.thread_status_id.toHexString()
+            : null,
+        thread_status: null,
+        comment_count: model.comment_count,
         created_at: model.created_at.getTime(),
         public: model.public,
         edited: model.edited,

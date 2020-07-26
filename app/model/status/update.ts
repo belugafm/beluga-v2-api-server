@@ -131,53 +131,100 @@ export const update = async ({
         statuses: await extract_statuses(text),
     }
 
-    if (channel_id) {
-        const channel = await get_channel({ channel_id })
-        if (channel == null) {
-            throw new ModelRuntimeError(ErrorCodes.ChannelNotFound)
+    const session = await mongoose.startSession()
+    session.startTransaction()
+
+    try {
+        if (channel_id) {
+            const channel = await get_channel(
+                { channel_id },
+                {
+                    transaction_session: session,
+                    disable_cache: true,
+                }
+            )
+            if (channel == null) {
+                throw new ModelRuntimeError(ErrorCodes.ChannelNotFound)
+            }
+
+            const status = await Status.create({
+                text: text,
+                user_id: user_id,
+                channel_id: channel_id,
+                community_id: channel.community_id,
+                thread_status_id: null,
+                public: channel.public,
+                edited: false,
+                created_at: new Date(),
+                like_count: 0,
+                favorite_count: 0,
+                comment_count: 0,
+                entities: entities,
+            })
+
+            channel.stats.statuses_count += 1
+            await channel.save()
+
+            await session.commitTransaction()
+            session.endSession()
+
+            return status
         }
 
-        return await Status.create({
-            text: text,
-            user_id: user_id,
-            channel_id: channel_id,
-            community_id: channel.community_id,
-            thread_status_id: null,
-            public: channel.public,
-            edited: false,
-            created_at: new Date(),
-            like_count: 0,
-            favorite_count: 0,
-            comment_count: 0,
-            entities: entities,
-        })
+        if (thread_status_id) {
+            const parent_status = await get_status(
+                { status_id: thread_status_id },
+                {
+                    transaction_session: session,
+                    disable_cache: true,
+                }
+            )
+            if (parent_status == null) {
+                throw new ModelRuntimeError(ErrorCodes.StatusNotFound)
+            }
+
+            const channel = await get_channel(
+                { channel_id: parent_status.channel_id },
+                {
+                    transaction_session: session,
+                    disable_cache: true,
+                }
+            )
+            if (channel == null) {
+                throw new ModelRuntimeError(ErrorCodes.ChannelNotFound)
+            }
+
+            const status = await Status.create({
+                text: text,
+                user_id: user_id,
+                channel_id: parent_status.channel_id,
+                community_id: channel.community_id,
+                thread_status_id: thread_status_id,
+                public: channel.public,
+                edited: false,
+                created_at: new Date(),
+                like_count: 0,
+                favorite_count: 0,
+                comment_count: 0,
+                entities: entities,
+            })
+
+            parent_status.comment_count += 1
+            await parent_status.save()
+
+            channel.stats.statuses_count += 1
+            await channel.save()
+
+            await session.commitTransaction()
+            session.endSession()
+
+            return status
+        }
+
+        throw new ModelRuntimeError(ErrorCodes.InvalidArguments)
+    } catch (error) {
+        await session.abortTransaction()
+        session.endSession()
+        throw error
     }
-
-    if (thread_status_id) {
-        const status = await get_status({ status_id: thread_status_id })
-        if (status == null) {
-            throw new ModelRuntimeError(ErrorCodes.StatusNotFound)
-        }
-        const channel = await get_channel({ channel_id: status.channel_id })
-        if (channel == null) {
-            throw new ModelRuntimeError(ErrorCodes.ChannelNotFound)
-        }
-
-        return await Status.create({
-            text: text,
-            user_id: user_id,
-            channel_id: status.channel_id,
-            community_id: channel.community_id,
-            thread_status_id: thread_status_id,
-            public: channel.public,
-            edited: false,
-            created_at: new Date(),
-            like_count: 0,
-            favorite_count: 0,
-            comment_count: 0,
-            entities: entities,
-        })
-    }
-
-    throw new ModelRuntimeError(ErrorCodes.InvalidArguments)
 }
