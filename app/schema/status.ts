@@ -29,6 +29,8 @@ export interface StatusSchema extends Document {
     created_at: Date
     like_count: number
     favorite_count: number
+    comment_count: number
+    thread_status_id: mongoose.Types.ObjectId | null
     public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
     edited: boolean
     entities: Entities
@@ -48,6 +50,7 @@ const schema = new Schema(
         user_id: mongoose.Types.ObjectId,
         channel_id: mongoose.Types.ObjectId,
         community_id: mongoose.Types.ObjectId,
+        thread_status_id: mongoose.Types.ObjectId,
         entities: {
             type: Object,
             default: {},
@@ -61,6 +64,10 @@ const schema = new Schema(
             default: 0,
         },
         favorite_count: {
+            type: Number,
+            default: 0,
+        },
+        comment_count: {
             type: Number,
             default: 0,
         },
@@ -81,6 +88,7 @@ const schema = new Schema(
 schema.index({ created_at: -1 })
 schema.index({ channel_id: -1, created_at: -1 })
 schema.index({ community_id: -1, created_at: -1 })
+schema.index({ thread_status_id: -1, created_at: -1 })
 
 schema.methods.transform = async function (
     this: StatusSchema,

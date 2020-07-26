@@ -23,7 +23,7 @@ import {
 } from "../../../../model/status/update"
 
 export const argument_specs = define_arguments(
-    ["text", "channel_id"] as const,
+    ["text", "channel_id", "thread_status_id"] as const,
     {
         text: {
             description: ["本文"],
@@ -34,7 +34,13 @@ export const argument_specs = define_arguments(
         channel_id: {
             description: ["投稿先のチャンネルID"],
             examples: [ExampleObjectId],
-            required: true,
+            required: false,
+            schema: vs.object_id(),
+        },
+        thread_status_id: {
+            description: ["スレッドの投稿ID"],
+            examples: [ExampleObjectId],
+            required: false,
             schema: vs.object_id(),
         },
     }
@@ -44,7 +50,9 @@ export const expected_error_specs = define_expected_errors(
     [
         "invalid_arg_text",
         "invalid_arg_channel_id",
+        "invalid_arg_thread_status_id",
         "channel_not_found",
+        "status_not_found",
         "invalid_auth",
         "internal_error",
         "unexpected_error",
@@ -61,10 +69,20 @@ export const expected_error_specs = define_expected_errors(
             code: "invalid_arg_channel_id",
             argument: "channel_id",
         },
+        invalid_arg_thread_status_id: {
+            description: ["`thread_status_id`が不正です"],
+            code: "invalid_arg_thread_status_id",
+            argument: "thread_status_id",
+        },
         channel_not_found: {
             description: ["チャンネルが見つかりません"],
             hint: ["`channel_id`を見直してください"],
             code: "channel_not_found",
+        },
+        status_not_found: {
+            description: ["投稿が見つかりません"],
+            hint: ["`thread_status_id`を見直してください"],
+            code: "status_not_found",
         },
         invalid_auth: new InvalidAuth(),
         internal_error: new InternalErrorSpec(),
@@ -104,6 +122,7 @@ export default define_method(
                 text: args.text,
                 user_id: auth_user._id,
                 channel_id: args.channel_id,
+                thread_status_id: args.thread_status_id,
             })
         } catch (error) {
             if (error instanceof WebApiRuntimeError) {
@@ -113,8 +132,14 @@ export default define_method(
                     raise(errors.invalid_arg_text, error)
                 } else if (error.code === ModelErrorCodes.InvalidArgChannelId) {
                     raise(errors.invalid_arg_channel_id, error)
+                } else if (
+                    error.code === ModelErrorCodes.InvalidArgThreadStatusId
+                ) {
+                    raise(errors.invalid_arg_thread_status_id, error)
                 } else if (error.code === ModelErrorCodes.ChannelNotFound) {
                     raise(errors.channel_not_found, error)
+                } else if (error.code === ModelErrorCodes.StatusNotFound) {
+                    raise(errors.status_not_found, error)
                 } else {
                     raise(errors.internal_error, error)
                 }

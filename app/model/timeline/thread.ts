@@ -9,7 +9,7 @@ export const ErrorCodes = {
 } as const
 
 type Argument = {
-    channel_id: mongoose.Types.ObjectId
+    thread_status_id: mongoose.Types.ObjectId
     since_id?: mongoose.Types.ObjectId
     max_id?: mongoose.Types.ObjectId
     since_date?: Date
@@ -17,18 +17,18 @@ type Argument = {
     limit?: number
 }
 
-export const channel = async ({
-    channel_id,
+export const thread = async ({
+    thread_status_id,
     since_id,
     max_id,
     since_date,
     until_date,
     limit,
 }: Argument): Promise<StatusSchema[]> => {
-    if (vs.object_id().ok(channel_id) !== true) {
+    if (vs.object_id().ok(thread_status_id) !== true) {
         throw new ModelRuntimeError(ErrorCodes.InvalidArgChannelId)
     }
-    return await mongo.find(Status, { channel_id }, (query) => {
+    return await mongo.find(Status, { thread_status_id }, (query) => {
         return query.sort({ created_at: -1 }).limit(limit ? limit : 30)
     })
 }

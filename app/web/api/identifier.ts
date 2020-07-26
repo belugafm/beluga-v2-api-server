@@ -17,4 +17,5 @@ export const MethodIdentifiers = {
     DestroyBlock: "blocks/destroy",
     ShowUser: "users/show",
     ChannelTimeline: "timeline/channel",
+    ThreadTimeline: "timeline/thread",
 }

@@ -1,4 +1,5 @@
 import { ChangeStream } from "mongodb"
+import config from "../config/app"
 
 export class CachedObject {
     expire_date: Date
@@ -26,7 +27,7 @@ export class InMemoryCache {
         this.cache_limit = cache_limit
         this.default_expire_seconds = default_expire_seconds
         this.data = {}
-        this.enabled = true
+        this.enabled = config.in_memory_cache.enabled
     }
     enable() {
         this.enabled = true

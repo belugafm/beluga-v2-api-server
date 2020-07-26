@@ -6,11 +6,19 @@ import mongoose, {
     CreateQuery,
 } from "mongoose"
 import { document_cache } from "../document/cache"
+import { ObjectID } from "mongodb"
 
 type FindOneOptions<T extends Document> = {
     additional_query_func?: (query: DocumentQuery<T | null, T>) => void
     disable_cache?: boolean
     transaction_session?: ClientSession | null
+}
+
+export function toObjectId(value?: string): ObjectID | undefined {
+    if (value == null) {
+        return undefined
+    }
+    return mongoose.Types.ObjectId(value)
 }
 
 export async function findOne<T extends Document>(

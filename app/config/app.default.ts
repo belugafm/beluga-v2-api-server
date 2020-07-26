@@ -72,6 +72,7 @@ const config: {
         }
     }
     in_memory_cache: {
+        enabled: boolean
         cache_limit: number
         default_expire_seconds: number
     }
@@ -173,6 +174,7 @@ const config: {
         },
     },
     in_memory_cache: {
+        enabled: true,
         cache_limit: 1000,
         default_expire_seconds: 600,
     },
