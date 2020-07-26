@@ -69,6 +69,7 @@ export const destroy = async ({
         await favorite.remove()
 
         status.favorite_count -= 1
+        status.updated_at = new Date()
         await status.save()
 
         await session.commitTransaction()

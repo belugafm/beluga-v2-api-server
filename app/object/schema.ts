@@ -29,6 +29,7 @@ export type CommunityObject = {
         channels_count: number
     }
     created_at: number
+    updated_at: number
     creator_id: string
     creator: UserObject | null
 }
@@ -41,6 +42,7 @@ export type ChannelObject = {
         statuses_count: number
     }
     created_at: number
+    updated_at: number
     creator_id: string
     creator: UserObject | null
     public: boolean
@@ -60,6 +62,7 @@ export type StatusObject = {
     thread_status: StatusObject | null
     text: string
     created_at: number
+    updated_at: number
     public: boolean
     edited: boolean
     favorited: boolean

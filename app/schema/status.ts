@@ -27,6 +27,7 @@ export interface StatusSchema extends Document {
     community_id: mongoose.Types.ObjectId | null
     text: string
     created_at: Date
+    updated_at: Date
     like_count: number
     favorite_count: number
     comment_count: number
@@ -47,6 +48,7 @@ const schema = new Schema(
     {
         text: String,
         created_at: Date,
+        updated_at: Date,
         user_id: mongoose.Types.ObjectId,
         channel_id: mongoose.Types.ObjectId,
         community_id: mongoose.Types.ObjectId,

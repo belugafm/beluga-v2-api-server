@@ -117,6 +117,7 @@ export const transform = async (
         thread_status: null,
         comment_count: model.comment_count,
         created_at: model.created_at.getTime(),
+        updated_at: model.updated_at.getTime(),
         public: model.public,
         edited: model.edited,
         favorited: await favorited(model, auth_user, options.disable_cache),

@@ -86,6 +86,7 @@ export const create = async ({
             await likes.save()
 
             status.like_count += 1
+            status.updated_at = new Date()
             await status.save()
 
             await session.commitTransaction()
@@ -94,6 +95,7 @@ export const create = async ({
             return likes
         } else {
             status.like_count += 1
+            status.updated_at = new Date()
             await status.save()
 
             const likes = await StatusLikes.create({

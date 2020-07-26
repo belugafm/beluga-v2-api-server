@@ -13,6 +13,7 @@ export interface ChannelSchema extends Document {
         statuses_count: number
     }
     created_at: Date
+    updated_at: Date
     creator_id: mongoose.Types.ObjectId
     public: boolean // グローバルタイムラインやコミュニティタイムラインに投稿が表示されるかどうか
     community_id: mongoose.Types.ObjectId | null
@@ -40,6 +41,7 @@ const schema = new Schema(
             },
         },
         created_at: Date,
+        updated_at: Date,
         public: {
             type: Boolean,
             default: false,

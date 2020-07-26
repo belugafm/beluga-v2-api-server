@@ -80,6 +80,7 @@ export const create = async ({
             throw new ModelRuntimeError(ErrorCodes.AlreadyFavorited)
         }
         status.favorite_count += 1
+        status.updated_at = new Date()
         await status.save()
 
         const favorite = await StatusFavorites.create({

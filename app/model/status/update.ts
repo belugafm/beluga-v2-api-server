@@ -156,6 +156,7 @@ export const update = async ({
                 public: channel.public,
                 edited: false,
                 created_at: new Date(),
+                updated_at: new Date(),
                 like_count: 0,
                 favorite_count: 0,
                 comment_count: 0,
@@ -203,6 +204,7 @@ export const update = async ({
                 public: channel.public,
                 edited: false,
                 created_at: new Date(),
+                updated_at: new Date(),
                 like_count: 0,
                 favorite_count: 0,
                 comment_count: 0,
@@ -210,9 +212,11 @@ export const update = async ({
             })
 
             parent_status.comment_count += 1
+            parent_status.updated_at = new Date()
             await parent_status.save()
 
             channel.stats.statuses_count += 1
+            channel.updated_at = new Date()
             await channel.save()
 
             await session.commitTransaction()

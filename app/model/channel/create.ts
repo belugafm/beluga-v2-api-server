@@ -58,6 +58,7 @@ export const create = async (args: Argument): Promise<ChannelSchema> => {
             statuses_count: 0,
         },
         created_at: new Date(),
+        updated_at: new Date(),
         creator_id: creator_id,
         community_id: community_id ? community_id : null,
         public: args.public,

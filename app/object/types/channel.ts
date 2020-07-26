@@ -26,6 +26,7 @@ export const transform = async (
         description: model.description,
         stats: model.stats,
         created_at: model.created_at.getTime(),
+        updated_at: model.updated_at.getTime(),
         creator_id: model.creator_id.toHexString(),
         creator: await transform_user(
             await mongo.findOne(
