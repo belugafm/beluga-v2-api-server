@@ -45,10 +45,13 @@ function remove_null(
         user: UserObject
     }[]
 }
-async function get(status: StatusSchema): Promise<StatusLikesSchema[]> {
+async function get(
+    status: StatusSchema,
+    disable_cache: boolean = false
+): Promise<StatusLikesSchema[]> {
     const namespace = status._id.toHexString()
     const key = status._id.toHexString()
-    {
+    if (disable_cache === false) {
         const [likes, is_cached] = cache.get(namespace, key)
         if (is_cached) {
             return likes
@@ -68,14 +71,17 @@ async function _likes_counts(
     auth_user: UserSchema | null,
     disable_cache: boolean = false
 ) {
-    const likes = await get(status)
+    const likes = await get(status, disable_cache)
     return remove_null(
         await Promise.all(
             likes.map(async (like) => {
                 return {
                     count: like.count,
                     user: await transform_user(
-                        await get_user({ user_id: like.user_id }),
+                        await get_user(
+                            { user_id: like.user_id },
+                            { disable_cache }
+                        ),
                         auth_user,
                         { disable_cache }
                     ),

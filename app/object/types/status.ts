@@ -92,13 +92,19 @@ export const transform = async (
         text: model.text,
         user_id: model.user_id.toHexString(),
         user: await transform_user(
-            await get_user({ user_id: model.user_id }),
+            await get_user(
+                { user_id: model.user_id },
+                { disable_cache: options.disable_cache }
+            ),
             auth_user,
             { disable_cache: options.disable_cache }
         ),
         channel_id: model.channel_id.toHexString(),
         channel: await transform_channel(
-            await get_channel({ channel_id: model.channel_id }),
+            await get_channel(
+                { channel_id: model.channel_id },
+                { disable_cache: options.disable_cache }
+            ),
             auth_user
         ),
         community_id: model.community_id

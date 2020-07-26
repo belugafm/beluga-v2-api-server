@@ -35,12 +35,17 @@ function remove_null(array: (UserObject | null)[]): UserObject[] {
     return array.filter((user) => user != null) as UserObject[]
 }
 
-async function get(status: StatusSchema): Promise<StatusFavoritesSchema[]> {
+async function get(
+    status: StatusSchema,
+    disable_cache: boolean = false
+): Promise<StatusFavoritesSchema[]> {
     const namespace = status._id.toHexString()
     const key = status._id.toHexString()
-    const [_favorites, is_cached] = cache.get(namespace, key)
-    if (is_cached) {
-        return _favorites
+    if (disable_cache === false) {
+        const [favorites, is_cached] = cache.get(namespace, key)
+        if (is_cached) {
+            return favorites
+        }
     }
     const favorites = (await get_favorites({
         status_id: status._id,
@@ -54,12 +59,15 @@ async function _favorites_users(
     auth_user: UserSchema | null,
     disable_cache: boolean = false
 ) {
-    const all_favorites = await get(status)
+    const all_favorites = await get(status, disable_cache)
     return remove_null(
         await Promise.all(
             all_favorites.map(async (likes) => {
                 return await transform_user(
-                    await get_user({ user_id: likes.user_id }),
+                    await get_user(
+                        { user_id: likes.user_id },
+                        { disable_cache }
+                    ),
                     auth_user,
                     { disable_cache }
                 )

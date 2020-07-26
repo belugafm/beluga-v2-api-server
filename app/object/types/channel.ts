@@ -28,7 +28,11 @@ export const transform = async (
         created_at: model.created_at.getTime(),
         creator_id: model.creator_id.toHexString(),
         creator: await transform_user(
-            await mongo.findOne(User, { _id: model.creator_id }),
+            await mongo.findOne(
+                User,
+                { _id: model.creator_id },
+                { disable_cache: options.disable_cache }
+            ),
             auth_user,
             { disable_cache: options.disable_cache }
         ),
