@@ -11,13 +11,8 @@ export type TransformOption = {
 export const transform = async (
     model: UserSchema | null,
     auth_user: UserSchema | null,
-    options?: TransformOption
+    options: TransformOption = { disable_cache: false }
 ): Promise<UserObject | null> => {
-    if (options == null) {
-        options = {
-            disable_cache: false,
-        }
-    }
     if (model === null) {
         return null
     }

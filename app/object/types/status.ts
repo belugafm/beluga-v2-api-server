@@ -68,12 +68,16 @@ async function transform_entities(
     }
 }
 
+export type TransformOption = {
+    disable_cache: boolean
+    transform_entities: boolean
+}
+
 export const transform = async (
     model: StatusSchema | null,
     auth_user: UserSchema | null,
-    options: {
-        transform_entities: boolean
-    } = {
+    options: TransformOption = {
+        disable_cache: false,
         transform_entities: true,
     }
 ): Promise<StatusObject | null> => {
@@ -103,7 +107,7 @@ export const transform = async (
         created_at: model.created_at.getTime(),
         public: model.public,
         edited: model.edited,
-        favorited: await favorited(model, auth_user),
+        favorited: await favorited(model, auth_user, options.disable_cache),
         entities: options.transform_entities
             ? await transform_entities(model, auth_user)
             : { channels: [], statuses: [] },

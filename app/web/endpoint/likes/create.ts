@@ -20,7 +20,10 @@ export default (server: TurboServer) => {
         }
         return {
             ok: true,
-            status: await status.transform(auth_user),
+            status: await status.transform(auth_user, {
+                disable_cache: true,
+                transform_entities: true,
+            }),
         }
     })
 }

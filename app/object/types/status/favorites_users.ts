@@ -51,7 +51,8 @@ async function get(status: StatusSchema): Promise<StatusFavoritesSchema[]> {
 
 async function _favorites_users(
     status: StatusSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    disable_cache: boolean = false
 ) {
     const all_favorites = await get(status)
     return remove_null(
@@ -59,7 +60,8 @@ async function _favorites_users(
             all_favorites.map(async (likes) => {
                 return await transform_user(
                     await get_user({ user_id: likes.user_id }),
-                    auth_user
+                    auth_user,
+                    { disable_cache }
                 )
             })
         )

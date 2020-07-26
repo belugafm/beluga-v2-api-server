@@ -77,19 +77,25 @@ export function get_cached_value(
 
 async function _favorited(
     status: StatusSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    disable_cache: boolean = false
 ): Promise<boolean> {
     if (auth_user == null) {
         return false
     }
-    const favorited = get_cached_value(status, auth_user)
-    if (favorited !== null) {
-        return favorited
+    if (disable_cache === false) {
+        const favorited = get_cached_value(status, auth_user)
+        if (favorited !== null) {
+            return favorited
+        }
     }
-    const document = (await get_favorites({
-        status_id: status._id,
-        user_id: auth_user._id,
-    })) as StatusFavoritesSchema | null
+    const document = (await get_favorites(
+        {
+            status_id: status._id,
+            user_id: auth_user._id,
+        },
+        { disable_cache }
+    )) as StatusFavoritesSchema | null
     const document_id = document == null ? null : document._id
     {
         const namespace = auth_user._id.toHexString()

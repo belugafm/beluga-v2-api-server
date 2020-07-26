@@ -79,16 +79,19 @@ async function _blocked(
     if (auth_user == null) {
         return false
     }
-    if (disable_cache !== true) {
+    if (disable_cache === false) {
         const blocked = get_cached_value(target_user, auth_user)
         if (blocked !== null) {
             return blocked
         }
     }
-    const document = (await get_blocks({
-        target_user_id: target_user._id,
-        auth_user_id: auth_user._id,
-    })) as UserBlocksSchema | null
+    const document = (await get_blocks(
+        {
+            target_user_id: target_user._id,
+            auth_user_id: auth_user._id,
+        },
+        { disable_cache }
+    )) as UserBlocksSchema | null
     const document_id = document == null ? null : document._id
     {
         const namespace = auth_user._id.toHexString()

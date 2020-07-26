@@ -65,7 +65,8 @@ async function get(status: StatusSchema): Promise<StatusLikesSchema[]> {
 
 async function _likes_counts(
     status: StatusSchema,
-    auth_user: UserSchema | null
+    auth_user: UserSchema | null,
+    disable_cache: boolean = false
 ) {
     const likes = await get(status)
     return remove_null(
@@ -75,7 +76,8 @@ async function _likes_counts(
                     count: like.count,
                     user: await transform_user(
                         await get_user({ user_id: like.user_id }),
-                        auth_user
+                        auth_user,
+                        { disable_cache }
                     ),
                 }
             })

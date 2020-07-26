@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose"
-import { transform } from "../object/types/status"
-import { StatusObject, UserObject } from "../object/schema"
+import { transform, TransformOption } from "../object/types/status"
+import { StatusObject } from "../object/schema"
 import { UserSchema } from "./user"
 
 const schema_version = 1
@@ -35,7 +35,10 @@ export interface StatusSchema extends Document {
     _schema_version?: number
 
     _cached?: boolean
-    transform: (auth_user: UserSchema | null) => Promise<StatusObject | null>
+    transform: (
+        auth_user: UserSchema | null,
+        options?: TransformOption
+    ) => Promise<StatusObject | null>
 }
 
 const schema = new Schema(
