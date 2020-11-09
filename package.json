@@ -12,7 +12,7 @@
         "@types/node-fetch": "^2.5.7",
         "bcrypt": "^5.0.0",
         "cookie": "^0.4.1",
-        "find-my-way": "^3.0.1",
+        "find-my-way": "^3.0.5",
         "jest": "^26.1.0",
         "mongodb": "^3.5.9",
         "mongoose": "^5.9.25",
